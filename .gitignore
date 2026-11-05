@@ -1,0 +1,9 @@
+*.tsbuildinfo
+.ipynb_checkpoints/
+.yarn/
+__pycache__/
+dist/
+jupyterlab_code_gear_solid/_version.py
+jupyterlab_code_gear_solid/labextension/
+lib/
+node_modules/

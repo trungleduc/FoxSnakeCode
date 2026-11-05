@@ -1,0 +1,57 @@
+[build-system]
+requires = [
+    "hatchling>=1.5.0",
+    "jupyterlab>=4.0.0,<5",
+    "hatch-nodejs-version>=0.3.2",
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "jupyterlab-code-gear-solid"
+readme = "README.md"
+requires-python = ">=3.9"
+dynamic = ["version", "description", "authors", "keywords"]
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "Programming Language :: Python :: 3",
+]
+
+[tool.hatch.version]
+source = "nodejs"
+
+[tool.hatch.metadata.hooks.nodejs]
+fields = ["description", "authors", "keywords"]
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["jupyterlab_code_gear_solid/labextension"]
+exclude = [".github", "node_modules"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"jupyterlab_code_gear_solid/labextension" = "share/jupyter/labextensions/jupyterlab-code-gear-solid"
+"install.json" = "share/jupyter/labextensions/jupyterlab-code-gear-solid/install.json"
+
+[tool.hatch.build.hooks.version]
+path = "jupyterlab_code_gear_solid/_version.py"
+
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.5"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+    "jupyterlab_code_gear_solid/labextension/static/style.js",
+    "jupyterlab_code_gear_solid/labextension/package.json",
+]
+skip-if-exists = ["jupyterlab_code_gear_solid/labextension/static/style.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+build_cmd = "build"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "jupyterlab_code_gear_solid/labextension"

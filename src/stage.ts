@@ -1,0 +1,352 @@
+import { FOX_MARKUP, sceneMarkup, SNAKE_HEAD_MARKUP } from './art';
+import { GameEvent } from './engine';
+import { IScene, MascotId, WORLD_HEIGHT, WORLD_WIDTH } from './format';
+
+const WALK_SPEED = 240;
+const TURN_SPEED = 360;
+const BUMP_TIME = 260;
+const MIN_COMMAND_TIME = 70;
+const MAX_PLAY_TIME = 30000;
+const BODY_SEGMENTS = 17;
+const SEGMENT_GAP = 7;
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+let nextStageId = 0;
+
+interface IPoint {
+  x: number;
+  y: number;
+}
+
+export class Stage {
+  readonly node: SVGSVGElement;
+
+  constructor(onChips: (collected: number, total: number) => void) {
+    this._id = `cgs-stage-${++nextStageId}`;
+    this._onChips = onChips;
+    this.node = document.createElementNS(SVG_NS, 'svg');
+    this.node.setAttribute('viewBox', `0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`);
+    this.node.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    this.node.setAttribute('role', 'img');
+    this.node.classList.add('cgs-scene');
+  }
+
+  load(scene: IScene, mascot: MascotId): void {
+    this.stop();
+    this._scene = scene;
+    this._mascot = mascot;
+    this.node.innerHTML = sceneMarkup(scene, this._id);
+    this._actor = this.node.querySelector('.cgs-actor') as SVGGElement;
+    this._snakeBody = this.node.querySelector(
+      '.cgs-snake-body'
+    ) as SVGGElement;
+    this.reset();
+  }
+
+  setMascot(mascot: MascotId): void {
+    this._mascot = mascot;
+    this._drawActorMarkup();
+    this._resetTrail();
+    this._drawPose();
+  }
+
+  reset(): void {
+    this.stop();
+    const scene = this._scene;
+    if (!scene) {
+      return;
+    }
+    this._x = scene.start.x;
+    this._y = scene.start.y;
+    this._angle = scene.start.angle;
+    this._collected = 0;
+    this._facing = Math.cos((this._angle * Math.PI) / 180) < -0.01 ? -1 : 1;
+    this.setOutcome(null);
+    this.node
+      .querySelectorAll('.cgs-chip-taken')
+      .forEach(chip => chip.classList.remove('cgs-chip-taken'));
+    this._drawActorMarkup();
+    this._resetTrail();
+    this._drawPose();
+    this._reportChips();
+  }
+
+  setOutcome(outcome: 'win' | 'fail' | null): void {
+    this.node.classList.toggle('cgs-win', outcome === 'win');
+    this.node.classList.toggle('cgs-fail', outcome === 'fail');
+  }
+
+  play(events: GameEvent[]): Promise<void> {
+    this.stop();
+    const durations = events.map(event => this._duration(event));
+    const total = durations.reduce((sum, time) => sum + time, 0);
+    const rate = total > MAX_PLAY_TIME ? total / MAX_PLAY_TIME : 1;
+    return new Promise<void>(resolve => {
+      this._finishPlay = resolve;
+      let index = 0;
+      let eventTime = 0;
+      let from = { x: this._x, y: this._y, angle: this._angle };
+      let last: number | null = null;
+      const tick = (now: number) => {
+        let budget = last === null ? 0 : (now - last) * rate;
+        last = now;
+        while (index < events.length) {
+          const event = events[index];
+          const duration = durations[index];
+          const left = duration - eventTime;
+          const used = Math.min(left, budget);
+          eventTime += used;
+          budget -= used;
+          this._applyEvent(event, from, duration ? eventTime / duration : 1);
+          if (eventTime < duration) {
+            break;
+          }
+          this._finishEvent(event);
+          from = { x: this._x, y: this._y, angle: this._angle };
+          index++;
+          eventTime = 0;
+        }
+        this._drawPose();
+        if (index >= events.length) {
+          this._setWalking(false);
+          this._frame = 0;
+          this._finishPlay = null;
+          resolve();
+          return;
+        }
+        this._frame = requestAnimationFrame(tick);
+      };
+      this._frame = requestAnimationFrame(tick);
+    });
+  }
+
+  stop(): void {
+    if (this._frame) {
+      cancelAnimationFrame(this._frame);
+      this._frame = 0;
+    }
+    this._setWalking(false);
+    clearTimeout(this._bumpTimer);
+    this.node.classList.remove('cgs-bump');
+    const finish = this._finishPlay;
+    this._finishPlay = null;
+    finish?.();
+  }
+
+  private _duration(event: GameEvent): number {
+    if (event.t === 'move') {
+      const walk = (event.d / WALK_SPEED) * 1000;
+      return Math.max(walk, MIN_COMMAND_TIME) + (event.blocked ? BUMP_TIME : 0);
+    }
+    return MIN_COMMAND_TIME + 280;
+  }
+
+  private _applyEvent(
+    event: GameEvent,
+    from: { x: number; y: number; angle: number },
+    progress: number
+  ): void {
+    if (event.t === 'turn') {
+      const change = event.a - from.angle;
+      const time = Math.min((Math.abs(change) / TURN_SPEED) * 1000, 350);
+      const amount = time ? Math.min(1, (progress * 350) / time) : 1;
+      this._angle = from.angle + change * amount;
+      this._setWalking(false);
+      return;
+    }
+    const walkShare = event.blocked
+      ? Math.max(0, 1 - BUMP_TIME / this._duration(event))
+      : 1;
+    const walked = walkShare ? Math.min(1, progress / walkShare) : 1;
+    this._x = from.x + (event.x - from.x) * walked;
+    this._y = from.y + (event.y - from.y) * walked;
+    this._setWalking(walked < 1 && event.d > 0);
+    if (event.blocked && walked >= 1) {
+      this._bump();
+    }
+    for (const pick of event.picked) {
+      if (walked * event.d >= pick.at) {
+        this._takeChip(pick.i);
+      }
+    }
+    this._extendTrail();
+  }
+
+  private _finishEvent(event: GameEvent): void {
+    if (event.t === 'turn') {
+      this._angle = event.a;
+      return;
+    }
+    this._x = event.x;
+    this._y = event.y;
+    event.picked.forEach(pick => this._takeChip(pick.i));
+    this._extendTrail();
+  }
+
+  private _takeChip(index: number): void {
+    const chip = this.node.querySelector(`[data-chip="${index}"]`);
+    if (!chip || chip.classList.contains('cgs-chip-taken')) {
+      return;
+    }
+    chip.classList.add('cgs-chip-taken');
+    if (!this._scene?.chips[index].trapped) {
+      this._collected++;
+      this._reportChips();
+    }
+  }
+
+  private _reportChips(): void {
+    const total = this._scene?.chips.filter(chip => !chip.trapped).length ?? 0;
+    this._onChips(this._collected, total);
+  }
+
+  private _bump(): void {
+    if (this.node.classList.contains('cgs-bump')) {
+      return;
+    }
+    this.node.classList.add('cgs-bump');
+    this._bumpTimer = window.setTimeout(() => {
+      this.node.classList.remove('cgs-bump');
+    }, BUMP_TIME);
+  }
+
+  private _setWalking(walking: boolean): void {
+    this.node.classList.toggle('cgs-walking', walking);
+  }
+
+  private _drawActorMarkup(): void {
+    if (!this._actor || !this._snakeBody) {
+      return;
+    }
+    this.node.classList.toggle('cgs-mascot-fox', this._mascot === 'fox');
+    this.node.classList.toggle('cgs-mascot-snake', this._mascot === 'snake');
+    this.node.setAttribute(
+      'aria-label',
+      this._mascot === 'fox'
+        ? 'A night-time facility where Grep Fox collects data chips'
+        : 'A night-time facility where Sudo Snake collects data chips'
+    );
+    this._actor.innerHTML =
+      this._mascot === 'fox' ? FOX_MARKUP : SNAKE_HEAD_MARKUP;
+    this._heading = this._actor.querySelector('.cgs-heading') as SVGGElement;
+    this._sprite = this._actor.querySelector('.cgs-sprite') as SVGGElement;
+    this._snakeBody.innerHTML = '';
+    this._segments = [];
+    if (this._mascot === 'snake') {
+      for (let index = BODY_SEGMENTS - 1; index >= 0; index--) {
+        const segment = document.createElementNS(SVG_NS, 'circle');
+        const radius = 12.5 - (index / BODY_SEGMENTS) * 9;
+        segment.setAttribute('r', radius.toFixed(1));
+        segment.setAttribute('fill', index % 3 === 1 ? '#e8bd3a' : '#1fa86f');
+        segment.setAttribute(
+          'stroke',
+          index % 3 === 1 ? '#9a7a18' : '#0c5a3e'
+        );
+        segment.setAttribute('stroke-width', '1.5');
+        this._snakeBody.appendChild(segment);
+        this._segments.unshift(segment);
+      }
+    }
+  }
+
+  private _resetTrail(): void {
+    const radians = (this._angle * Math.PI) / 180;
+    const length = BODY_SEGMENTS * SEGMENT_GAP + SEGMENT_GAP;
+    this._trail = [
+      {
+        x: this._x - Math.cos(radians) * length,
+        y: this._y - Math.sin(radians) * length
+      },
+      { x: this._x, y: this._y }
+    ];
+  }
+
+  private _extendTrail(): void {
+    const tail = this._trail[this._trail.length - 1];
+    if (tail && Math.hypot(tail.x - this._x, tail.y - this._y) >= 3) {
+      this._trail.push({ x: this._x, y: this._y });
+    }
+    const limit = BODY_SEGMENTS * SEGMENT_GAP + 40;
+    let length = 0;
+    for (let index = this._trail.length - 1; index > 0; index--) {
+      length += Math.hypot(
+        this._trail[index].x - this._trail[index - 1].x,
+        this._trail[index].y - this._trail[index - 1].y
+      );
+      if (length > limit) {
+        this._trail.splice(0, index - 1);
+        break;
+      }
+    }
+  }
+
+  private _drawPose(): void {
+    if (!this._actor || !this._heading || !this._sprite) {
+      return;
+    }
+    this._actor.setAttribute(
+      'transform',
+      `translate(${this._x.toFixed(1)} ${this._y.toFixed(1)})`
+    );
+    this._heading.setAttribute('transform', `rotate(${this._angle.toFixed(1)})`);
+    if (this._mascot === 'fox') {
+      const cosine = Math.cos((this._angle * Math.PI) / 180);
+      if (Math.abs(cosine) > 0.01) {
+        this._facing = cosine < 0 ? -1 : 1;
+      }
+      this._sprite.setAttribute('transform', `scale(${this._facing} 1)`);
+      return;
+    }
+    this._sprite.setAttribute('transform', `rotate(${this._angle.toFixed(1)})`);
+    this._drawSnakeBody();
+  }
+
+  private _drawSnakeBody(): void {
+    let target = SEGMENT_GAP * 1.4;
+    let walked = 0;
+    let head: IPoint = { x: this._x, y: this._y };
+    let index = this._trail.length - 1;
+    for (const segment of this._segments) {
+      let point = head;
+      while (index >= 0) {
+        const previous = this._trail[index];
+        const gap = Math.hypot(previous.x - head.x, previous.y - head.y);
+        if (walked + gap >= target && gap > 0) {
+          const share = (target - walked) / gap;
+          point = {
+            x: head.x + (previous.x - head.x) * share,
+            y: head.y + (previous.y - head.y) * share
+          };
+          break;
+        }
+        walked += gap;
+        head = previous;
+        point = previous;
+        index--;
+      }
+      segment.setAttribute('cx', point.x.toFixed(1));
+      segment.setAttribute('cy', point.y.toFixed(1));
+      target += SEGMENT_GAP;
+    }
+  }
+
+  private _id: string;
+  private _onChips: (collected: number, total: number) => void;
+  private _scene: IScene | null = null;
+  private _mascot: MascotId = 'fox';
+  private _actor: SVGGElement | null = null;
+  private _snakeBody: SVGGElement | null = null;
+  private _heading: SVGGElement | null = null;
+  private _sprite: SVGGElement | null = null;
+  private _segments: SVGCircleElement[] = [];
+  private _trail: IPoint[] = [];
+  private _x = 0;
+  private _y = 0;
+  private _angle = 0;
+  private _facing = 1;
+  private _collected = 0;
+  private _frame = 0;
+  private _bumpTimer = 0;
+  private _finishPlay: (() => void) | null = null;
+}

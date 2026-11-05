@@ -1,0 +1,483 @@
+{
+  "title": "Operation First Run",
+  "levels": [
+    {
+      "title": "1. First Steps",
+      "instructions": "Steal the data chip! Each floor panel is 100 steps wide. `step(100)` only gets you part of the way, so change the number and press Run.",
+      "starterCode": "step(100)\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 250,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 400,
+            "y": 250
+          }
+        ]
+      }
+    },
+    {
+      "title": "2. Turn the Corner",
+      "instructions": "Crates block your way, so go around them. `turn(90)` turns right and `turn(-90)` turns left.",
+      "starterCode": "step(400)\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 400,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 500,
+            "y": 150
+          }
+        ],
+        "obstacles": [
+          {
+            "x": 200,
+            "y": 150,
+            "w": 200,
+            "h": 180
+          }
+        ]
+      }
+    },
+    {
+      "title": "3. Zigzag",
+      "instructions": "Collect all the chips in order. You can write as many commands as you need, one on each line.",
+      "starterCode": "step(200)\nturn(-90)\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 400,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 300,
+            "y": 400
+          },
+          {
+            "x": 300,
+            "y": 250
+          },
+          {
+            "x": 500,
+            "y": 250
+          },
+          {
+            "x": 500,
+            "y": 100
+          }
+        ],
+        "obstacles": [
+          {
+            "x": 100,
+            "y": 100,
+            "w": 150,
+            "h": 200
+          },
+          {
+            "x": 350,
+            "y": 300,
+            "w": 250,
+            "h": 150
+          }
+        ]
+      }
+    },
+    {
+      "title": "4. The Staircase",
+      "instructions": "These stairs repeat. Instead of writing every command, put one stair inside a `for` loop: move 100 steps, turn left, move 75 steps, turn right.",
+      "starterCode": "for i in range(5):\n    step(100)\n    # add the rest of one stair here\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 450,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 200,
+            "y": 375
+          },
+          {
+            "x": 300,
+            "y": 300
+          },
+          {
+            "x": 400,
+            "y": 225
+          },
+          {
+            "x": 500,
+            "y": 150
+          },
+          {
+            "x": 600,
+            "y": 75
+          }
+        ]
+      }
+    },
+    {
+      "title": "5. Patrol the Crate",
+      "instructions": "Walk around the crate. Each side is the same, so one loop can do the whole patrol.",
+      "starterCode": "for i in range(4):\n    # walk one side, then turn the corner\n    pass\n",
+      "scene": {
+        "start": {
+          "x": 200,
+          "y": 100,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 500,
+            "y": 100
+          },
+          {
+            "x": 500,
+            "y": 400
+          },
+          {
+            "x": 200,
+            "y": 400
+          }
+        ],
+        "obstacles": [
+          {
+            "x": 300,
+            "y": 180,
+            "w": 100,
+            "h": 140
+          }
+        ]
+      }
+    },
+    {
+      "title": "6. Around the Searchlight",
+      "instructions": "Stay out of the searchlight! The chips form a hexagon, so each side is 150 steps and each corner is a 60 degree turn.",
+      "starterCode": "for i in range(6):\n    step(150)\n",
+      "scene": {
+        "start": {
+          "x": 325,
+          "y": 100,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 475,
+            "y": 100
+          },
+          {
+            "x": 550,
+            "y": 230
+          },
+          {
+            "x": 475,
+            "y": 360
+          },
+          {
+            "x": 325,
+            "y": 360
+          },
+          {
+            "x": 250,
+            "y": 230
+          }
+        ],
+        "hazards": [
+          {
+            "x": 400,
+            "y": 230,
+            "r": 50
+          }
+        ]
+      }
+    },
+    {
+      "title": "7. The Chip List",
+      "instructions": "`chips` is a list of every chip in the room. `turn_to(c)` faces a chip and `distance_to(c)` tells you how far away it is, so you never need to measure.",
+      "starterCode": "for c in chips:\n    turn_to(c)\n    # now walk to the chip\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 100,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 300,
+            "y": 150
+          },
+          {
+            "x": 500,
+            "y": 100
+          },
+          {
+            "x": 700,
+            "y": 200
+          },
+          {
+            "x": 500,
+            "y": 350
+          },
+          {
+            "x": 200,
+            "y": 400
+          }
+        ]
+      }
+    },
+    {
+      "title": "8. Your First Function",
+      "instructions": "A function gives a name to commands you use often. Fill in `grab`, then choose the chip order carefully: `chips[0]` is across the searchlight, so start with the one nearest you.",
+      "starterCode": "def grab(chip):\n    turn_to(chip)\n    # walk to the chip\n\ngrab(chips[0])\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 250,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 700,
+            "y": 250
+          },
+          {
+            "x": 550,
+            "y": 100
+          },
+          {
+            "x": 250,
+            "y": 100
+          }
+        ],
+        "hazards": [
+          {
+            "x": 400,
+            "y": 250,
+            "r": 100
+          }
+        ]
+      }
+    },
+    {
+      "title": "9. Any Size You Like",
+      "instructions": "Functions can take inputs. Finish `square(size)`, walk the small square, take 200 steps to reach the big one, then walk that too.",
+      "starterCode": "def square(size):\n    for i in range(4):\n        step(size)\n        # turn the corner\n\nsquare(100)\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 100,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 200,
+            "y": 100
+          },
+          {
+            "x": 200,
+            "y": 200
+          },
+          {
+            "x": 100,
+            "y": 200
+          },
+          {
+            "x": 500,
+            "y": 100
+          },
+          {
+            "x": 500,
+            "y": 300
+          },
+          {
+            "x": 300,
+            "y": 300
+          }
+        ],
+        "obstacles": [
+          {
+            "x": 350,
+            "y": 150,
+            "w": 100,
+            "h": 100
+          }
+        ]
+      }
+    },
+    {
+      "title": "10. Crate Hopper",
+      "instructions": "Put your detour in a function: turn left, walk 100, turn right, walk 200, turn right, walk 100, turn left. Then use a loop to repeat it. Keep clear of the laser.",
+      "starterCode": "def around_crate():\n    turn(-90)\n    step(100)\n    # finish the detour\n\nstep(100)\n",
+      "scene": {
+        "start": {
+          "x": 50,
+          "y": 300,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 150,
+            "y": 300
+          },
+          {
+            "x": 350,
+            "y": 300
+          },
+          {
+            "x": 550,
+            "y": 300
+          },
+          {
+            "x": 750,
+            "y": 300
+          }
+        ],
+        "obstacles": [
+          {
+            "x": 200,
+            "y": 250,
+            "w": 100,
+            "h": 100
+          },
+          {
+            "x": 400,
+            "y": 250,
+            "w": 100,
+            "h": 100
+          },
+          {
+            "x": 600,
+            "y": 250,
+            "w": 100,
+            "h": 100
+          }
+        ],
+        "hazards": [
+          {
+            "x": 150,
+            "y": 120,
+            "w": 600,
+            "h": 6
+          }
+        ]
+      }
+    },
+    {
+      "title": "11. Trapped Chips",
+      "instructions": "The red chips are traps! Every chip has a `trapped` value, so use `if not c.trapped:` to skip them.",
+      "starterCode": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 250,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 250,
+            "y": 100
+          },
+          {
+            "x": 300,
+            "y": 400,
+            "trapped": true
+          },
+          {
+            "x": 500,
+            "y": 400
+          },
+          {
+            "x": 450,
+            "y": 150,
+            "trapped": true
+          },
+          {
+            "x": 700,
+            "y": 150
+          },
+          {
+            "x": 650,
+            "y": 400,
+            "trapped": true
+          }
+        ]
+      }
+    },
+    {
+      "title": "12. Final Run",
+      "instructions": "Use everything you've learned. Write a `grab` function, loop over `chips`, and skip the traps. Watch out for the searchlight and the lasers.",
+      "starterCode": "def grab(chip):\n    # face the chip and walk to it\n    pass\n\nfor c in chips:\n    # grab the chip unless it is trapped\n    pass\n",
+      "scene": {
+        "start": {
+          "x": 100,
+          "y": 250,
+          "angle": 0
+        },
+        "chips": [
+          {
+            "x": 250,
+            "y": 130
+          },
+          {
+            "x": 250,
+            "y": 370,
+            "trapped": true
+          },
+          {
+            "x": 450,
+            "y": 130,
+            "trapped": true
+          },
+          {
+            "x": 450,
+            "y": 370
+          },
+          {
+            "x": 650,
+            "y": 130
+          },
+          {
+            "x": 650,
+            "y": 370,
+            "trapped": true
+          }
+        ],
+        "hazards": [
+          {
+            "x": 350,
+            "y": 100,
+            "r": 40
+          },
+          {
+            "x": 0,
+            "y": 40,
+            "w": 800,
+            "h": 6
+          },
+          {
+            "x": 0,
+            "y": 460,
+            "w": 800,
+            "h": 6
+          }
+        ]
+      }
+    }
+  ],
+  "progress": {
+    "mascot": "snake",
+    "currentLevel": 4,
+    "solved": [],
+    "code": {
+      "4": "for i in range(4):\n    # walk one side, then turn the corner\n    pass\n",
+      "10": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n"
+    }
+  }
+}

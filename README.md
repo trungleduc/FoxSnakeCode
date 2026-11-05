@@ -6,6 +6,7 @@
   <p><strong>Tactical Coding Action</strong></p>
   <p>Coding missions, challenges, stealth debugging, boss levels...</p>
   <p><em>Write Python. Slip past the searchlights. Steal the data.</em></p>
+  <p><a href="https://trungleduc.github.io/FoxSnakeCode/lab/"><strong>Try it in your browser</strong></a></p>
 </div>
 
 ## Meet the team
@@ -48,7 +49,9 @@ jlpm build:demo
 
 The site is written to `demo/_output`, which you can host on any static web server.
 
-The demo site keeps files in memory only, so nothing is saved in the browser and reloading the page starts the mission fresh.
+A local demo build keeps files in memory only, so nothing is saved in the browser and reloading the page starts the mission fresh.
+
+The site deployed to GitHub Pages saves progress in the player's browser instead. Returning players keep their saved copy of a mission, so they won't see later edits to that file unless they clear their browser data or the update ships under a new file name.
 
 Stop restarts the kernel, so the next Run can take a few seconds in JupyterLite.
 

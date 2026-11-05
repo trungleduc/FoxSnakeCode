@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          micromamba-version: '2.3.2-0'
+          environment-name: build-env
+          create-args: >-
+            python=3.12
+            pip
+            jupyterlab=4
+            nodejs=22
+
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: python -m pip install -U "jupyterlite-core==0.8.7" "jupyterlite-xeus==5.1.0" "jupyter-builder>=1.2.2"
+
+      - name: Build the extension
+        shell: bash -l {0}
+        run: |
+          set -eux
+          jlpm install
+          jlpm build:prod
+          python -m pip install .
+
+      - name: Enable persistent storage for the deployed demo
+        shell: bash -l {0}
+        run: |
+          set -eux
+          jq 'del(.["jupyter-config-data"].enableMemoryStorage, .["jupyter-config-data"].contentsStorageDrivers)' \
+            demo/jupyter-lite.json > demo/jupyter-lite.json.tmp
+          mv demo/jupyter-lite.json.tmp demo/jupyter-lite.json
+
+      - name: Build the lite site
+        shell: bash -l {0}
+        run: |
+          set -eux
+          jlpm build:demo
+
+      - name: Upload artifact
+        id: upload-jupyterlite-artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./demo/_output
+          retention-days: 30
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

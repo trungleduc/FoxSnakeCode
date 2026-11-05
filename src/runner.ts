@@ -3,7 +3,7 @@ import { Kernel, KernelMessage } from '@jupyterlab/services';
 import { buildRunCode, IRunResult, readRunOutput } from './engine';
 import { IScene } from './format';
 
-const READY_TIMEOUT = 30000;
+const READY_TIMEOUT = 60000;
 const READY_ATTEMPT_TIME = 1000;
 const READY_RETRY_DELAY = 200;
 
@@ -14,8 +14,9 @@ function delay(time: number): Promise<undefined> {
 }
 
 export class Runner {
-  constructor(sessionContext: ISessionContext) {
+  constructor(sessionContext: ISessionContext, kernelManager: Kernel.IManager) {
     this._sessionContext = sessionContext;
+    this._kernelManager = kernelManager;
   }
 
   async run(scene: IScene, code: string): Promise<IRunResult> {
@@ -107,12 +108,8 @@ export class Runner {
   }
 
   private async _readyKernel(): Promise<Kernel.IKernelConnection> {
-    const session = this._sessionContext.session;
-    if (session?.kernel?.status === 'dead') {
-      await this._reviveKernel();
-    }
     const deadline = Date.now() + READY_TIMEOUT;
-    while (Date.now() < deadline) {
+    while (Date.now() < deadline && !this._stopRequested) {
       const kernel = this._sessionContext.session?.kernel;
       if (kernel) {
         const reply = await Promise.race([
@@ -123,22 +120,35 @@ export class Runner {
           return kernel;
         }
       }
+      if (await this._kernelIsGone(kernel)) {
+        await this._reviveKernel();
+      }
       await delay(READY_RETRY_DELAY);
     }
     throw new Error('The Python kernel is not responding.');
   }
 
-  private async _reviveKernel(): Promise<void> {
-    try {
-      await this._sessionContext.restartKernel();
-    } catch {
-      await this._sessionContext.changeKernel({
-        name: this._sessionContext.kernelPreference.name
-      });
+  private async _kernelIsGone(
+    kernel: Kernel.IKernelConnection | null | undefined
+  ): Promise<boolean> {
+    if (!kernel || kernel.status === 'dead') {
+      return true;
     }
+    const model = await this._kernelManager
+      .findById(kernel.id)
+      .catch(() => kernel.model);
+    return !model;
+  }
+
+  private async _reviveKernel(): Promise<void> {
+    await this._sessionContext.shutdown().catch(() => undefined);
+    await this._sessionContext
+      .changeKernel({ name: this._sessionContext.kernelPreference.name })
+      .catch(() => undefined);
   }
 
   private _sessionContext: ISessionContext;
+  private _kernelManager: Kernel.IManager;
   private _running: Promise<void> | null = null;
   private _abandon: (() => void) | null = null;
   private _stopRequested = false;

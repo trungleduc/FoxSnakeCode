@@ -166,7 +166,6 @@ export function sceneMarkup(scene: IScene, id: string): string {
   ${hazards}
   ${scene.obstacles.map(obstacle => crate(obstacle, id)).join('')}
   ${scene.chips.map((c, index) => chip(c.x, c.y, !!c.trapped, index, id)).join('')}
-  <g class="fsc-snake-body"></g>
   <g class="fsc-actor"></g>
   <rect width="${WORLD_WIDTH}" height="${WORLD_HEIGHT}" fill="url(#${id}-vignette)" pointer-events="none"/>`;
 }
@@ -181,7 +180,7 @@ export const FOX_MARKUP = `
   ${HEADING}
   <g class="fsc-sprite">
     <g class="fsc-bounce">
-      <g class="fsc-fox-tail">
+      <g class="fsc-tail">
         <path d="M-11 9C-24 11 -38 3 -36 -14C-35 -22 -31 -27 -27 -30C-27 -21 -22 -14 -8 -3Z" fill="#d9692b" stroke="#7b3513" stroke-width="1.5" stroke-linejoin="round"/>
         <path d="M-35.5 -11C-35.5 -20 -31 -27 -27 -30C-27 -24 -25 -19 -22 -15C-27 -15 -31 -14 -35.5 -11Z" fill="#fff4e3"/>
       </g>
@@ -218,32 +217,53 @@ export const FOX_MARKUP = `
     </g>
   </g>`;
 
-export const SNAKE_HEAD_MARKUP = `
+export const SNAKE_MARKUP = `
+  <ellipse cx="0" cy="25" rx="26" ry="6" fill="#02060c" opacity="0.5"/>
   ${HEADING}
   <g class="fsc-sprite">
     <g class="fsc-bounce">
-      <g class="fsc-tongue">
-        <path d="M18 0H30M30 0L35 -4M30 0L35 4" fill="none" stroke="#ff5a6e" stroke-width="2.2" stroke-linecap="round"/>
+      <g class="fsc-tail">
+        <path d="M-18 18C-31 21 -37 11 -29 6" fill="none" stroke="#12694F" stroke-width="9" stroke-linecap="round"/>
+        <path d="M-18 18C-31 21 -37 11 -29 6" fill="none" stroke="#34C58F" stroke-width="6" stroke-linecap="round"/>
       </g>
-      <path d="M-15 -10C-6 -19 10 -17 18 -7C21 -3 21 3 18 7C10 17 -6 19 -15 10C-19 6 -19 -6 -15 -10Z" fill="#1fa86f" stroke="#0c5a3e" stroke-width="1.8"/>
-      <path d="M-13 0L-3 -7L7 0L-3 7Z" fill="#e8bd3a" stroke="#9a7a18" stroke-width="1.2"/>
-      <circle cx="13.5" cy="-3" r="1.1" fill="#0c3a2a"/><circle cx="13.5" cy="3" r="1.1" fill="#0c3a2a"/>
-      <g class="fsc-eyes fsc-eyes-open">
-        <circle cx="5" cy="-10" r="5.6" fill="#fffbe8" stroke="#0c5a3e" stroke-width="1.3"/>
-        <circle cx="5" cy="10" r="5.6" fill="#fffbe8" stroke="#0c5a3e" stroke-width="1.3"/>
-        <circle class="fsc-blink" cx="7" cy="-10" r="3" fill="#14222f"/>
-        <circle class="fsc-blink" cx="7" cy="10" r="3" fill="#14222f"/>
-        <circle cx="8" cy="-11" r="1" fill="#fff"/><circle cx="8" cy="9" r="1" fill="#fff"/>
+      <g class="fsc-coil fsc-coil-a">
+        <ellipse cx="-1" cy="16" rx="23" ry="9" fill="#34C58F" stroke="#12694F" stroke-width="1.5"/>
+        <path d="M-18 19Q-1 27 16 19" fill="none" stroke="#C9F5DC" stroke-width="3" stroke-linecap="round"/>
       </g>
-      <g class="fsc-eyes fsc-eyes-happy">
-        <circle cx="5" cy="-10" r="5.6" fill="#fffbe8" stroke="#0c5a3e" stroke-width="1.3"/>
-        <circle cx="5" cy="10" r="5.6" fill="#fffbe8" stroke="#0c5a3e" stroke-width="1.3"/>
-        <path d="M2 -7C5 -13 7 -13 9 -10M2 13C5 7 7 7 9 10" fill="none" stroke="#14222f" stroke-width="2.2" stroke-linecap="round"/>
+      <g class="fsc-coil fsc-coil-b">
+        <ellipse cx="1" cy="7" rx="18" ry="8" fill="#34C58F" stroke="#12694F" stroke-width="1.5"/>
+        <path d="M-12 10Q1 16 14 10" fill="none" stroke="#C9F5DC" stroke-width="2.5" stroke-linecap="round"/>
       </g>
-      <g class="fsc-eyes fsc-eyes-dizzy">
-        <circle cx="5" cy="-10" r="5.6" fill="#fffbe8" stroke="#0c5a3e" stroke-width="1.3"/>
-        <circle cx="5" cy="10" r="5.6" fill="#fffbe8" stroke="#0c5a3e" stroke-width="1.3"/>
-        <path d="M2.5 -12.5L7.5 -7.5M7.5 -12.5L2.5 -7.5M2.5 7.5L7.5 12.5M7.5 7.5L2.5 12.5" stroke="#14222f" stroke-width="2" stroke-linecap="round"/>
+      <g class="fsc-coil fsc-coil-a">
+        <ellipse cx="0" cy="-1" rx="13" ry="7" fill="#34C58F" stroke="#12694F" stroke-width="1.5"/>
+        <path d="M-8 2Q0 6 8 2" fill="none" stroke="#C9F5DC" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(6 -17)">
+        <ellipse cx="-3" cy="11" rx="12" ry="6" fill="#5A6F9E" stroke="#27365C" stroke-width="1.5"/>
+        <ellipse cx="0" cy="0" rx="19" ry="17" fill="#5A6F9E" stroke="#27365C" stroke-width="1.5"/>
+        <ellipse cx="1" cy="1" rx="16" ry="14" fill="#1B2233"/>
+        <ellipse cx="2" cy="3" rx="14" ry="11" fill="#34C58F" stroke="#12694F" stroke-width="1.2"/>
+        <path d="M-17 -3C-16 -22 17 -22 18 -5" fill="none" stroke="#FFC93C" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="-17" cy="1" r="4.5" fill="#FFC93C" stroke="#8A6A12" stroke-width="1.2"/>
+        <circle cx="18" cy="-2" r="3" fill="#FFC93C" stroke="#8A6A12" stroke-width="1.2"/>
+        <g class="fsc-eyes fsc-eyes-open">
+          <ellipse cx="-3" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
+          <ellipse cx="8" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
+          <circle class="fsc-blink" cx="-1.5" cy="1" r="2.6" fill="#14222F"/>
+          <circle class="fsc-blink" cx="9.5" cy="1" r="2.6" fill="#14222F"/>
+          <circle cx="-0.6" cy="-0.2" r="1" fill="#FFFFFF"/>
+          <circle cx="10.4" cy="-0.2" r="1" fill="#FFFFFF"/>
+        </g>
+        <g class="fsc-eyes fsc-eyes-happy">
+          <path d="M-7 2Q-3 -4 1 2M4 2Q8 -4 12 2" fill="none" stroke="#14222F" stroke-width="1.8" stroke-linecap="round"/>
+        </g>
+        <g class="fsc-eyes fsc-eyes-dizzy">
+          <ellipse cx="-3" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
+          <ellipse cx="8" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
+          <path d="M-5.5 -2.5L-0.5 2.5M-0.5 -2.5L-5.5 2.5M5.5 -2.5L10.5 2.5M10.5 -2.5L5.5 2.5" stroke="#14222F" stroke-width="1.6" stroke-linecap="round"/>
+        </g>
+        <path d="M0 8Q4 11 8 8" fill="none" stroke="#14222F" stroke-width="1.2" stroke-linecap="round"/>
+        <path class="fsc-tongue" d="M5 9.6L5.6 13M5.6 13L4 15M5.6 13L7.4 15" fill="none" stroke="#E5484D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
     </g>
   </g>`;

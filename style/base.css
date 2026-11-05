@@ -294,7 +294,7 @@ select.fsc-mascot-select {
 .fsc-sprite,
 .fsc-bounce,
 .fsc-leg,
-.fsc-fox-tail,
+.fsc-tail,
 .fsc-fox-head,
 .fsc-tongue,
 .fsc-blink {
@@ -309,7 +309,7 @@ select.fsc-mascot-select {
   transform-origin: center top;
 }
 
-.fsc-fox-tail {
+.fsc-tail {
   transform-origin: right bottom;
   animation: fsc-tail-sway 2.2s ease-in-out infinite;
 }
@@ -319,12 +319,8 @@ select.fsc-mascot-select {
   animation: fsc-blink 4.6s linear infinite;
 }
 
-.fsc-mascot-snake .fsc-bounce {
-  transform-origin: center;
-}
-
 .fsc-tongue {
-  transform-origin: left center;
+  transform-origin: center top;
   animation: fsc-tongue-flick 2.4s ease-in-out infinite;
 }
 
@@ -341,12 +337,20 @@ select.fsc-mascot-select {
   animation: fsc-leg-swing 0.32s ease-in-out infinite alternate-reverse;
 }
 
-.fsc-walking.fsc-mascot-fox .fsc-bounce {
+.fsc-walking .fsc-bounce {
   animation: fsc-walk-bob 0.32s ease-in-out infinite alternate;
 }
 
-.fsc-walking.fsc-mascot-fox .fsc-fox-tail {
+.fsc-walking .fsc-tail {
   animation-duration: 0.64s;
+}
+
+.fsc-walking .fsc-coil-a {
+  animation: fsc-coil-sway 0.32s ease-in-out infinite alternate;
+}
+
+.fsc-walking .fsc-coil-b {
+  animation: fsc-coil-sway 0.32s ease-in-out infinite alternate-reverse;
 }
 
 .fsc-bump .fsc-bounce {
@@ -377,7 +381,7 @@ select.fsc-mascot-select {
 }
 
 .fsc-fail .fsc-tongue,
-.fsc-fail .fsc-fox-tail {
+.fsc-fail .fsc-tail {
   animation: none;
 }
 
@@ -419,12 +423,12 @@ select.fsc-mascot-select {
 @keyframes fsc-tongue-flick {
   0%,
   70%,
+  90%,
   100% {
-    transform: scaleX(0);
+    transform: scaleY(1);
   }
-  80%,
-  90% {
-    transform: scaleX(1);
+  80% {
+    transform: scaleY(0.4);
   }
 }
 
@@ -434,6 +438,15 @@ select.fsc-mascot-select {
   }
   to {
     transform: rotate(24deg);
+  }
+}
+
+@keyframes fsc-coil-sway {
+  from {
+    transform: translateX(-2px);
+  }
+  to {
+    transform: translateX(2px);
   }
 }
 
@@ -479,10 +492,12 @@ select.fsc-mascot-select {
   .fsc-light,
   .fsc-laser,
   .fsc-chip-inner,
-  .fsc-fox-tail,
+  .fsc-tail,
   .fsc-blink,
   .fsc-tongue,
   .fsc-walking .fsc-leg,
+  .fsc-walking .fsc-coil-a,
+  .fsc-walking .fsc-coil-b,
   .fsc-walking .fsc-bounce,
   .fsc-bump .fsc-bounce,
   .fsc-win .fsc-bounce,

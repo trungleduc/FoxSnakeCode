@@ -28,7 +28,7 @@ jlpm build:demo
 
 The site is written to `demo/_output`, which you can host on any static web server.
 
-In JupyterLite, saved progress stays in that browser's storage.
+The demo site keeps files in memory only, so nothing is saved in the browser and reloading the page starts the mission fresh.
 
 Stop restarts the kernel, so the next Run can take a few seconds in JupyterLite.
 

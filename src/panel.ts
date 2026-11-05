@@ -80,7 +80,10 @@ export class FscPanel extends SplitPanel {
         shutdownOnDispose: true
       }
     });
-    this._runner = new Runner(this._sessionContext);
+    this._runner = new Runner(
+      this._sessionContext,
+      options.serviceManager.kernels
+    );
     this._stage = new Stage((collected, total) => {
       this._chipCount.textContent = `Chips ${collected} / ${total}`;
     });

@@ -1,4 +1,4 @@
-import { FOX_MARKUP, sceneMarkup, SNAKE_HEAD_MARKUP } from './art';
+import { FOX_MARKUP, sceneMarkup, SNAKE_MARKUP } from './art';
 import { GameEvent } from './engine';
 import { IScene, MascotId, WORLD_HEIGHT, WORLD_WIDTH } from './format';
 
@@ -7,17 +7,10 @@ const TURN_SPEED = 360;
 const BUMP_TIME = 260;
 const MIN_COMMAND_TIME = 70;
 const MAX_PLAY_TIME = 30000;
-const BODY_SEGMENTS = 17;
-const SEGMENT_GAP = 7;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 let nextStageId = 0;
-
-interface IPoint {
-  x: number;
-  y: number;
-}
 
 export class Stage {
   readonly node: SVGSVGElement;
@@ -38,16 +31,12 @@ export class Stage {
     this._mascot = mascot;
     this.node.innerHTML = sceneMarkup(scene, this._id);
     this._actor = this.node.querySelector('.fsc-actor') as SVGGElement;
-    this._snakeBody = this.node.querySelector(
-      '.fsc-snake-body'
-    ) as SVGGElement;
     this.reset();
   }
 
   setMascot(mascot: MascotId): void {
     this._mascot = mascot;
     this._drawActorMarkup();
-    this._resetTrail();
     this._drawPose();
   }
 
@@ -67,7 +56,6 @@ export class Stage {
       .querySelectorAll('.fsc-chip-taken')
       .forEach(chip => chip.classList.remove('fsc-chip-taken'));
     this._drawActorMarkup();
-    this._resetTrail();
     this._drawPose();
     this._reportChips();
   }
@@ -170,7 +158,6 @@ export class Stage {
         this._takeChip(pick.i);
       }
     }
-    this._extendTrail();
   }
 
   private _finishEvent(event: GameEvent): void {
@@ -181,7 +168,6 @@ export class Stage {
     this._x = event.x;
     this._y = event.y;
     event.picked.forEach(pick => this._takeChip(pick.i));
-    this._extendTrail();
   }
 
   private _takeChip(index: number): void {
@@ -216,7 +202,7 @@ export class Stage {
   }
 
   private _drawActorMarkup(): void {
-    if (!this._actor || !this._snakeBody) {
+    if (!this._actor) {
       return;
     }
     this.node.classList.toggle('fsc-mascot-fox', this._mascot === 'fox');
@@ -228,57 +214,9 @@ export class Stage {
         : 'A night-time facility where Sudo Snake collects data chips'
     );
     this._actor.innerHTML =
-      this._mascot === 'fox' ? FOX_MARKUP : SNAKE_HEAD_MARKUP;
+      this._mascot === 'fox' ? FOX_MARKUP : SNAKE_MARKUP;
     this._heading = this._actor.querySelector('.fsc-heading') as SVGGElement;
     this._sprite = this._actor.querySelector('.fsc-sprite') as SVGGElement;
-    this._snakeBody.innerHTML = '';
-    this._segments = [];
-    if (this._mascot === 'snake') {
-      for (let index = BODY_SEGMENTS - 1; index >= 0; index--) {
-        const segment = document.createElementNS(SVG_NS, 'circle');
-        const radius = 12.5 - (index / BODY_SEGMENTS) * 9;
-        segment.setAttribute('r', radius.toFixed(1));
-        segment.setAttribute('fill', index % 3 === 1 ? '#e8bd3a' : '#1fa86f');
-        segment.setAttribute(
-          'stroke',
-          index % 3 === 1 ? '#9a7a18' : '#0c5a3e'
-        );
-        segment.setAttribute('stroke-width', '1.5');
-        this._snakeBody.appendChild(segment);
-        this._segments.unshift(segment);
-      }
-    }
-  }
-
-  private _resetTrail(): void {
-    const radians = (this._angle * Math.PI) / 180;
-    const length = BODY_SEGMENTS * SEGMENT_GAP + SEGMENT_GAP;
-    this._trail = [
-      {
-        x: this._x - Math.cos(radians) * length,
-        y: this._y - Math.sin(radians) * length
-      },
-      { x: this._x, y: this._y }
-    ];
-  }
-
-  private _extendTrail(): void {
-    const tail = this._trail[this._trail.length - 1];
-    if (tail && Math.hypot(tail.x - this._x, tail.y - this._y) >= 3) {
-      this._trail.push({ x: this._x, y: this._y });
-    }
-    const limit = BODY_SEGMENTS * SEGMENT_GAP + 40;
-    let length = 0;
-    for (let index = this._trail.length - 1; index > 0; index--) {
-      length += Math.hypot(
-        this._trail[index].x - this._trail[index - 1].x,
-        this._trail[index].y - this._trail[index - 1].y
-      );
-      if (length > limit) {
-        this._trail.splice(0, index - 1);
-        break;
-      }
-    }
   }
 
   private _drawPose(): void {
@@ -290,45 +228,11 @@ export class Stage {
       `translate(${this._x.toFixed(1)} ${this._y.toFixed(1)})`
     );
     this._heading.setAttribute('transform', `rotate(${this._angle.toFixed(1)})`);
-    if (this._mascot === 'fox') {
-      const cosine = Math.cos((this._angle * Math.PI) / 180);
-      if (Math.abs(cosine) > 0.01) {
-        this._facing = cosine < 0 ? -1 : 1;
-      }
-      this._sprite.setAttribute('transform', `scale(${this._facing} 1)`);
-      return;
+    const cosine = Math.cos((this._angle * Math.PI) / 180);
+    if (Math.abs(cosine) > 0.01) {
+      this._facing = cosine < 0 ? -1 : 1;
     }
-    this._sprite.setAttribute('transform', `rotate(${this._angle.toFixed(1)})`);
-    this._drawSnakeBody();
-  }
-
-  private _drawSnakeBody(): void {
-    let target = SEGMENT_GAP * 1.4;
-    let walked = 0;
-    let head: IPoint = { x: this._x, y: this._y };
-    let index = this._trail.length - 1;
-    for (const segment of this._segments) {
-      let point = head;
-      while (index >= 0) {
-        const previous = this._trail[index];
-        const gap = Math.hypot(previous.x - head.x, previous.y - head.y);
-        if (walked + gap >= target && gap > 0) {
-          const share = (target - walked) / gap;
-          point = {
-            x: head.x + (previous.x - head.x) * share,
-            y: head.y + (previous.y - head.y) * share
-          };
-          break;
-        }
-        walked += gap;
-        head = previous;
-        point = previous;
-        index--;
-      }
-      segment.setAttribute('cx', point.x.toFixed(1));
-      segment.setAttribute('cy', point.y.toFixed(1));
-      target += SEGMENT_GAP;
-    }
+    this._sprite.setAttribute('transform', `scale(${this._facing} 1)`);
   }
 
   private _id: string;
@@ -336,11 +240,8 @@ export class Stage {
   private _scene: IScene | null = null;
   private _mascot: MascotId = 'fox';
   private _actor: SVGGElement | null = null;
-  private _snakeBody: SVGGElement | null = null;
   private _heading: SVGGElement | null = null;
   private _sprite: SVGGElement | null = null;
-  private _segments: SVGCircleElement[] = [];
-  private _trail: IPoint[] = [];
   private _x = 0;
   private _y = 0;
   private _angle = 0;

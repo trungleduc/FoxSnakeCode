@@ -1,12 +1,12 @@
-.cgs-panel {
+.fsc-panel {
   background: var(--jp-layout-color1);
 }
 
-.cgs-panel > .lm-SplitPanel-handle {
+.fsc-panel > .lm-SplitPanel-handle {
   background: var(--jp-border-color2);
 }
 
-.cgs-code-side {
+.fsc-code-side {
   display: flex;
   flex-direction: column;
   min-width: 260px;
@@ -16,70 +16,70 @@
   font-size: var(--jp-ui-font-size1);
 }
 
-.cgs-brief {
+.fsc-brief {
   flex: 0 0 auto;
   max-height: 45%;
   overflow-y: auto;
   padding: 12px 14px 8px;
 }
 
-.cgs-level-select {
+.fsc-level-select {
   width: 100%;
   margin-bottom: 10px;
 }
 
-.cgs-level-select[hidden] {
+.fsc-level-select[hidden] {
   display: none;
 }
 
-.cgs-level-title[hidden] {
+.fsc-level-title[hidden] {
   display: none;
 }
 
-.cgs-level-title {
+.fsc-level-title {
   margin: 0 0 6px;
   font-size: var(--jp-ui-font-size3);
   font-weight: 600;
   color: var(--jp-ui-font-color0);
 }
 
-.cgs-instructions {
+.fsc-instructions {
   margin: 0 0 8px;
   line-height: 1.5;
 }
 
-.cgs-instructions code,
-.cgs-help dt {
+.fsc-instructions code,
+.fsc-help dt {
   font-family: var(--jp-code-font-family);
   font-size: 0.95em;
 }
 
-.cgs-instructions code {
+.fsc-instructions code {
   padding: 1px 4px;
   border-radius: 3px;
   background: var(--jp-layout-color2);
 }
 
-.cgs-help summary {
+.fsc-help summary {
   cursor: pointer;
   color: var(--jp-ui-font-color2);
 }
 
-.cgs-help dl {
+.fsc-help dl {
   margin: 6px 0 0;
 }
 
-.cgs-help dt {
+.fsc-help dt {
   margin-top: 6px;
   color: var(--jp-ui-font-color0);
 }
 
-.cgs-help dd {
+.fsc-help dd {
   margin: 0;
   color: var(--jp-ui-font-color2);
 }
 
-.cgs-actions {
+.fsc-actions {
   flex: 0 0 auto;
   display: flex;
   flex-wrap: wrap;
@@ -90,11 +90,11 @@
   border-bottom: 1px solid var(--jp-border-color2);
 }
 
-.cgs-actions .jp-Button {
+.fsc-actions .jp-Button {
   min-width: 68px;
 }
 
-.cgs-link-button {
+.fsc-link-button {
   padding: 2px;
   border: 0;
   background: none;
@@ -103,36 +103,36 @@
   cursor: pointer;
 }
 
-.cgs-link-button:hover {
+.fsc-link-button:hover {
   text-decoration: underline;
 }
 
-.cgs-link-button:disabled {
+.fsc-link-button:disabled {
   color: var(--jp-ui-font-color3);
   cursor: default;
   text-decoration: none;
 }
 
-.cgs-status {
+.fsc-status {
   color: var(--jp-ui-font-color2);
 }
 
-.cgs-editor {
+.fsc-editor {
   flex: 1 1 0;
   min-height: 80px;
   overflow: hidden;
   background: var(--jp-layout-color0);
 }
 
-.cgs-editor .cm-editor {
+.fsc-editor .cm-editor {
   height: 100%;
 }
 
-.cgs-output-holder {
+.fsc-output-holder {
   flex: 0 0 auto;
 }
 
-.cgs-output {
+.fsc-output {
   max-height: 110px;
   margin: 0;
   padding: 8px 14px;
@@ -143,11 +143,11 @@
   white-space: pre-wrap;
 }
 
-.cgs-output[hidden] {
+.fsc-output[hidden] {
   display: none;
 }
 
-.cgs-play-side {
+.fsc-play-side {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -157,7 +157,7 @@
   font-family: var(--jp-ui-font-family);
 }
 
-.cgs-hud {
+.fsc-hud {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -167,7 +167,7 @@
   border-bottom: 1px solid #243647;
 }
 
-.cgs-mission-title {
+.fsc-mission-title {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -179,7 +179,7 @@
   white-space: nowrap;
 }
 
-.cgs-chip-count {
+.fsc-chip-count {
   flex: 0 0 auto;
   color: #37f5d6;
   font-family: var(--jp-code-font-family);
@@ -187,7 +187,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-select.cgs-mascot-select {
+select.fsc-mascot-select {
   flex: 0 0 auto;
   width: auto;
   height: 28px;
@@ -196,7 +196,7 @@ select.cgs-mascot-select {
   line-height: normal;
 }
 
-.cgs-stage {
+.fsc-stage {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
@@ -205,13 +205,13 @@ select.cgs-mascot-select {
   padding: 10px;
 }
 
-.cgs-scene {
+.fsc-scene {
   width: 100%;
   height: 100%;
   border-radius: 6px;
 }
 
-.cgs-banner {
+.fsc-banner {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -222,51 +222,51 @@ select.cgs-mascot-select {
   background: #1c2230;
 }
 
-.cgs-banner[hidden] {
+.fsc-banner[hidden] {
   display: none;
 }
 
-.cgs-banner[data-kind='win'] {
+.fsc-banner[data-kind='win'] {
   border-top-color: #37f5d6;
   background: #0c2c2c;
 }
 
-.cgs-banner[data-kind='fail'] {
+.fsc-banner[data-kind='fail'] {
   border-top-color: #ff5a6e;
   background: #311821;
 }
 
-.cgs-banner-text {
+.fsc-banner-text {
   flex: 1 1 auto;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.cgs-banner-text strong {
+.fsc-banner-text strong {
   display: block;
   font-size: 15px;
 }
 
-.cgs-banner-text span {
+.fsc-banner-text span {
   color: #c9d4de;
   font-size: 13px;
 }
 
-.cgs-banner .jp-Button {
+.fsc-banner .jp-Button {
   flex: 0 0 auto;
 }
 
-.cgs-banner .jp-Button[hidden] {
+.fsc-banner .jp-Button[hidden] {
   display: none;
 }
 
-.cgs-ruler text {
+.fsc-ruler text {
   fill: #6c8aa3;
   font-family: var(--jp-code-font-family);
   font-size: 11px;
 }
 
-.cgs-start {
+.fsc-start {
   fill: none;
   stroke: #6c8aa3;
   stroke-dasharray: 5 6;
@@ -274,138 +274,138 @@ select.cgs-mascot-select {
   opacity: 0.8;
 }
 
-.cgs-light {
-  animation: cgs-light-pulse 2.6s ease-in-out infinite;
+.fsc-light {
+  animation: fsc-light-pulse 2.6s ease-in-out infinite;
 }
 
-.cgs-laser {
-  animation: cgs-laser-flicker 1.1s linear infinite;
+.fsc-laser {
+  animation: fsc-laser-flicker 1.1s linear infinite;
 }
 
-.cgs-chip-inner {
-  animation: cgs-chip-bob 1.8s ease-in-out infinite;
+.fsc-chip-inner {
+  animation: fsc-chip-bob 1.8s ease-in-out infinite;
 }
 
-.cgs-chip-taken {
+.fsc-chip-taken {
   opacity: 0;
   transition: opacity 0.2s ease-out;
 }
 
-.cgs-sprite,
-.cgs-bounce,
-.cgs-leg,
-.cgs-fox-tail,
-.cgs-fox-head,
-.cgs-tongue,
-.cgs-blink {
+.fsc-sprite,
+.fsc-bounce,
+.fsc-leg,
+.fsc-fox-tail,
+.fsc-fox-head,
+.fsc-tongue,
+.fsc-blink {
   transform-box: fill-box;
 }
 
-.cgs-bounce {
+.fsc-bounce {
   transform-origin: center bottom;
 }
 
-.cgs-leg {
+.fsc-leg {
   transform-origin: center top;
 }
 
-.cgs-fox-tail {
+.fsc-fox-tail {
   transform-origin: right bottom;
-  animation: cgs-tail-sway 2.2s ease-in-out infinite;
+  animation: fsc-tail-sway 2.2s ease-in-out infinite;
 }
 
-.cgs-blink {
+.fsc-blink {
   transform-origin: center;
-  animation: cgs-blink 4.6s linear infinite;
+  animation: fsc-blink 4.6s linear infinite;
 }
 
-.cgs-mascot-snake .cgs-bounce {
+.fsc-mascot-snake .fsc-bounce {
   transform-origin: center;
 }
 
-.cgs-tongue {
+.fsc-tongue {
   transform-origin: left center;
-  animation: cgs-tongue-flick 2.4s ease-in-out infinite;
+  animation: fsc-tongue-flick 2.4s ease-in-out infinite;
 }
 
-.cgs-eyes-happy,
-.cgs-eyes-dizzy {
+.fsc-eyes-happy,
+.fsc-eyes-dizzy {
   display: none;
 }
 
-.cgs-walking.cgs-mascot-fox .cgs-leg-a {
-  animation: cgs-leg-swing 0.32s ease-in-out infinite alternate;
+.fsc-walking.fsc-mascot-fox .fsc-leg-a {
+  animation: fsc-leg-swing 0.32s ease-in-out infinite alternate;
 }
 
-.cgs-walking.cgs-mascot-fox .cgs-leg-b {
-  animation: cgs-leg-swing 0.32s ease-in-out infinite alternate-reverse;
+.fsc-walking.fsc-mascot-fox .fsc-leg-b {
+  animation: fsc-leg-swing 0.32s ease-in-out infinite alternate-reverse;
 }
 
-.cgs-walking.cgs-mascot-fox .cgs-bounce {
-  animation: cgs-walk-bob 0.32s ease-in-out infinite alternate;
+.fsc-walking.fsc-mascot-fox .fsc-bounce {
+  animation: fsc-walk-bob 0.32s ease-in-out infinite alternate;
 }
 
-.cgs-walking.cgs-mascot-fox .cgs-fox-tail {
+.fsc-walking.fsc-mascot-fox .fsc-fox-tail {
   animation-duration: 0.64s;
 }
 
-.cgs-bump .cgs-bounce {
-  animation: cgs-bump 0.26s ease-out;
+.fsc-bump .fsc-bounce {
+  animation: fsc-bump 0.26s ease-out;
 }
 
-.cgs-win .cgs-eyes-open,
-.cgs-fail .cgs-eyes-open {
+.fsc-win .fsc-eyes-open,
+.fsc-fail .fsc-eyes-open {
   display: none;
 }
 
-.cgs-win .cgs-eyes-happy,
-.cgs-fail .cgs-eyes-dizzy {
+.fsc-win .fsc-eyes-happy,
+.fsc-fail .fsc-eyes-dizzy {
   display: inline;
 }
 
-.cgs-win .cgs-heading,
-.cgs-fail .cgs-heading {
+.fsc-win .fsc-heading,
+.fsc-fail .fsc-heading {
   display: none;
 }
 
-.cgs-win .cgs-bounce {
-  animation: cgs-celebrate 0.56s ease-in-out infinite;
+.fsc-win .fsc-bounce {
+  animation: fsc-celebrate 0.56s ease-in-out infinite;
 }
 
-.cgs-fail .cgs-bounce {
-  animation: cgs-dizzy 0.9s ease-in-out infinite;
+.fsc-fail .fsc-bounce {
+  animation: fsc-dizzy 0.9s ease-in-out infinite;
 }
 
-.cgs-fail .cgs-tongue,
-.cgs-fail .cgs-fox-tail {
+.fsc-fail .fsc-tongue,
+.fsc-fail .fsc-fox-tail {
   animation: none;
 }
 
-@keyframes cgs-light-pulse {
+@keyframes fsc-light-pulse {
   50% {
     opacity: 0.84;
   }
 }
 
-@keyframes cgs-laser-flicker {
+@keyframes fsc-laser-flicker {
   50% {
     opacity: 0.74;
   }
 }
 
-@keyframes cgs-chip-bob {
+@keyframes fsc-chip-bob {
   50% {
     transform: translateY(-3px);
   }
 }
 
-@keyframes cgs-tail-sway {
+@keyframes fsc-tail-sway {
   50% {
     transform: rotate(9deg);
   }
 }
 
-@keyframes cgs-blink {
+@keyframes fsc-blink {
   0%,
   94%,
   100% {
@@ -416,7 +416,7 @@ select.cgs-mascot-select {
   }
 }
 
-@keyframes cgs-tongue-flick {
+@keyframes fsc-tongue-flick {
   0%,
   70%,
   100% {
@@ -428,7 +428,7 @@ select.cgs-mascot-select {
   }
 }
 
-@keyframes cgs-leg-swing {
+@keyframes fsc-leg-swing {
   from {
     transform: rotate(-24deg);
   }
@@ -437,7 +437,7 @@ select.cgs-mascot-select {
   }
 }
 
-@keyframes cgs-walk-bob {
+@keyframes fsc-walk-bob {
   from {
     transform: translateY(0);
   }
@@ -446,7 +446,7 @@ select.cgs-mascot-select {
   }
 }
 
-@keyframes cgs-bump {
+@keyframes fsc-bump {
   25% {
     transform: translateX(-4px) scale(1.05, 0.92);
   }
@@ -455,7 +455,7 @@ select.cgs-mascot-select {
   }
 }
 
-@keyframes cgs-celebrate {
+@keyframes fsc-celebrate {
   0%,
   100% {
     transform: translateY(0) scale(1.06, 0.94);
@@ -465,7 +465,7 @@ select.cgs-mascot-select {
   }
 }
 
-@keyframes cgs-dizzy {
+@keyframes fsc-dizzy {
   0%,
   100% {
     transform: rotate(-8deg);
@@ -476,17 +476,17 @@ select.cgs-mascot-select {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cgs-light,
-  .cgs-laser,
-  .cgs-chip-inner,
-  .cgs-fox-tail,
-  .cgs-blink,
-  .cgs-tongue,
-  .cgs-walking .cgs-leg,
-  .cgs-walking .cgs-bounce,
-  .cgs-bump .cgs-bounce,
-  .cgs-win .cgs-bounce,
-  .cgs-fail .cgs-bounce {
+  .fsc-light,
+  .fsc-laser,
+  .fsc-chip-inner,
+  .fsc-fox-tail,
+  .fsc-blink,
+  .fsc-tongue,
+  .fsc-walking .fsc-leg,
+  .fsc-walking .fsc-bounce,
+  .fsc-bump .fsc-bounce,
+  .fsc-win .fsc-bounce,
+  .fsc-fail .fsc-bounce {
     animation: none;
   }
 }

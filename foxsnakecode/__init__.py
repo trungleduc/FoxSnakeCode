@@ -5,4 +5,4 @@ except ImportError:
 
 
 def _jupyter_labextension_paths():
-    return [{"src": "labextension", "dest": "jupyterlab-code-gear-solid"}]
+    return [{"src": "labextension", "dest": "foxsnakecode"}]

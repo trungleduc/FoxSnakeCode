@@ -1,9 +1,17 @@
 import { ISessionContext } from '@jupyterlab/apputils';
-import { KernelMessage } from '@jupyterlab/services';
+import { Kernel, KernelMessage } from '@jupyterlab/services';
 import { buildRunCode, IRunResult, readRunOutput } from './engine';
 import { IScene } from './format';
 
-const STOP_TIMEOUT = 2000;
+const READY_TIMEOUT = 30000;
+const READY_ATTEMPT_TIME = 1000;
+const READY_RETRY_DELAY = 200;
+
+function delay(time: number): Promise<undefined> {
+  return new Promise(resolve => {
+    window.setTimeout(() => resolve(undefined), time);
+  });
+}
 
 export class Runner {
   constructor(sessionContext: ISessionContext) {
@@ -11,9 +19,45 @@ export class Runner {
   }
 
   async run(scene: IScene, code: string): Promise<IRunResult> {
-    const kernel = this._sessionContext.session?.kernel;
-    if (!kernel) {
-      throw new Error('No Python kernel is running.');
+    this._stopRequested = false;
+    let finished: () => void = () => undefined;
+    this._running = new Promise<void>(resolve => {
+      finished = resolve;
+    });
+    const abandoned = new Promise<void>(resolve => {
+      this._abandon = resolve;
+    });
+    try {
+      return await this._execute(scene, code, abandoned);
+    } finally {
+      this._abandon = null;
+      finished();
+      this._running = null;
+    }
+  }
+
+  async stop(): Promise<void> {
+    const running = this._running;
+    if (!running) {
+      return;
+    }
+    this._stopRequested = true;
+    await this._sessionContext.restartKernel().catch(() => undefined);
+    this._abandon?.();
+    await running;
+  }
+
+  private async _execute(
+    scene: IScene,
+    code: string,
+    abandoned: Promise<void>
+  ): Promise<IRunResult> {
+    const kernel = await Promise.race([
+      this._readyKernel(),
+      abandoned.then(() => null)
+    ]);
+    if (!kernel || this._stopRequested) {
+      return { status: 'stopped', events: [] };
     }
     let stdout = '';
     let stderr = '';
@@ -36,24 +80,12 @@ export class Runner {
         kernelError = `${message.content.ename}: ${message.content.evalue}`;
       }
     };
-    this._stopRequested = false;
-    const abandoned = new Promise<void>(resolve => {
-      this._abandon = resolve;
-    });
-    let finished: () => void = () => undefined;
-    this._running = new Promise<void>(resolve => {
-      finished = resolve;
-    });
     try {
       await Promise.race([future.done, abandoned]);
     } catch (error) {
       kernelError = kernelError || (error as Error).message;
     }
     future.dispose();
-    this._abandon = null;
-    window.clearTimeout(this._stopTimer);
-    finished();
-    this._running = null;
 
     if (this._stopRequested) {
       return { status: 'stopped', events: [] };
@@ -74,27 +106,40 @@ export class Runner {
     return result;
   }
 
-  async stop(): Promise<void> {
-    const running = this._running;
-    const kernel = this._sessionContext.session?.kernel;
-    if (!running || !kernel) {
-      return;
+  private async _readyKernel(): Promise<Kernel.IKernelConnection> {
+    const session = this._sessionContext.session;
+    if (session?.kernel?.status === 'dead') {
+      await this._reviveKernel();
     }
-    this._stopRequested = true;
-    this._stopTimer = window.setTimeout(() => {
-      const abandon = this._abandon;
-      void this._sessionContext
-        .restartKernel()
-        .catch(() => undefined)
-        .then(() => abandon?.());
-    }, STOP_TIMEOUT);
-    kernel.interrupt().catch(() => undefined);
-    await running;
+    const deadline = Date.now() + READY_TIMEOUT;
+    while (Date.now() < deadline) {
+      const kernel = this._sessionContext.session?.kernel;
+      if (kernel) {
+        const reply = await Promise.race([
+          kernel.requestKernelInfo().catch(() => undefined),
+          delay(READY_ATTEMPT_TIME)
+        ]);
+        if (reply) {
+          return kernel;
+        }
+      }
+      await delay(READY_RETRY_DELAY);
+    }
+    throw new Error('The Python kernel is not responding.');
+  }
+
+  private async _reviveKernel(): Promise<void> {
+    try {
+      await this._sessionContext.restartKernel();
+    } catch {
+      await this._sessionContext.changeKernel({
+        name: this._sessionContext.kernelPreference.name
+      });
+    }
   }
 
   private _sessionContext: ISessionContext;
   private _running: Promise<void> | null = null;
   private _abandon: (() => void) | null = null;
   private _stopRequested = false;
-  private _stopTimer = 0;
 }

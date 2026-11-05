@@ -1,9 +1,9 @@
 {
-  "title": "Operation First Run",
+  "title": "Operation Silent Script",
   "levels": [
     {
-      "title": "1. First Steps",
-      "instructions": "Steal the data chip! Each floor panel is 100 steps wide. `step(100)` only gets you part of the way, so change the number and press Run.",
+      "title": "1. Infiltration",
+      "instructions": "HQ: You're inside. Your target is one data chip. Each floor panel is 100 steps wide, and `step(100)` won't get you all the way. Adjust the number and press Run.",
       "starterCode": "step(100)\n",
       "scene": {
         "start": {
@@ -20,8 +20,8 @@
       }
     },
     {
-      "title": "2. Turn the Corner",
-      "instructions": "Crates block your way, so go around them. `turn(90)` turns right and `turn(-90)` turns left.",
+      "title": "2. Blind Corner",
+      "instructions": "HQ: Crates ahead, and you can't go through them. Go around. `turn(90)` turns right and `turn(-90)` turns left.",
       "starterCode": "step(400)\n",
       "scene": {
         "start": {
@@ -46,8 +46,8 @@
       }
     },
     {
-      "title": "3. Zigzag",
-      "instructions": "Collect all the chips in order. You can write as many commands as you need, one on each line.",
+      "title": "3. Crate Alley",
+      "instructions": "HQ: Four chips in this alley. Collect them in order. You can give as many orders as you need, one on each line.",
       "starterCode": "step(200)\nturn(-90)\n",
       "scene": {
         "start": {
@@ -90,8 +90,8 @@
       }
     },
     {
-      "title": "4. The Staircase",
-      "instructions": "These stairs repeat. Instead of writing every command, put one stair inside a `for` loop: move 100 steps, turn left, move 75 steps, turn right.",
+      "title": "4. Service Stairs",
+      "instructions": "HQ: These stairs repeat, so don't write every order. Put one stair inside a `for` loop: move 100 steps, turn left, move 75 steps, turn right.",
       "starterCode": "for i in range(5):\n    step(100)\n    # add the rest of one stair here\n",
       "scene": {
         "start": {
@@ -124,8 +124,8 @@
       }
     },
     {
-      "title": "5. Patrol the Crate",
-      "instructions": "Walk around the crate. Each side is the same, so one loop can do the whole patrol.",
+      "title": "5. Perimeter Sweep",
+      "instructions": "HQ: Sweep the perimeter around the crate. Each side is the same, so one loop can handle the whole patrol.",
       "starterCode": "for i in range(4):\n    # walk one side, then turn the corner\n    pass\n",
       "scene": {
         "start": {
@@ -158,8 +158,8 @@
       }
     },
     {
-      "title": "6. Around the Searchlight",
-      "instructions": "Stay out of the searchlight! The chips form a hexagon, so each side is 150 steps and each corner is a 60 degree turn.",
+      "title": "6. Searchlight Yard",
+      "instructions": "HQ: Stay out of the searchlight. The chips form a hexagon around it: each side is 150 steps and each corner is a 60 degree turn.",
       "starterCode": "for i in range(6):\n    step(150)\n",
       "scene": {
         "start": {
@@ -199,8 +199,8 @@
       }
     },
     {
-      "title": "7. The Chip List",
-      "instructions": "`chips` is a list of every chip in the room. `turn_to(c)` faces a chip and `distance_to(c)` tells you how far away it is, so you never need to measure.",
+      "title": "7. Target List",
+      "instructions": "HQ: Here's your target list. `chips` holds every chip in the room. `turn_to(c)` faces a chip and `distance_to(c)` tells you how far away it is, so you never need to measure.",
       "starterCode": "for c in chips:\n    turn_to(c)\n    # now walk to the chip\n",
       "scene": {
         "start": {
@@ -233,8 +233,8 @@
       }
     },
     {
-      "title": "8. Your First Function",
-      "instructions": "A function gives a name to commands you use often. Fill in `grab`, then choose the chip order carefully: `chips[0]` is across the searchlight, so start with the one nearest you.",
+      "title": "8. Standard Procedure",
+      "instructions": "HQ: Time for a standard procedure. A function gives a name to orders you use often. Fill in `grab`, then choose your route carefully: `chips[0]` is across the searchlight, so start with the chip nearest you.",
       "starterCode": "def grab(chip):\n    turn_to(chip)\n    # walk to the chip\n\ngrab(chips[0])\n",
       "scene": {
         "start": {
@@ -266,8 +266,8 @@
       }
     },
     {
-      "title": "9. Any Size You Like",
-      "instructions": "Functions can take inputs. Finish `square(size)`, walk the small square, take 200 steps to reach the big one, then walk that too.",
+      "title": "9. Recon Grid",
+      "instructions": "HQ: Functions can take inputs. Finish `square(size)`, sweep the small square, take 200 steps to reach the big one, then sweep that too.",
       "starterCode": "def square(size):\n    for i in range(4):\n        step(size)\n        # turn the corner\n\nsquare(100)\n",
       "scene": {
         "start": {
@@ -312,8 +312,8 @@
       }
     },
     {
-      "title": "10. Crate Hopper",
-      "instructions": "Put your detour in a function: turn left, walk 100, turn right, walk 200, turn right, walk 100, turn left. Then use a loop to repeat it. Keep clear of the laser.",
+      "title": "10. Cargo Bay",
+      "instructions": "HQ: Crates block the way through the cargo bay. Put your detour in a function: turn left, walk 100, turn right, walk 200, turn right, walk 100, turn left. Then use a loop to repeat it. Keep clear of the laser.",
       "starterCode": "def around_crate():\n    turn(-90)\n    step(100)\n    # finish the detour\n\nstep(100)\n",
       "scene": {
         "start": {
@@ -370,8 +370,8 @@
       }
     },
     {
-      "title": "11. Trapped Chips",
-      "instructions": "The red chips are traps! Every chip has a `trapped` value, so use `if not c.trapped:` to skip them.",
+      "title": "11. Decoy Vault",
+      "instructions": "HQ: Intel confirms the red chips are decoys wired to the alarm. Every chip has a `trapped` value, so use `if not c.trapped:` to leave them alone.",
       "starterCode": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n",
       "scene": {
         "start": {
@@ -411,8 +411,8 @@
       }
     },
     {
-      "title": "12. Final Run",
-      "instructions": "Use everything you've learned. Write a `grab` function, loop over `chips`, and skip the traps. Watch out for the searchlight and the lasers.",
+      "title": "12. Extraction",
+      "instructions": "HQ: This is it. Use everything you've learned. Write a `grab` function, loop over `chips`, and skip the decoys. Watch out for the searchlight and the lasers, then get out.",
       "starterCode": "def grab(chip):\n    # face the chip and walk to it\n    pass\n\nfor c in chips:\n    # grab the chip unless it is trapped\n    pass\n",
       "scene": {
         "start": {
@@ -470,14 +470,5 @@
         ]
       }
     }
-  ],
-  "progress": {
-    "mascot": "snake",
-    "currentLevel": 4,
-    "solved": [],
-    "code": {
-      "4": "for i in range(4):\n    # walk one side, then turn the corner\n    pass\n",
-      "10": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n"
-    }
-  }
+  ]
 }

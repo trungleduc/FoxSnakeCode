@@ -1518,6 +1518,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"foxsnakecode@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "foxsnakecode@workspace:."
+  dependencies:
+    "@jupyterlab/application": ^4.0.0
+    "@jupyterlab/apputils": ^4.0.0
+    "@jupyterlab/builder": ^4.0.0
+    "@jupyterlab/codeeditor": ^4.0.0
+    "@jupyterlab/docregistry": ^4.0.0
+    "@jupyterlab/services": ^7.0.0
+    "@jupyterlab/ui-components": ^4.0.0
+    "@lumino/widgets": ^2.0.0
+    npm-run-all2: ^7.0.1
+    rimraf: ^5.0.1
+    typescript: ~5.5.4
+  languageName: unknown
+  linkType: soft
+
 "free-style@npm:3.1.0":
   version: 3.1.0
   resolution: "free-style@npm:3.1.0"
@@ -1836,24 +1854,6 @@ __metadata:
   checksum: 0b40f712900ad0c846681ea2db23b6684b9d5eedf55807b4708c656f5894b63507d0e28ae10aa1bddbea551241035afe62b6df0800fc94c2e2806a7f3adecd7c
   languageName: node
   linkType: hard
-
-"jupyterlab-code-gear-solid@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "jupyterlab-code-gear-solid@workspace:."
-  dependencies:
-    "@jupyterlab/application": ^4.0.0
-    "@jupyterlab/apputils": ^4.0.0
-    "@jupyterlab/builder": ^4.0.0
-    "@jupyterlab/codeeditor": ^4.0.0
-    "@jupyterlab/docregistry": ^4.0.0
-    "@jupyterlab/services": ^7.0.0
-    "@jupyterlab/ui-components": ^4.0.0
-    "@lumino/widgets": ^2.0.0
-    npm-run-all2: ^7.0.1
-    rimraf: ^5.0.1
-    typescript: ~5.5.4
-  languageName: unknown
-  linkType: soft
 
 "kind-of@npm:^6.0.2":
   version: 6.0.3

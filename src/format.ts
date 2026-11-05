@@ -193,7 +193,7 @@ export function parseMission(text: string): IMission {
     parseLevel(level, `Level ${index + 1}`)
   );
   return {
-    title: typeof raw.title === 'string' ? raw.title : 'Code Gear Solid',
+    title: typeof raw.title === 'string' ? raw.title : 'FoxSnakeCode',
     levels,
     progress: parseProgress(raw.progress, levels.length),
     raw

@@ -12,15 +12,15 @@ import {
   IDocumentWidget
 } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
-import { cgsIcon } from './art';
-import { CgsPanel } from './panel';
+import { fscIcon } from './art';
+import { FscPanel } from './panel';
 
-const FACTORY = 'Code Gear Solid';
-const FILE_TYPE = 'cgs';
+const FACTORY = 'FoxSnakeCode';
+const FILE_TYPE = 'fsc';
 
-class CgsWidgetFactory extends ABCWidgetFactory<IDocumentWidget<CgsPanel>> {
+class FscWidgetFactory extends ABCWidgetFactory<IDocumentWidget<FscPanel>> {
   constructor(
-    options: DocumentRegistry.IWidgetFactoryOptions<IDocumentWidget<CgsPanel>>,
+    options: DocumentRegistry.IWidgetFactoryOptions<IDocumentWidget<FscPanel>>,
     editorServices: IEditorServices,
     serviceManager: ServiceManager.IManager
   ) {
@@ -31,8 +31,8 @@ class CgsWidgetFactory extends ABCWidgetFactory<IDocumentWidget<CgsPanel>> {
 
   protected createNewWidget(
     context: DocumentRegistry.IContext<DocumentRegistry.IModel>
-  ): IDocumentWidget<CgsPanel> {
-    const content = new CgsPanel({
+  ): IDocumentWidget<FscPanel> {
+    const content = new FscPanel({
       context,
       editorServices: this._editorServices,
       serviceManager: this._serviceManager
@@ -47,8 +47,8 @@ class CgsWidgetFactory extends ABCWidgetFactory<IDocumentWidget<CgsPanel>> {
 }
 
 const plugin: JupyterFrontEndPlugin<void> = {
-  id: 'jupyterlab-code-gear-solid:plugin',
-  description: 'Open .cgs coding puzzles in a split code and game panel.',
+  id: 'foxsnakecode:plugin',
+  description: 'Open .fsc coding puzzles in a split code and game panel.',
   autoStart: true,
   requires: [IEditorServices],
   optional: [ILayoutRestorer],
@@ -59,15 +59,15 @@ const plugin: JupyterFrontEndPlugin<void> = {
   ) => {
     app.docRegistry.addFileType({
       name: FILE_TYPE,
-      displayName: 'Code Gear Solid Mission',
-      extensions: ['.cgs'],
+      displayName: 'FoxSnakeCode Mission',
+      extensions: ['.fsc'],
       mimeTypes: ['application/json'],
       fileFormat: 'text',
       contentType: 'file',
-      icon: cgsIcon
+      icon: fscIcon
     });
 
-    const factory = new CgsWidgetFactory(
+    const factory = new FscWidgetFactory(
       {
         name: FACTORY,
         modelName: 'text',
@@ -78,8 +78,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
       app.serviceManager
     );
 
-    const tracker = new WidgetTracker<IDocumentWidget<CgsPanel>>({
-      namespace: 'code-gear-solid'
+    const tracker = new WidgetTracker<IDocumentWidget<FscPanel>>({
+      namespace: 'foxsnakecode'
     });
     if (restorer) {
       void restorer.restore(tracker, {
@@ -89,7 +89,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       });
     }
     factory.widgetCreated.connect((_, widget) => {
-      widget.title.icon = cgsIcon;
+      widget.title.icon = fscIcon;
       widget.context.pathChanged.connect(() => {
         void tracker.save(widget);
       });

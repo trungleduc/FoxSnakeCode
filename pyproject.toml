@@ -7,7 +7,7 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyterlab-code-gear-solid"
+name = "foxsnakecode"
 readme = "README.md"
 requires-python = ">=3.9"
 dynamic = ["version", "description", "authors", "keywords"]
@@ -27,24 +27,24 @@ source = "nodejs"
 fields = ["description", "authors", "keywords"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["jupyterlab_code_gear_solid/labextension"]
+artifacts = ["foxsnakecode/labextension"]
 exclude = [".github", "node_modules"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyterlab_code_gear_solid/labextension" = "share/jupyter/labextensions/jupyterlab-code-gear-solid"
-"install.json" = "share/jupyter/labextensions/jupyterlab-code-gear-solid/install.json"
+"foxsnakecode/labextension" = "share/jupyter/labextensions/foxsnakecode"
+"install.json" = "share/jupyter/labextensions/foxsnakecode/install.json"
 
 [tool.hatch.build.hooks.version]
-path = "jupyterlab_code_gear_solid/_version.py"
+path = "foxsnakecode/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "jupyterlab_code_gear_solid/labextension/static/style.js",
-    "jupyterlab_code_gear_solid/labextension/package.json",
+    "foxsnakecode/labextension/static/style.js",
+    "foxsnakecode/labextension/package.json",
 ]
-skip-if-exists = ["jupyterlab_code_gear_solid/labextension/static/style.js"]
+skip-if-exists = ["foxsnakecode/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -54,4 +54,4 @@ npm = ["jlpm"]
 build_cmd = "build"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "jupyterlab_code_gear_solid/labextension"
+build_dir = "foxsnakecode/labextension"

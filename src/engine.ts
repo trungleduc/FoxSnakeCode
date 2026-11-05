@@ -205,8 +205,8 @@ def _run(payload):
 
 
 _output = sys.stdout
-_result = _run(json.loads(base64.b64decode(_CGS_PAYLOAD).decode("utf-8")))
-_output.write("\n\x1eCGS" + json.dumps(_result) + "\x1e\n")
+_result = _run(json.loads(base64.b64decode(_FSC_PAYLOAD).decode("utf-8")))
+_output.write("\n\x1eFSC" + json.dumps(_result) + "\x1e\n")
 _output.flush()
 `;
 
@@ -223,7 +223,7 @@ export function buildRunCode(scene: IScene, code: string): string {
   const payload = toBase64(JSON.stringify({ scene, code }));
   return (
     `exec(__import__("base64").b64decode("${engine}").decode("utf-8"), ` +
-    `{"__name__": "__cgs__", "_CGS_PAYLOAD": "${payload}"})`
+    `{"__name__": "__fsc__", "_FSC_PAYLOAD": "${payload}"})`
   );
 }
 
@@ -252,7 +252,7 @@ export interface IRunResult {
   output?: string;
 }
 
-const RESULT_PATTERN = /\n?\x1eCGS([\s\S]*?)\x1e\n?/;
+const RESULT_PATTERN = /\n?\x1eFSC([\s\S]*?)\x1e\n?/;
 
 export function readRunOutput(stdout: string): IRunResult | null {
   const match = RESULT_PATTERN.exec(stdout);

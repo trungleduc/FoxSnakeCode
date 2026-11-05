@@ -54,16 +54,16 @@ function setInlineCode(node: HTMLElement, text: string): void {
   });
 }
 
-export interface ICgsPanelOptions {
+export interface IFscPanelOptions {
   context: DocumentRegistry.IContext<DocumentRegistry.IModel>;
   editorServices: IEditorServices;
   serviceManager: ServiceManager.IManager;
 }
 
-export class CgsPanel extends SplitPanel {
-  constructor(options: ICgsPanelOptions) {
+export class FscPanel extends SplitPanel {
+  constructor(options: IFscPanelOptions) {
     super({ orientation: 'horizontal', spacing: 3 });
-    this.addClass('cgs-panel');
+    this.addClass('fsc-panel');
     this._context = options.context;
     this._serviceManager = options.serviceManager;
 
@@ -71,7 +71,7 @@ export class CgsPanel extends SplitPanel {
       sessionManager: options.serviceManager.sessions,
       specsManager: options.serviceManager.kernelspecs,
       path: this._context.path,
-      type: 'code-gear-solid',
+      type: 'foxsnakecode',
       name: this._context.localPath,
       kernelPreference: {
         language: 'python',
@@ -91,7 +91,7 @@ export class CgsPanel extends SplitPanel {
       model: this._editorModel,
       editorOptions: { config: { lineNumbers: true } }
     });
-    editor.addClass('cgs-editor');
+    editor.addClass('fsc-editor');
     this._editorModel.sharedModel.changed.connect((_, change) => {
       if (change.sourceChange) {
         this._onCodeChanged();
@@ -123,18 +123,18 @@ export class CgsPanel extends SplitPanel {
 
   private _buildCodeSide(editor: CodeEditorWrapper): Panel {
     const side = new Panel();
-    side.addClass('cgs-code-side');
+    side.addClass('fsc-code-side');
 
     const brief = new Widget();
-    brief.addClass('cgs-brief');
+    brief.addClass('fsc-brief');
     this._levelSelect.setAttribute('aria-label', 'Level');
     this._levelSelect.addEventListener('change', () => {
       void this._goToLevel(Number(this._levelSelect.value));
     });
     brief.node.append(this._levelSelect, this._levelTitle, this._instructions);
 
-    const help = element('details', 'cgs-help');
-    help.appendChild(element('summary', '', 'Commands'));
+    const help = element('details', 'fsc-help');
+    help.appendChild(element('summary', '', 'Field manual'));
     const commands = element('dl', '');
     for (const [name, description] of COMMANDS) {
       commands.append(element('dt', '', name), element('dd', '', description));
@@ -143,7 +143,7 @@ export class CgsPanel extends SplitPanel {
     brief.node.appendChild(help);
 
     const actions = new Widget();
-    actions.addClass('cgs-actions');
+    actions.addClass('fsc-actions');
     this._runButton.addEventListener('click', () => void this._onRunClicked());
     this._resetButton.addEventListener('click', () => void this._reset());
     this._restoreButton.addEventListener(
@@ -159,7 +159,7 @@ export class CgsPanel extends SplitPanel {
     this._status.setAttribute('role', 'status');
 
     const output = new Widget();
-    output.addClass('cgs-output-holder');
+    output.addClass('fsc-output-holder');
     output.node.appendChild(this._output);
 
     side.addWidget(brief);
@@ -171,9 +171,9 @@ export class CgsPanel extends SplitPanel {
 
   private _buildPlaySide(): Widget {
     const side = new Widget();
-    side.addClass('cgs-play-side');
+    side.addClass('fsc-play-side');
 
-    const header = element('div', 'cgs-hud');
+    const header = element('div', 'fsc-hud');
     this._mascotSelect.setAttribute('aria-label', 'Mascot');
     for (const mascot of MASCOTS) {
       const option = element('option', '', mascot.name);
@@ -190,7 +190,7 @@ export class CgsPanel extends SplitPanel {
     });
     header.append(this._missionTitle, this._chipCount, this._mascotSelect);
 
-    const stageHolder = element('div', 'cgs-stage');
+    const stageHolder = element('div', 'fsc-stage');
     stageHolder.appendChild(this._stage.node);
 
     this._nextButton.addEventListener('click', () => {
@@ -423,12 +423,12 @@ export class CgsPanel extends SplitPanel {
           mission.progress.solved.length === mission.levels.length;
         this._showBanner(
           'win',
-          cleared ? 'Mission complete!' : 'Data secured!',
+          cleared ? 'MISSION ACCOMPLISHED' : 'OBJECTIVE SECURED',
           cleared
-            ? `${mascot} cleared every level.`
+            ? `${mascot} vanished without a trace.`
             : hasNext
-            ? `${mascot} got away with all the chips.`
-            : `${mascot} got away with all the chips. Some earlier levels are still unsolved.`,
+            ? `${mascot} slipped out with the data.`
+            : `${mascot} slipped out with the data. Some earlier objectives are still open.`,
           hasNext
         );
         return;
@@ -436,15 +436,21 @@ export class CgsPanel extends SplitPanel {
       case 'failed': {
         this._stage.setOutcome('fail');
         const messages: Record<string, [string, string]> = {
-          light: ['Spotted!', `The searchlight caught ${mascot}.`],
-          laser: ['Alarm!', `${mascot} tripped a laser.`],
-          trap: ["It's a trap!", `${mascot} grabbed a trapped chip.`]
+          light: [
+            "ALERT: YOU'VE BEEN SPOTTED",
+            `The searchlight found ${mascot}. Stay in the shadows.`
+          ],
+          laser: [
+            'ALARM TRIPPED',
+            `${mascot} broke a laser beam. Plot a new route.`
+          ],
+          trap: ['DECOY CHIP', 'It was rigged. Check .trapped before you grab.']
         };
         const [title, detail] = messages[result.reason ?? ''] ?? [
-          'Caught!',
-          `${mascot} was caught.`
+          'ALARM TRIPPED',
+          `${mascot} was detected. Plot a new route.`
         ];
-        this._showBanner('fail', title, `${detail} Change your route and try again.`);
+        this._showBanner('fail', title, detail);
         return;
       }
       case 'incomplete': {
@@ -460,10 +466,10 @@ export class CgsPanel extends SplitPanel {
         const remaining = left - taken.size;
         this._showBanner(
           'info',
-          'Not there yet',
-          `Your code finished with ${remaining} ${
+          'OBJECTIVE INCOMPLETE',
+          `Your orders ran out with ${remaining} ${
             remaining === 1 ? 'chip' : 'chips'
-          } still to collect.`
+          } still in the building.`
         );
         return;
       }
@@ -473,8 +479,8 @@ export class CgsPanel extends SplitPanel {
         if (error.kind === 'too-long') {
           this._showBanner(
             'fail',
-            'Too many steps',
-            'Your code ran for too long. Check for a loop that never ends.'
+            'MISSION TIMEOUT',
+            'Your orders never end. Check for an endless loop.'
           );
           return;
         }
@@ -482,7 +488,7 @@ export class CgsPanel extends SplitPanel {
         const message = error.message ? `: ${error.message}` : '';
         this._showBanner(
           'fail',
-          'There is a bug in your code',
+          'ORDERS NOT UNDERSTOOD',
           `${where}${error.type ?? 'Error'}${message}`
         );
         return;
@@ -523,9 +529,9 @@ export class CgsPanel extends SplitPanel {
     this._resetButton.disabled = !usable;
     this._restoreButton.disabled = !usable;
     const messages: Record<Phase, string> = {
-      starting: 'Starting Python…',
+      starting: 'Establishing kernel link…',
       idle: '',
-      running: 'Running your code…',
+      running: 'Operation under way…',
       playing: '',
       stopping: 'Stopping…',
       broken: ''
@@ -593,18 +599,18 @@ export class CgsPanel extends SplitPanel {
   private _lastFileText = '';
   private _saveTimer = 0;
 
-  private _levelSelect = element('select', 'jp-mod-styled cgs-level-select');
-  private _levelTitle = element('h2', 'cgs-level-title');
-  private _instructions = element('p', 'cgs-instructions');
-  private _runButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept cgs-run', 'Run');
+  private _levelSelect = element('select', 'jp-mod-styled fsc-level-select');
+  private _levelTitle = element('h2', 'fsc-level-title');
+  private _instructions = element('p', 'fsc-instructions');
+  private _runButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept fsc-run', 'Run');
   private _resetButton = element('button', 'jp-Button jp-mod-styled jp-mod-reject', 'Reset');
-  private _restoreButton = element('button', 'cgs-link-button', 'Restore starter code');
-  private _status = element('span', 'cgs-status', 'Starting Python…');
-  private _output = element('pre', 'cgs-output');
-  private _missionTitle = element('span', 'cgs-mission-title');
-  private _chipCount = element('span', 'cgs-chip-count');
-  private _mascotSelect = element('select', 'jp-mod-styled cgs-mascot-select');
-  private _banner = element('div', 'cgs-banner');
-  private _bannerText = element('div', 'cgs-banner-text');
-  private _nextButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept', 'Next level');
+  private _restoreButton = element('button', 'fsc-link-button', 'Restore starter code');
+  private _status = element('span', 'fsc-status', 'Establishing kernel link…');
+  private _output = element('pre', 'fsc-output');
+  private _missionTitle = element('span', 'fsc-mission-title');
+  private _chipCount = element('span', 'fsc-chip-count');
+  private _mascotSelect = element('select', 'jp-mod-styled fsc-mascot-select');
+  private _banner = element('div', 'fsc-banner');
+  private _bannerText = element('div', 'fsc-banner-text');
+  private _nextButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept', 'Next mission');
 }

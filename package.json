@@ -1,5 +1,5 @@
 {
-  "name": "jupyterlab-code-gear-solid",
+  "name": "foxsnakecode",
   "version": "0.1.0",
   "description": "A coding puzzle game for JupyterLab and JupyterLite",
   "keywords": [
@@ -29,8 +29,9 @@
     "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:demo": "rimraf demo/_output demo/.jupyterlite.doit.db && cd demo && jupyter lite build .",
     "build:lib": "tsc --sourceMap",
-    "clean": "rimraf lib tsconfig.tsbuildinfo jupyterlab_code_gear_solid/labextension jupyterlab_code_gear_solid/_version.py",
+    "clean": "rimraf lib tsconfig.tsbuildinfo foxsnakecode/labextension foxsnakecode/_version.py",
     "watch": "run-p watch:src watch:labextension",
     "watch:src": "tsc -w --sourceMap",
     "watch:labextension": "jupyter labextension watch ."
@@ -52,6 +53,6 @@
   },
   "jupyterlab": {
     "extension": true,
-    "outputDir": "jupyterlab_code_gear_solid/labextension"
+    "outputDir": "foxsnakecode/labextension"
   }
 }

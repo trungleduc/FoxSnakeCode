@@ -23,13 +23,13 @@ export class Stage {
   readonly node: SVGSVGElement;
 
   constructor(onChips: (collected: number, total: number) => void) {
-    this._id = `cgs-stage-${++nextStageId}`;
+    this._id = `fsc-stage-${++nextStageId}`;
     this._onChips = onChips;
     this.node = document.createElementNS(SVG_NS, 'svg');
     this.node.setAttribute('viewBox', `0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`);
     this.node.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.node.setAttribute('role', 'img');
-    this.node.classList.add('cgs-scene');
+    this.node.classList.add('fsc-scene');
   }
 
   load(scene: IScene, mascot: MascotId): void {
@@ -37,9 +37,9 @@ export class Stage {
     this._scene = scene;
     this._mascot = mascot;
     this.node.innerHTML = sceneMarkup(scene, this._id);
-    this._actor = this.node.querySelector('.cgs-actor') as SVGGElement;
+    this._actor = this.node.querySelector('.fsc-actor') as SVGGElement;
     this._snakeBody = this.node.querySelector(
-      '.cgs-snake-body'
+      '.fsc-snake-body'
     ) as SVGGElement;
     this.reset();
   }
@@ -64,8 +64,8 @@ export class Stage {
     this._facing = Math.cos((this._angle * Math.PI) / 180) < -0.01 ? -1 : 1;
     this.setOutcome(null);
     this.node
-      .querySelectorAll('.cgs-chip-taken')
-      .forEach(chip => chip.classList.remove('cgs-chip-taken'));
+      .querySelectorAll('.fsc-chip-taken')
+      .forEach(chip => chip.classList.remove('fsc-chip-taken'));
     this._drawActorMarkup();
     this._resetTrail();
     this._drawPose();
@@ -73,8 +73,8 @@ export class Stage {
   }
 
   setOutcome(outcome: 'win' | 'fail' | null): void {
-    this.node.classList.toggle('cgs-win', outcome === 'win');
-    this.node.classList.toggle('cgs-fail', outcome === 'fail');
+    this.node.classList.toggle('fsc-win', outcome === 'win');
+    this.node.classList.toggle('fsc-fail', outcome === 'fail');
   }
 
   play(events: GameEvent[]): Promise<void> {
@@ -128,7 +128,7 @@ export class Stage {
     }
     this._setWalking(false);
     clearTimeout(this._bumpTimer);
-    this.node.classList.remove('cgs-bump');
+    this.node.classList.remove('fsc-bump');
     const finish = this._finishPlay;
     this._finishPlay = null;
     finish?.();
@@ -186,10 +186,10 @@ export class Stage {
 
   private _takeChip(index: number): void {
     const chip = this.node.querySelector(`[data-chip="${index}"]`);
-    if (!chip || chip.classList.contains('cgs-chip-taken')) {
+    if (!chip || chip.classList.contains('fsc-chip-taken')) {
       return;
     }
-    chip.classList.add('cgs-chip-taken');
+    chip.classList.add('fsc-chip-taken');
     if (!this._scene?.chips[index].trapped) {
       this._collected++;
       this._reportChips();
@@ -202,25 +202,25 @@ export class Stage {
   }
 
   private _bump(): void {
-    if (this.node.classList.contains('cgs-bump')) {
+    if (this.node.classList.contains('fsc-bump')) {
       return;
     }
-    this.node.classList.add('cgs-bump');
+    this.node.classList.add('fsc-bump');
     this._bumpTimer = window.setTimeout(() => {
-      this.node.classList.remove('cgs-bump');
+      this.node.classList.remove('fsc-bump');
     }, BUMP_TIME);
   }
 
   private _setWalking(walking: boolean): void {
-    this.node.classList.toggle('cgs-walking', walking);
+    this.node.classList.toggle('fsc-walking', walking);
   }
 
   private _drawActorMarkup(): void {
     if (!this._actor || !this._snakeBody) {
       return;
     }
-    this.node.classList.toggle('cgs-mascot-fox', this._mascot === 'fox');
-    this.node.classList.toggle('cgs-mascot-snake', this._mascot === 'snake');
+    this.node.classList.toggle('fsc-mascot-fox', this._mascot === 'fox');
+    this.node.classList.toggle('fsc-mascot-snake', this._mascot === 'snake');
     this.node.setAttribute(
       'aria-label',
       this._mascot === 'fox'
@@ -229,8 +229,8 @@ export class Stage {
     );
     this._actor.innerHTML =
       this._mascot === 'fox' ? FOX_MARKUP : SNAKE_HEAD_MARKUP;
-    this._heading = this._actor.querySelector('.cgs-heading') as SVGGElement;
-    this._sprite = this._actor.querySelector('.cgs-sprite') as SVGGElement;
+    this._heading = this._actor.querySelector('.fsc-heading') as SVGGElement;
+    this._sprite = this._actor.querySelector('.fsc-sprite') as SVGGElement;
     this._snakeBody.innerHTML = '';
     this._segments = [];
     if (this._mascot === 'snake') {

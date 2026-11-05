@@ -1,8 +1,8 @@
-# Code Gear Solid
+# FoxSnakeCode
 
-A coding puzzle game for JupyterLab and JupyterLite. Double-click a `.cgs` file to open a split panel: write Python on the left, then press Run to watch Grep Fox or Sudo Snake steal data chips from a night-time facility on the right.
+A coding puzzle game for JupyterLab and JupyterLite. Double-click a `.fsc` file to open a split panel: write Python on the left, then press Run to watch Grep Fox or Sudo Snake steal data chips from a night-time facility on the right.
 
-Code Gear Solid runs your code on a Python kernel and prefers xeus-python.
+FoxSnakeCode runs your code on a Python kernel and prefers xeus-python.
 
 ## Install for development
 
@@ -16,28 +16,21 @@ jlpm build
 jupyter lab
 ```
 
-Then open `examples/first-mission.cgs`.
+Then open `demo/files/first-mission.fsc`.
 
-## Use in JupyterLite
+## JupyterLite demo site
 
-With the extension installed, create an `environment.yml` for the in-browser kernel:
-
-```yaml
-name: xeus-python-kernel
-channels:
-  - https://prefix.dev/emscripten-forge-4x
-  - https://prefix.dev/conda-forge
-dependencies:
-  - xeus-python
-```
-
-Then build the site from the same folder, with your `.cgs` files in `contents`, and host `dist` on any static web server:
+The `demo` folder holds a JupyterLite site with xeus-python running in the browser. Put missions in `demo/files`, then build the site with the extension installed:
 
 ```bash
-jupyter lite build --contents contents --output-dir dist
+jlpm build:demo
 ```
 
-In JupyterLite, saved progress stays in that browser's storage. Stop may need to restart the in-browser kernel, so the next Run can take a few seconds.
+The site is written to `demo/_output`, which you can host on any static web server.
+
+In JupyterLite, saved progress stays in that browser's storage.
+
+Stop restarts the kernel, so the next Run can take a few seconds in JupyterLite.
 
 ## Commands players can use
 
@@ -51,9 +44,9 @@ In JupyterLite, saved progress stays in that browser's storage. Stop may need to
 
 A level is solved when every chip that isn't trapped has been collected. Searchlights, lasers and trapped chips end the attempt, while crates and walls just block the way.
 
-## The `.cgs` file format
+## The `.fsc` file format
 
-A `.cgs` file is JSON. The world is 800 by 500 steps, with `x` increasing to the right and `y` increasing downward. An `angle` of 0 faces right.
+A `.fsc` file is JSON. The world is 800 by 500 steps, with `x` increasing to the right and `y` increasing downward. An `angle` of 0 faces right.
 
 A file can hold a list of levels:
 

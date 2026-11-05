@@ -1,0 +1,12 @@
+{
+  "LiteBuildConfig": {
+    "extra_file_types": {
+      "fsc": {
+        "name": "fsc",
+        "extensions": [".fsc"],
+        "mimeTypes": ["application/json"],
+        "fileFormat": "text"
+      }
+    }
+  }
+}

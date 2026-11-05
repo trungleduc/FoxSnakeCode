@@ -2,8 +2,10 @@
 .ipynb_checkpoints/
 .yarn/
 __pycache__/
+demo/.jupyterlite.doit.db
+demo/_output/
 dist/
-jupyterlab_code_gear_solid/_version.py
-jupyterlab_code_gear_solid/labextension/
+foxsnakecode/_version.py
+foxsnakecode/labextension/
 lib/
 node_modules/

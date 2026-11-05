@@ -3,7 +3,7 @@
   "levels": [
     {
       "title": "1. Infiltration",
-      "instructions": "HQ: You're inside. Your target is one data chip. Each floor panel is 100 steps wide, and `step(100)` won't get you all the way. Adjust the number and press Run.",
+      "instructions": "HQ: Grep Fox, you're inside. Your target is one data chip. Each floor panel is 100 steps wide, and `step(100)` won't get you all the way. Adjust the number and press Run.",
       "starterCode": "step(100)\n",
       "scene": {
         "start": {

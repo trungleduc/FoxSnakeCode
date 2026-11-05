@@ -1,12 +1,14 @@
-import { FOX_MARKUP, sceneMarkup, SNAKE_MARKUP } from './art';
+import { FOX_MARKUP, sceneMarkup } from './art';
+import { GameAudio } from './audio';
 import { GameEvent } from './engine';
-import { IScene, MascotId, WORLD_HEIGHT, WORLD_WIDTH } from './format';
+import { IScene, WORLD_HEIGHT, WORLD_WIDTH } from './format';
 
 const WALK_SPEED = 240;
 const TURN_SPEED = 360;
 const BUMP_TIME = 260;
 const MIN_COMMAND_TIME = 70;
 const MAX_PLAY_TIME = 30000;
+const FOOTSTEP_DISTANCE = 45;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -15,9 +17,13 @@ let nextStageId = 0;
 export class Stage {
   readonly node: SVGSVGElement;
 
-  constructor(onChips: (collected: number, total: number) => void) {
+  constructor(
+    onChips: (collected: number, total: number) => void,
+    audio: GameAudio
+  ) {
     this._id = `fsc-stage-${++nextStageId}`;
     this._onChips = onChips;
+    this._audio = audio;
     this.node = document.createElementNS(SVG_NS, 'svg');
     this.node.setAttribute('viewBox', `0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`);
     this.node.setAttribute('preserveAspectRatio', 'xMidYMid meet');
@@ -25,19 +31,12 @@ export class Stage {
     this.node.classList.add('fsc-scene');
   }
 
-  load(scene: IScene, mascot: MascotId): void {
+  load(scene: IScene): void {
     this.stop();
     this._scene = scene;
-    this._mascot = mascot;
     this.node.innerHTML = sceneMarkup(scene, this._id);
     this._actor = this.node.querySelector('.fsc-actor') as SVGGElement;
     this.reset();
-  }
-
-  setMascot(mascot: MascotId): void {
-    this._mascot = mascot;
-    this._drawActorMarkup();
-    this._drawPose();
   }
 
   reset(): void {
@@ -76,11 +75,18 @@ export class Stage {
       let eventTime = 0;
       let from = { x: this._x, y: this._y, angle: this._angle };
       let last: number | null = null;
+      let announced = -1;
       const tick = (now: number) => {
         let budget = last === null ? 0 : (now - last) * rate;
         last = now;
         while (index < events.length) {
           const event = events[index];
+          if (index !== announced) {
+            announced = index;
+            if (event.t === 'turn' && event.a !== from.angle) {
+              this._audio.turn();
+            }
+          }
           const duration = durations[index];
           const left = duration - eventTime;
           const used = Math.min(left, budget);
@@ -147,8 +153,15 @@ export class Stage {
       ? Math.max(0, 1 - BUMP_TIME / this._duration(event))
       : 1;
     const walked = walkShare ? Math.min(1, progress / walkShare) : 1;
-    this._x = from.x + (event.x - from.x) * walked;
-    this._y = from.y + (event.y - from.y) * walked;
+    const nextX = from.x + (event.x - from.x) * walked;
+    const nextY = from.y + (event.y - from.y) * walked;
+    this._footstepTravel += Math.hypot(nextX - this._x, nextY - this._y);
+    if (this._footstepTravel >= FOOTSTEP_DISTANCE) {
+      this._footstepTravel = 0;
+      this._audio.footstep();
+    }
+    this._x = nextX;
+    this._y = nextY;
     this._setWalking(walked < 1 && event.d > 0);
     if (event.blocked && walked >= 1) {
       this._bump();
@@ -179,6 +192,7 @@ export class Stage {
     if (!this._scene?.chips[index].trapped) {
       this._collected++;
       this._reportChips();
+      this._audio.chip();
     }
   }
 
@@ -192,6 +206,7 @@ export class Stage {
       return;
     }
     this.node.classList.add('fsc-bump');
+    this._audio.bump();
     this._bumpTimer = window.setTimeout(() => {
       this.node.classList.remove('fsc-bump');
     }, BUMP_TIME);
@@ -205,16 +220,11 @@ export class Stage {
     if (!this._actor) {
       return;
     }
-    this.node.classList.toggle('fsc-mascot-fox', this._mascot === 'fox');
-    this.node.classList.toggle('fsc-mascot-snake', this._mascot === 'snake');
     this.node.setAttribute(
       'aria-label',
-      this._mascot === 'fox'
-        ? 'A night-time facility where Grep Fox collects data chips'
-        : 'A night-time facility where Sudo Snake collects data chips'
+      'A night-time facility where Grep Fox collects data chips'
     );
-    this._actor.innerHTML =
-      this._mascot === 'fox' ? FOX_MARKUP : SNAKE_MARKUP;
+    this._actor.innerHTML = FOX_MARKUP;
     this._heading = this._actor.querySelector('.fsc-heading') as SVGGElement;
     this._sprite = this._actor.querySelector('.fsc-sprite') as SVGGElement;
   }
@@ -237,8 +247,9 @@ export class Stage {
 
   private _id: string;
   private _onChips: (collected: number, total: number) => void;
+  private _audio: GameAudio;
+  private _footstepTravel = 0;
   private _scene: IScene | null = null;
-  private _mascot: MascotId = 'fox';
   private _actor: SVGGElement | null = null;
   private _heading: SVGGElement | null = null;
   private _sprite: SVGGElement | null = null;

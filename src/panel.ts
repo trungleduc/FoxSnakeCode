@@ -3,10 +3,11 @@ import { CodeEditor, CodeEditorWrapper, IEditorServices } from '@jupyterlab/code
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
 import { Panel, SplitPanel, Widget } from '@lumino/widgets';
+import { sudoSnakeAvatar } from './art';
+import { GameAudio } from './audio';
 import { IRunResult } from './engine';
 import {
   IMission,
-  MascotId,
   parseMission,
   serializeMission
 } from './format';
@@ -15,10 +16,10 @@ import { Stage } from './stage';
 
 const SAVE_DELAY = 1000;
 
-const MASCOTS: { id: MascotId; name: string }[] = [
-  { id: 'fox', name: 'Grep Fox' },
-  { id: 'snake', name: 'Sudo Snake' }
-];
+const MASCOT = 'Grep Fox';
+const HQ_NAME = 'Sudo Snake';
+
+let nextHqAvatarId = 0;
 
 const COMMANDS: [string, string][] = [
   ['step(distance)', 'Walk forward. A negative number walks backward.'],
@@ -86,7 +87,7 @@ export class FscPanel extends SplitPanel {
     );
     this._stage = new Stage((collected, total) => {
       this._chipCount.textContent = `Chips ${collected} / ${total}`;
-    });
+    }, this._audio);
 
     this._editorModel = new CodeEditor.Model({ mimeType: 'text/x-python' });
     const editor = new CodeEditorWrapper({
@@ -119,6 +120,7 @@ export class FscPanel extends SplitPanel {
     }
     window.clearTimeout(this._saveTimer);
     this._stage.stop();
+    this._audio.dispose();
     this._sessionContext.dispose();
     this._editorModel.dispose();
     super.dispose();
@@ -134,7 +136,7 @@ export class FscPanel extends SplitPanel {
     this._levelSelect.addEventListener('change', () => {
       void this._goToLevel(Number(this._levelSelect.value));
     });
-    brief.node.append(this._levelSelect, this._levelTitle, this._instructions);
+    brief.node.append(this._levelSelect, this._levelTitle);
 
     const help = element('details', 'fsc-help');
     help.appendChild(element('summary', '', 'Field manual'));
@@ -177,21 +179,24 @@ export class FscPanel extends SplitPanel {
     side.addClass('fsc-play-side');
 
     const header = element('div', 'fsc-hud');
-    this._mascotSelect.setAttribute('aria-label', 'Mascot');
-    for (const mascot of MASCOTS) {
-      const option = element('option', '', mascot.name);
-      option.value = mascot.id;
-      this._mascotSelect.appendChild(option);
-    }
-    this._mascotSelect.addEventListener('change', () => {
-      const mascot = this._mascotSelect.value as MascotId;
-      if (this._mission) {
-        this._mission.progress.mascot = mascot;
-        this._stage.setMascot(mascot);
-        this._writeProgress();
-      }
+    this._soundButton.addEventListener('click', () => {
+      this._audio.setMuted(!this._audio.muted);
+      this._renderSoundButton();
     });
-    header.append(this._missionTitle, this._chipCount, this._mascotSelect);
+    this._renderSoundButton();
+    header.append(
+      this._missionTitle,
+      this._agentName,
+      this._chipCount,
+      this._soundButton
+    );
+
+    const hqAvatar = element('span', 'fsc-hq-avatar');
+    hqAvatar.innerHTML = sudoSnakeAvatar(`fsc-hq-clip-${++nextHqAvatarId}`);
+    hqAvatar.setAttribute('aria-hidden', 'true');
+    const hqMessage = element('div', 'fsc-hq-message');
+    hqMessage.append(element('strong', 'fsc-hq-name', HQ_NAME), this._instructions);
+    this._hq.append(hqAvatar, hqMessage);
 
     const stageHolder = element('div', 'fsc-stage');
     stageHolder.appendChild(this._stage.node);
@@ -205,8 +210,14 @@ export class FscPanel extends SplitPanel {
     this._banner.append(this._bannerText, this._nextButton);
     this._banner.hidden = true;
 
-    side.node.append(header, stageHolder, this._banner);
+    side.node.append(header, this._hq, stageHolder, this._banner);
     return side;
+  }
+
+  private _renderSoundButton(): void {
+    const on = !this._audio.muted;
+    this._soundButton.textContent = on ? 'Sound: on' : 'Sound: off';
+    this._soundButton.setAttribute('aria-pressed', String(on));
   }
 
   private _loadFile(): void {
@@ -227,7 +238,6 @@ export class FscPanel extends SplitPanel {
     }
     this._mission = mission;
     this._missionTitle.textContent = mission.title;
-    this._mascotSelect.value = mission.progress.mascot;
     this._levelSelect.hidden = mission.levels.length < 2;
     this._levelTitle.hidden = mission.levels.length >= 2;
     this._renderLevelOptions();
@@ -264,9 +274,10 @@ export class FscPanel extends SplitPanel {
     const level = mission.levels[index];
     this._levelTitle.textContent = level.title;
     setInlineCode(this._instructions, level.instructions);
+    this._hq.hidden = !level.instructions;
     this._banner.hidden = true;
     this._showOutput('');
-    this._stage.load(level.scene, mission.progress.mascot);
+    this._stage.load(level.scene);
     this._loadingCode = true;
     const code = mission.progress.code[String(index)] ?? level.starterCode;
     this._editorModel.sharedModel.setSource(code);
@@ -333,6 +344,7 @@ export class FscPanel extends SplitPanel {
     if (!mission) {
       return;
     }
+    this._audio.start();
     const levelIndex = mission.progress.currentLevel;
     const runId = ++this._runId;
     this._flushSave();
@@ -410,11 +422,10 @@ export class FscPanel extends SplitPanel {
     if (!mission) {
       return;
     }
-    const mascot =
-      MASCOTS.find(item => item.id === mission.progress.mascot)?.name ?? '';
     switch (result.status) {
       case 'solved': {
         this._stage.setOutcome('win');
+        this._audio.win();
         if (!mission.progress.solved.includes(levelIndex)) {
           mission.progress.solved.push(levelIndex);
           mission.progress.solved.sort((a, b) => a - b);
@@ -428,30 +439,31 @@ export class FscPanel extends SplitPanel {
           'win',
           cleared ? 'MISSION ACCOMPLISHED' : 'OBJECTIVE SECURED',
           cleared
-            ? `${mascot} vanished without a trace.`
+            ? `${MASCOT} vanished without a trace.`
             : hasNext
-            ? `${mascot} slipped out with the data.`
-            : `${mascot} slipped out with the data. Some earlier objectives are still open.`,
+            ? `${MASCOT} slipped out with the data.`
+            : `${MASCOT} slipped out with the data. Some earlier objectives are still open.`,
           hasNext
         );
         return;
       }
       case 'failed': {
         this._stage.setOutcome('fail');
+        this._audio.alarm();
         const messages: Record<string, [string, string]> = {
           light: [
             "ALERT: YOU'VE BEEN SPOTTED",
-            `The searchlight found ${mascot}. Stay in the shadows.`
+            `The searchlight found ${MASCOT}. Stay in the shadows.`
           ],
           laser: [
             'ALARM TRIPPED',
-            `${mascot} broke a laser beam. Plot a new route.`
+            `${MASCOT} broke a laser beam. Plot a new route.`
           ],
           trap: ['DECOY CHIP', 'It was rigged. Check .trapped before you grab.']
         };
         const [title, detail] = messages[result.reason ?? ''] ?? [
           'ALARM TRIPPED',
-          `${mascot} was detected. Plot a new route.`
+          `${MASCOT} was detected. Plot a new route.`
         ];
         this._showBanner('fail', title, detail);
         return;
@@ -593,6 +605,7 @@ export class FscPanel extends SplitPanel {
   private _sessionContext: SessionContext;
   private _runner: Runner;
   private _stage: Stage;
+  private _audio = new GameAudio(() => this.isVisible && !document.hidden);
   private _editorModel: CodeEditor.Model;
   private _mission: IMission | null = null;
   private _phase: Phase = 'starting';
@@ -605,14 +618,16 @@ export class FscPanel extends SplitPanel {
   private _levelSelect = element('select', 'jp-mod-styled fsc-level-select');
   private _levelTitle = element('h2', 'fsc-level-title');
   private _instructions = element('p', 'fsc-instructions');
+  private _hq = element('div', 'fsc-hq');
   private _runButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept fsc-run', 'Run');
   private _resetButton = element('button', 'jp-Button jp-mod-styled jp-mod-reject', 'Reset');
   private _restoreButton = element('button', 'fsc-link-button', 'Restore starter code');
   private _status = element('span', 'fsc-status', 'Establishing kernel link…');
   private _output = element('pre', 'fsc-output');
   private _missionTitle = element('span', 'fsc-mission-title');
+  private _agentName = element('span', 'fsc-agent-name', MASCOT);
+  private _soundButton = element('button', 'fsc-sound-button');
   private _chipCount = element('span', 'fsc-chip-count');
-  private _mascotSelect = element('select', 'jp-mod-styled fsc-mascot-select');
   private _banner = element('div', 'fsc-banner');
   private _bannerText = element('div', 'fsc-banner-text');
   private _nextButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept', 'Next mission');

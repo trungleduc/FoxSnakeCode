@@ -1,8 +1,28 @@
-# FoxSnakeCode
+<div align="center">
+  <img src="docs/grep-fox.png" width="140" alt="Grep Fox">
+  <img src="docs/sudo-snake.svg" width="140" alt="Sudo Snake">
 
-A coding puzzle game for JupyterLab and JupyterLite. Double-click a `.fsc` file to open a split panel: write Python on the left, then press Run to watch Grep Fox or Sudo Snake steal data chips from a night-time facility on the right.
+  <h1>FoxSnakeCode</h1>
+  <p><strong>Tactical Coding Action</strong></p>
+  <p>Coding missions, challenges, stealth debugging, boss levels...</p>
+  <p><em>Write Python. Slip past the searchlights. Steal the data.</em></p>
+</div>
 
-FoxSnakeCode runs your code on a Python kernel and prefers xeus-python.
+## Meet the team
+
+| | Codename | Role | |
+| --- | --- | --- | --- |
+| 🦊 | **Grep Fox** | Field agent | Sniffs out any word, in any file, in a flash. Your code tells Grep Fox where to go. |
+| 🐍 | **Sudo Snake** | HQ | Sneaks past bugs and runs every command with superpowers. Briefs you on every mission. |
+
+## How it plays
+
+1. Double-click a `.fsc` mission file.
+2. Read your briefing from Sudo Snake.
+3. Write Python, then press Run.
+4. Watch Grep Fox dodge searchlights, lasers and decoys to grab every data chip.
+
+FoxSnakeCode runs in JupyterLab and JupyterLite. Your code runs on a Python kernel, and xeus-python is preferred.
 
 ## Install for development
 
@@ -82,7 +102,6 @@ Players' work is saved automatically to a `progress` section in the same file, s
 
 ```json
 "progress": {
-  "mascot": "fox",
   "currentLevel": 2,
   "solved": [0, 1],
   "code": { "0": "step(300)\n" }

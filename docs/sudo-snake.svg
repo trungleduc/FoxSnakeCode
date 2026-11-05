@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="140 40 320 320" role="img" aria-label="Sudo Snake avatar: the snake's head in its hoodie on a yellow circle">
+<defs>
+<clipPath id="avatarClip"><circle cx="300" cy="200" r="158"></circle></clipPath>
+</defs>
+<circle cx="300" cy="200" r="158" fill="#FFC93C"></circle>
+<g clip-path="url(#avatarClip)">
+<path d="M 380 505 C 470 470 450 360 360 340 C 280 320 260 280 300 250" fill="none" stroke="#0F2E33" stroke-width="82" stroke-linecap="round"></path>
+<path d="M 380 505 C 470 470 450 360 360 340 C 280 320 260 280 300 250" fill="none" stroke="#34C58F" stroke-width="66" stroke-linecap="round"></path>
+<path d="M 380 505 C 470 470 450 360 360 340" fill="none" stroke="#C9F5DC" stroke-width="22" stroke-linecap="round"></path>
+<path d="M 360 340 C 280 320 260 280 300 250" fill="none" stroke="#0F2E33" stroke-width="96" stroke-linecap="round"></path>
+<path d="M 360 340 C 280 320 260 280 300 250" fill="none" stroke="#3D4A6B" stroke-width="82" stroke-linecap="round"></path>
+<rect x="352" y="290" width="20" height="100" rx="10" fill="#3D4A6B" stroke="#0F2E33" stroke-width="5" transform="rotate(14 362 340)"></rect>
+<rect x="352" y="290" width="20" height="100" rx="10" fill="#FFFFFF" opacity="0.14" transform="rotate(14 362 340)"></rect>
+<ellipse cx="300" cy="178" rx="132" ry="118" fill="#3D4A6B" stroke="#0F2E33" stroke-width="6"></ellipse>
+<ellipse cx="300" cy="188" rx="112" ry="96" fill="#141A26"></ellipse>
+<circle cx="311" cy="322" r="19" fill="#FFFFFF" stroke="#0F2E33" stroke-width="5"></circle>
+<text x="311" y="331" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="24" font-weight="500" fill="#0F2E33">#</text>
+<ellipse cx="300" cy="202" rx="100" ry="78" fill="#34C58F" stroke="#0F2E33" stroke-width="6"></ellipse>
+<circle cx="276" cy="140" r="8" fill="#0F2E33" opacity="0.16"></circle>
+<circle cx="322" cy="137" r="6" fill="#0F2E33" opacity="0.16"></circle>
+<circle cx="300" cy="131" r="4" fill="#0F2E33" opacity="0.16"></circle>
+<path d="M 205 222 Q 212 268 258 266" fill="none" stroke="#0F2E33" stroke-width="6" stroke-linecap="round"></path>
+<circle cx="263" cy="266" r="8" fill="#0F2E33"></circle>
+<circle cx="200" cy="205" r="17" fill="#FFC93C" stroke="#0F2E33" stroke-width="5"></circle>
+<ellipse cx="262" cy="192" rx="25" ry="29" fill="#FFFFFF" stroke="#0F2E33" stroke-width="4"></ellipse>
+<ellipse cx="338" cy="192" rx="25" ry="29" fill="#FFFFFF" stroke="#0F2E33" stroke-width="4"></ellipse>
+<circle cx="269" cy="197" r="13" fill="#0F2E33"></circle>
+<circle cx="345" cy="197" r="13" fill="#0F2E33"></circle>
+<circle cx="274" cy="190" r="5" fill="#FFFFFF"></circle>
+<circle cx="350" cy="190" r="5" fill="#FFFFFF"></circle>
+<path d="M 236 152 Q 260 146 286 160" fill="none" stroke="#0F2E33" stroke-width="7" stroke-linecap="round"></path>
+<path d="M 364 152 Q 340 146 314 160" fill="none" stroke="#0F2E33" stroke-width="7" stroke-linecap="round"></path>
+<ellipse cx="232" cy="232" rx="13" ry="8" fill="#FF8FA3" opacity="0.6"></ellipse>
+<ellipse cx="368" cy="232" rx="13" ry="8" fill="#FF8FA3" opacity="0.6"></ellipse>
+<circle cx="292" cy="226" r="2.5" fill="#0F2E33"></circle>
+<circle cx="308" cy="226" r="2.5" fill="#0F2E33"></circle>
+<path d="M 280 240 Q 302 256 326 238" fill="none" stroke="#0F2E33" stroke-width="5" stroke-linecap="round"></path>
+<path d="M 306 249 L 309 266 L 302 274 M 309 266 L 316 274" fill="none" stroke="#E5484D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+</g>
+<circle cx="300" cy="200" r="158" fill="none" stroke="#0F2E33" stroke-width="6"></circle>
+</svg>

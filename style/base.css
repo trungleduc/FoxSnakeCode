@@ -13,7 +13,7 @@
   background: var(--jp-layout-color1);
   color: var(--jp-ui-font-color1);
   font-family: var(--jp-ui-font-family);
-  font-size: var(--jp-ui-font-size1);
+  font-size: 16px;
 }
 
 .fsc-brief {
@@ -21,6 +21,10 @@
   max-height: 45%;
   overflow-y: auto;
   padding: 12px 14px 8px;
+}
+
+select.fsc-level-select {
+  font-size: 16px;
 }
 
 .fsc-level-select {
@@ -38,7 +42,7 @@
 
 .fsc-level-title {
   margin: 0 0 6px;
-  font-size: var(--jp-ui-font-size3);
+  font-size: 20px;
   font-weight: 600;
   color: var(--jp-ui-font-color0);
 }
@@ -92,6 +96,7 @@
 
 .fsc-actions .jp-Button {
   min-width: 68px;
+  font-size: 16px;
 }
 
 .fsc-link-button {
@@ -118,6 +123,7 @@
 }
 
 .fsc-editor {
+  --jp-code-font-size: 18px;
   flex: 1 1 0;
   min-height: 80px;
   overflow: hidden;
@@ -139,7 +145,7 @@
   overflow: auto;
   border-top: 1px solid var(--jp-border-color2);
   font-family: var(--jp-code-font-family);
-  font-size: var(--jp-code-font-size);
+  font-size: 16px;
   white-space: pre-wrap;
 }
 
@@ -171,7 +177,7 @@
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-overflow: ellipsis;
@@ -179,21 +185,92 @@
   white-space: nowrap;
 }
 
+.fsc-agent-name {
+  flex: 0 0 auto;
+  color: #ffc93c;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .fsc-chip-count {
   flex: 0 0 auto;
   color: #37f5d6;
   font-family: var(--jp-code-font-family);
-  font-size: 13px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
 
-select.fsc-mascot-select {
+.fsc-sound-button {
   flex: 0 0 auto;
-  width: auto;
-  height: 28px;
-  padding: 0 6px;
-  font-size: 13px;
-  line-height: normal;
+  padding: 4px 10px;
+  border: 1px solid #4a6378;
+  border-radius: 4px;
+  background: #1d2d3d;
+  color: #e6edf3;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.fsc-sound-button:hover {
+  background: #2a3f54;
+}
+
+.fsc-sound-button[aria-pressed='false'] {
+  color: #9fb3c4;
+}
+
+.fsc-hq {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #0f1f2c;
+  border-bottom: 1px solid #243647;
+  font-size: 18px;
+}
+
+.fsc-hq[hidden] {
+  display: none;
+}
+
+.fsc-hq-avatar {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+}
+
+.fsc-hq-avatar svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fsc-hq-message {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fsc-hq-name {
+  display: block;
+  margin-bottom: 2px;
+  color: #34c58f;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fsc-hq .fsc-instructions {
+  margin: 0;
+  color: #e6edf3;
+}
+
+.fsc-hq .fsc-instructions code {
+  background: #1d2d3d;
+  color: #7cffb2;
 }
 
 .fsc-stage {
@@ -244,16 +321,17 @@ select.fsc-mascot-select {
 
 .fsc-banner-text strong {
   display: block;
-  font-size: 15px;
+  font-size: 22px;
 }
 
 .fsc-banner-text span {
   color: #c9d4de;
-  font-size: 13px;
+  font-size: 18px;
 }
 
 .fsc-banner .jp-Button {
   flex: 0 0 auto;
+  font-size: 16px;
 }
 
 .fsc-banner .jp-Button[hidden] {
@@ -261,9 +339,9 @@ select.fsc-mascot-select {
 }
 
 .fsc-ruler text {
-  fill: #6c8aa3;
+  fill: #b4cde0;
   font-family: var(--jp-code-font-family);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .fsc-start {
@@ -296,7 +374,6 @@ select.fsc-mascot-select {
 .fsc-leg,
 .fsc-tail,
 .fsc-fox-head,
-.fsc-tongue,
 .fsc-blink {
   transform-box: fill-box;
 }
@@ -319,21 +396,16 @@ select.fsc-mascot-select {
   animation: fsc-blink 4.6s linear infinite;
 }
 
-.fsc-tongue {
-  transform-origin: center top;
-  animation: fsc-tongue-flick 2.4s ease-in-out infinite;
-}
-
 .fsc-eyes-happy,
 .fsc-eyes-dizzy {
   display: none;
 }
 
-.fsc-walking.fsc-mascot-fox .fsc-leg-a {
+.fsc-walking .fsc-leg-a {
   animation: fsc-leg-swing 0.32s ease-in-out infinite alternate;
 }
 
-.fsc-walking.fsc-mascot-fox .fsc-leg-b {
+.fsc-walking .fsc-leg-b {
   animation: fsc-leg-swing 0.32s ease-in-out infinite alternate-reverse;
 }
 
@@ -343,14 +415,6 @@ select.fsc-mascot-select {
 
 .fsc-walking .fsc-tail {
   animation-duration: 0.64s;
-}
-
-.fsc-walking .fsc-coil-a {
-  animation: fsc-coil-sway 0.32s ease-in-out infinite alternate;
-}
-
-.fsc-walking .fsc-coil-b {
-  animation: fsc-coil-sway 0.32s ease-in-out infinite alternate-reverse;
 }
 
 .fsc-bump .fsc-bounce {
@@ -380,7 +444,6 @@ select.fsc-mascot-select {
   animation: fsc-dizzy 0.9s ease-in-out infinite;
 }
 
-.fsc-fail .fsc-tongue,
 .fsc-fail .fsc-tail {
   animation: none;
 }
@@ -420,33 +483,12 @@ select.fsc-mascot-select {
   }
 }
 
-@keyframes fsc-tongue-flick {
-  0%,
-  70%,
-  90%,
-  100% {
-    transform: scaleY(1);
-  }
-  80% {
-    transform: scaleY(0.4);
-  }
-}
-
 @keyframes fsc-leg-swing {
   from {
     transform: rotate(-24deg);
   }
   to {
     transform: rotate(24deg);
-  }
-}
-
-@keyframes fsc-coil-sway {
-  from {
-    transform: translateX(-2px);
-  }
-  to {
-    transform: translateX(2px);
   }
 }
 
@@ -494,10 +536,7 @@ select.fsc-mascot-select {
   .fsc-chip-inner,
   .fsc-tail,
   .fsc-blink,
-  .fsc-tongue,
   .fsc-walking .fsc-leg,
-  .fsc-walking .fsc-coil-a,
-  .fsc-walking .fsc-coil-b,
   .fsc-walking .fsc-bounce,
   .fsc-bump .fsc-bounce,
   .fsc-win .fsc-bounce,

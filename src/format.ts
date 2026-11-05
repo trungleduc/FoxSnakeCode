@@ -1,8 +1,6 @@
 export const WORLD_WIDTH = 800;
 export const WORLD_HEIGHT = 500;
 
-export type MascotId = 'fox' | 'snake';
-
 export interface IChip {
   x: number;
   y: number;
@@ -37,7 +35,6 @@ export interface ILevel {
 }
 
 export interface IProgress {
-  mascot: MascotId;
   currentLevel: number;
   solved: number[];
   code: Record<string, string>;
@@ -160,7 +157,6 @@ function parseProgress(value: unknown, levelCount: number): IProgress {
     }
   }
   return {
-    mascot: source.mascot === 'snake' ? 'snake' : 'fox',
     currentLevel:
       Number.isInteger(current) &&
       (current as number) >= 0 &&

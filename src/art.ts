@@ -181,89 +181,102 @@ export const FOX_MARKUP = `
   <g class="fsc-sprite">
     <g class="fsc-bounce">
       <g class="fsc-tail">
-        <path d="M-11 9C-24 11 -38 3 -36 -14C-35 -22 -31 -27 -27 -30C-27 -21 -22 -14 -8 -3Z" fill="#d9692b" stroke="#7b3513" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M-35.5 -11C-35.5 -20 -31 -27 -27 -30C-27 -24 -25 -19 -22 -15C-27 -15 -31 -14 -35.5 -11Z" fill="#fff4e3"/>
+        <path d="M-8 14C-24 16 -32 4 -27 -10C-25 -16 -19 -18 -17 -12C-15 -4 -18 4 -8 8Z" fill="#E8894A" stroke="#0F2E33" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M-27 -10C-25 -16 -19 -18 -17 -12C-16.5 -9 -17 -7 -17.5 -5C-20 -8 -24 -9 -27 -10Z" fill="#F4F1EA"/>
       </g>
-      <g class="fsc-leg fsc-leg-b"><rect x="-13" y="9" width="7" height="16" rx="3.5" fill="#a84d1c"/><rect x="-13" y="18" width="7" height="7" rx="3" fill="#2a2430"/></g>
-      <g class="fsc-leg fsc-leg-a"><rect x="4" y="9" width="7" height="16" rx="3.5" fill="#a84d1c"/><rect x="4" y="18" width="7" height="7" rx="3" fill="#2a2430"/></g>
-      <ellipse cx="-1" cy="5" rx="16" ry="13" fill="#d9692b" stroke="#7b3513" stroke-width="1.5"/>
-      <ellipse cx="4" cy="10" rx="9" ry="7" fill="#fff4e3"/>
-      <rect x="-17" y="-8" width="13" height="16" rx="3.5" fill="#1d3342" stroke="#0c1a24" stroke-width="1.5"/>
-      <path d="M-14.5 -2.5L-13 -5.5L-11.5 -3.8H-9.5L-8 -5.5L-6.5 -2.5L-10.5 2Z" fill="#37f5d6"/>
-      <g class="fsc-leg fsc-leg-a"><rect x="-8" y="10" width="7" height="15" rx="3.5" fill="#c55e24"/><rect x="-8" y="18" width="7" height="7" rx="3" fill="#2a2430"/></g>
-      <g class="fsc-leg fsc-leg-b"><rect x="9" y="10" width="7" height="15" rx="3.5" fill="#c55e24"/><rect x="9" y="18" width="7" height="7" rx="3" fill="#2a2430"/></g>
-      <g class="fsc-fox-head" transform="translate(9 -15)">
-        <path d="M-17 -5L-15 -27L-3 -15Z" fill="#d9692b" stroke="#7b3513" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M-13.5 -11L-13 -21.5L-7 -15Z" fill="#3b2230"/>
-        <path d="M17 -5L15 -27L3 -15Z" fill="#d9692b" stroke="#7b3513" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M13.5 -11L13 -21.5L7 -15Z" fill="#3b2230"/>
-        <path d="M-20 -3C-20 -14 -10 -18 0 -18C10 -18 20 -14 20 -3C20 2 16 6 11 9C7 12 3 15 0 15C-3 15 -7 12 -11 9C-16 6 -20 2 -20 -3Z" fill="#e4752f" stroke="#7b3513" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M-19 0C-13 -1 -7 1 0 8C7 1 13 -1 19 0C18 3 15 6 11 9C7 12 3 15 0 15C-3 15 -7 12 -11 9C-15 6 -18 3 -19 0Z" fill="#fff4e3"/>
-        <path d="M-3.5 7.5C-2 6.5 2 6.5 3.5 7.5C3 10 1 11.5 0 11.5C-1 11.5 -3 10 -3.5 7.5Z" fill="#23202a"/>
-        <path d="M0 11.5V13.5M-3 14C-1.5 15 -0.5 14.5 0 13.5C0.5 14.5 1.5 15 3 14" fill="none" stroke="#23202a" stroke-width="1.2" stroke-linecap="round"/>
+      <g class="fsc-leg fsc-leg-a"><rect x="-8" y="14" width="7" height="11" rx="2.5" fill="#2A2F36" stroke="#7E93A3" stroke-width="1"/></g>
+      <g class="fsc-leg fsc-leg-b"><rect x="1" y="14" width="7" height="11" rx="2.5" fill="#2A2F36" stroke="#7E93A3" stroke-width="1"/></g>
+      <path d="M-10 4L-15 11" stroke="#7E93A3" stroke-width="6.4" stroke-linecap="round"/>
+      <path d="M-10 4L-15 11" stroke="#3E4636" stroke-width="4.6" stroke-linecap="round"/>
+      <circle cx="-15.5" cy="12" r="2.8" fill="#2A2F36" stroke="#7E93A3" stroke-width="1"/>
+      <rect x="-11" y="0" width="22" height="17" rx="7" fill="#3E4636" stroke="#7E93A3" stroke-width="1"/>
+      <g fill="#52604A" stroke="#1E2329" stroke-width="0.8">
+        <rect x="-9" y="6" width="5.5" height="5.5" rx="1"/>
+        <rect x="-2.75" y="6" width="5.5" height="5.5" rx="1"/>
+        <rect x="3.5" y="6" width="5.5" height="5.5" rx="1"/>
+      </g>
+      <rect x="-3" y="1.6" width="6" height="3" rx="0.8" fill="#FFC93C"/>
+      <rect x="-10.6" y="12.6" width="21.2" height="2.6" fill="#1E2329"/>
+      <rect x="-1.3" y="12.6" width="2.6" height="2.6" fill="#FFC93C"/>
+      <path d="M10 4L16 9" stroke="#7E93A3" stroke-width="6.4" stroke-linecap="round"/>
+      <path d="M10 4L16 9" stroke="#3E4636" stroke-width="4.6" stroke-linecap="round"/>
+      <circle cx="16.5" cy="9.5" r="2.8" fill="#2A2F36" stroke="#7E93A3" stroke-width="1"/>
+      <g class="fsc-fox-head" transform="translate(0 -14)">
+        <path d="M-18 -11L-20 -29L-5 -18Z" fill="#E8894A" stroke="#0F2E33" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M-16 -14L-17.5 -24.5L-9 -18Z" fill="#3B2A22"/>
+        <path d="M18 -11L20 -29L5 -18Z" fill="#E8894A" stroke="#0F2E33" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M16 -14L17.5 -24.5L9 -18Z" fill="#3B2A22"/>
+        <path d="M-21 -6C-21 -16 -11 -19 0 -19C11 -19 21 -16 21 -6L24 1L19 3C15 10 7 14 0 14C-7 14 -15 10 -19 3L-24 1Z" fill="#E8894A" stroke="#0F2E33" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M-19 2.4C-13 -1 -6 1 0 1C6 1 13 -1 19 2.4C15 10 7 13.2 0 13.2C-7 13.2 -15 10 -19 2.4Z" fill="#F4F1EA"/>
+        <path d="M-20 -11C-20 -24 -10 -27 0 -27C10 -27 20 -24 20 -11Z" fill="#2A2F36" stroke="#7E93A3" stroke-width="1"/>
+        <path d="M-15 -19C-12 -23 -8 -24.5 -4 -25" fill="none" stroke="#7E93A3" stroke-width="1.2" stroke-linecap="round"/>
+        <rect x="-6.5" y="-21" width="13" height="6.4" rx="1.2" fill="#3E4636"/>
+        <rect x="-3.8" y="-18.8" width="7.6" height="2" rx="0.8" fill="#FFC93C"/>
+        <rect x="-22" y="-12" width="44" height="5" rx="1.5" fill="#1E2329" stroke="#7E93A3" stroke-width="1"/>
+        <path d="M-13 -4.6L-6 -3M13 -4.6L6 -3" stroke="#0F2E33" stroke-width="1.6" stroke-linecap="round"/>
         <g class="fsc-eyes fsc-eyes-open">
-          <ellipse class="fsc-blink" cx="-8" cy="-3" rx="3.8" ry="4.6" fill="#14222f"/>
-          <ellipse class="fsc-blink" cx="8" cy="-3" rx="3.8" ry="4.6" fill="#14222f"/>
-          <circle cx="-6.8" cy="-4.8" r="1.4" fill="#fff"/><circle cx="9.2" cy="-4.8" r="1.4" fill="#fff"/>
-          <path d="M-13 -9.5L-4 -7.5M13 -9.5L4 -7.5" stroke="#7b3513" stroke-width="2" stroke-linecap="round"/>
+          <ellipse class="fsc-blink" cx="-7" cy="1.4" rx="4" ry="4.7" fill="#14181F"/>
+          <ellipse class="fsc-blink" cx="7" cy="1.4" rx="4" ry="4.7" fill="#14181F"/>
+          <circle cx="-5.7" cy="-0.4" r="1.4" fill="#FFFFFF"/><circle cx="8.3" cy="-0.4" r="1.4" fill="#FFFFFF"/>
+          <circle cx="-8.5" cy="3.4" r="0.6" fill="#FFFFFF"/><circle cx="5.5" cy="3.4" r="0.6" fill="#FFFFFF"/>
         </g>
         <g class="fsc-eyes fsc-eyes-happy">
-          <path d="M-12 -2C-10 -7 -6 -7 -4 -2M12 -2C10 -7 6 -7 4 -2" fill="none" stroke="#14222f" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M-11 2.5Q-7 -3 -3 2.5M3 2.5Q7 -3 11 2.5" fill="none" stroke="#14181F" stroke-width="1.9" stroke-linecap="round"/>
         </g>
         <g class="fsc-eyes fsc-eyes-dizzy">
-          <path d="M-11.5 -6L-4.5 0M-4.5 -6L-11.5 0M4.5 -6L11.5 0M11.5 -6L4.5 0" stroke="#14222f" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M-10 -1.6L-4 4.4M-4 -1.6L-10 4.4M4 -1.6L10 4.4M10 -1.6L4 4.4" stroke="#14181F" stroke-width="1.9" stroke-linecap="round"/>
         </g>
+        <ellipse cx="-12.5" cy="7" rx="2.6" ry="1.6" fill="#FFB3C1"/>
+        <ellipse cx="12.5" cy="7" rx="2.6" ry="1.6" fill="#FFB3C1"/>
+        <path d="M-1.7 5.6Q0 4.7 1.7 5.6Q1 7.6 0 7.8Q-1 7.6 -1.7 5.6Z" fill="#14181F"/>
+        <path d="M0 7.8V8.8M-2.6 8.8C-1.6 10.4 -0.5 9.9 0 8.8C0.5 9.9 1.6 10.4 2.6 8.8" fill="none" stroke="#14181F" stroke-width="0.9" stroke-linecap="round"/>
+        <path d="M-21 -3Q-21 7 -13 10" fill="none" stroke="#0F2E33" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="-12.5" cy="10.2" r="1.5" fill="#0F2E33"/>
+        <rect x="-25.5" y="-13.5" width="7" height="11" rx="3" fill="#3E4636" stroke="#7E93A3" stroke-width="1"/>
       </g>
     </g>
   </g>`;
 
-export const SNAKE_MARKUP = `
-  <ellipse cx="0" cy="25" rx="26" ry="6" fill="#02060c" opacity="0.5"/>
-  ${HEADING}
-  <g class="fsc-sprite">
-    <g class="fsc-bounce">
-      <g class="fsc-tail">
-        <path d="M-18 18C-31 21 -37 11 -29 6" fill="none" stroke="#12694F" stroke-width="9" stroke-linecap="round"/>
-        <path d="M-18 18C-31 21 -37 11 -29 6" fill="none" stroke="#34C58F" stroke-width="6" stroke-linecap="round"/>
-      </g>
-      <g class="fsc-coil fsc-coil-a">
-        <ellipse cx="-1" cy="16" rx="23" ry="9" fill="#34C58F" stroke="#12694F" stroke-width="1.5"/>
-        <path d="M-18 19Q-1 27 16 19" fill="none" stroke="#C9F5DC" stroke-width="3" stroke-linecap="round"/>
-      </g>
-      <g class="fsc-coil fsc-coil-b">
-        <ellipse cx="1" cy="7" rx="18" ry="8" fill="#34C58F" stroke="#12694F" stroke-width="1.5"/>
-        <path d="M-12 10Q1 16 14 10" fill="none" stroke="#C9F5DC" stroke-width="2.5" stroke-linecap="round"/>
-      </g>
-      <g class="fsc-coil fsc-coil-a">
-        <ellipse cx="0" cy="-1" rx="13" ry="7" fill="#34C58F" stroke="#12694F" stroke-width="1.5"/>
-        <path d="M-8 2Q0 6 8 2" fill="none" stroke="#C9F5DC" stroke-width="2" stroke-linecap="round"/>
-      </g>
-      <g transform="translate(6 -17)">
-        <ellipse cx="-3" cy="11" rx="12" ry="6" fill="#5A6F9E" stroke="#27365C" stroke-width="1.5"/>
-        <ellipse cx="0" cy="0" rx="19" ry="17" fill="#5A6F9E" stroke="#27365C" stroke-width="1.5"/>
-        <ellipse cx="1" cy="1" rx="16" ry="14" fill="#1B2233"/>
-        <ellipse cx="2" cy="3" rx="14" ry="11" fill="#34C58F" stroke="#12694F" stroke-width="1.2"/>
-        <path d="M-17 -3C-16 -22 17 -22 18 -5" fill="none" stroke="#FFC93C" stroke-width="2.4" stroke-linecap="round"/>
-        <circle cx="-17" cy="1" r="4.5" fill="#FFC93C" stroke="#8A6A12" stroke-width="1.2"/>
-        <circle cx="18" cy="-2" r="3" fill="#FFC93C" stroke="#8A6A12" stroke-width="1.2"/>
-        <g class="fsc-eyes fsc-eyes-open">
-          <ellipse cx="-3" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
-          <ellipse cx="8" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
-          <circle class="fsc-blink" cx="-1.5" cy="1" r="2.6" fill="#14222F"/>
-          <circle class="fsc-blink" cx="9.5" cy="1" r="2.6" fill="#14222F"/>
-          <circle cx="-0.6" cy="-0.2" r="1" fill="#FFFFFF"/>
-          <circle cx="10.4" cy="-0.2" r="1" fill="#FFFFFF"/>
-        </g>
-        <g class="fsc-eyes fsc-eyes-happy">
-          <path d="M-7 2Q-3 -4 1 2M4 2Q8 -4 12 2" fill="none" stroke="#14222F" stroke-width="1.8" stroke-linecap="round"/>
-        </g>
-        <g class="fsc-eyes fsc-eyes-dizzy">
-          <ellipse cx="-3" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
-          <ellipse cx="8" cy="0" rx="4.6" ry="5.4" fill="#FFFFFF" stroke="#12694F" stroke-width="0.8"/>
-          <path d="M-5.5 -2.5L-0.5 2.5M-0.5 -2.5L-5.5 2.5M5.5 -2.5L10.5 2.5M10.5 -2.5L5.5 2.5" stroke="#14222F" stroke-width="1.6" stroke-linecap="round"/>
-        </g>
-        <path d="M0 8Q4 11 8 8" fill="none" stroke="#14222F" stroke-width="1.2" stroke-linecap="round"/>
-        <path class="fsc-tongue" d="M5 9.6L5.6 13M5.6 13L4 15M5.6 13L7.4 15" fill="none" stroke="#E5484D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-      </g>
-    </g>
-  </g>`;
+export function sudoSnakeAvatar(id: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="140 40 320 320">
+<defs>
+<clipPath id="${id}"><circle cx="300" cy="200" r="158"></circle></clipPath>
+</defs>
+<circle cx="300" cy="200" r="158" fill="#FFC93C"></circle>
+<g clip-path="url(#${id})">
+<path d="M 380 505 C 470 470 450 360 360 340 C 280 320 260 280 300 250" fill="none" stroke="#0F2E33" stroke-width="82" stroke-linecap="round"></path>
+<path d="M 380 505 C 470 470 450 360 360 340 C 280 320 260 280 300 250" fill="none" stroke="#34C58F" stroke-width="66" stroke-linecap="round"></path>
+<path d="M 380 505 C 470 470 450 360 360 340" fill="none" stroke="#C9F5DC" stroke-width="22" stroke-linecap="round"></path>
+<path d="M 360 340 C 280 320 260 280 300 250" fill="none" stroke="#0F2E33" stroke-width="96" stroke-linecap="round"></path>
+<path d="M 360 340 C 280 320 260 280 300 250" fill="none" stroke="#3D4A6B" stroke-width="82" stroke-linecap="round"></path>
+<rect x="352" y="290" width="20" height="100" rx="10" fill="#3D4A6B" stroke="#0F2E33" stroke-width="5" transform="rotate(14 362 340)"></rect>
+<rect x="352" y="290" width="20" height="100" rx="10" fill="#FFFFFF" opacity="0.14" transform="rotate(14 362 340)"></rect>
+<ellipse cx="300" cy="178" rx="132" ry="118" fill="#3D4A6B" stroke="#0F2E33" stroke-width="6"></ellipse>
+<ellipse cx="300" cy="188" rx="112" ry="96" fill="#141A26"></ellipse>
+<circle cx="311" cy="322" r="19" fill="#FFFFFF" stroke="#0F2E33" stroke-width="5"></circle>
+<text x="311" y="331" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="24" font-weight="500" fill="#0F2E33">#</text>
+<ellipse cx="300" cy="202" rx="100" ry="78" fill="#34C58F" stroke="#0F2E33" stroke-width="6"></ellipse>
+<circle cx="276" cy="140" r="8" fill="#0F2E33" opacity="0.16"></circle>
+<circle cx="322" cy="137" r="6" fill="#0F2E33" opacity="0.16"></circle>
+<circle cx="300" cy="131" r="4" fill="#0F2E33" opacity="0.16"></circle>
+<path d="M 205 222 Q 212 268 258 266" fill="none" stroke="#0F2E33" stroke-width="6" stroke-linecap="round"></path>
+<circle cx="263" cy="266" r="8" fill="#0F2E33"></circle>
+<circle cx="200" cy="205" r="17" fill="#FFC93C" stroke="#0F2E33" stroke-width="5"></circle>
+<ellipse cx="262" cy="192" rx="25" ry="29" fill="#FFFFFF" stroke="#0F2E33" stroke-width="4"></ellipse>
+<ellipse cx="338" cy="192" rx="25" ry="29" fill="#FFFFFF" stroke="#0F2E33" stroke-width="4"></ellipse>
+<circle cx="269" cy="197" r="13" fill="#0F2E33"></circle>
+<circle cx="345" cy="197" r="13" fill="#0F2E33"></circle>
+<circle cx="274" cy="190" r="5" fill="#FFFFFF"></circle>
+<circle cx="350" cy="190" r="5" fill="#FFFFFF"></circle>
+<path d="M 236 152 Q 260 146 286 160" fill="none" stroke="#0F2E33" stroke-width="7" stroke-linecap="round"></path>
+<path d="M 364 152 Q 340 146 314 160" fill="none" stroke="#0F2E33" stroke-width="7" stroke-linecap="round"></path>
+<ellipse cx="232" cy="232" rx="13" ry="8" fill="#FF8FA3" opacity="0.6"></ellipse>
+<ellipse cx="368" cy="232" rx="13" ry="8" fill="#FF8FA3" opacity="0.6"></ellipse>
+<circle cx="292" cy="226" r="2.5" fill="#0F2E33"></circle>
+<circle cx="308" cy="226" r="2.5" fill="#0F2E33"></circle>
+<path d="M 280 240 Q 302 256 326 238" fill="none" stroke="#0F2E33" stroke-width="5" stroke-linecap="round"></path>
+<path d="M 306 249 L 309 266 L 302 274 M 309 266 L 316 274" fill="none" stroke="#E5484D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+</g>
+<circle cx="300" cy="200" r="158" fill="none" stroke="#0F2E33" stroke-width="6"></circle>
+</svg>`;
+}

@@ -29,7 +29,7 @@
     "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
     "build:labextension": "jupyter-builder build .",
     "build:labextension:dev": "jupyter-builder build --development True .",
-    "build:demo": "rimraf demo/_output demo/.jupyterlite.doit.db && cd demo && jupyter lite build .",
+    "build:demo": "node script/build-demo.mjs",
     "update:demo": "node script/update-demo.mjs",
     "build:lib": "tsc --sourceMap",
     "clean": "rimraf lib tsconfig.tsbuildinfo foxsnakecode/labextension foxsnakecode/_version.py",
@@ -50,6 +50,7 @@
     "@jupyter/builder": "^1.0.0",
     "npm-run-all2": "^7.0.1",
     "rimraf": "^5.0.1",
+    "tar": "^7.5.2",
     "typescript": "~5.5.4"
   },
   "jupyterlab": {

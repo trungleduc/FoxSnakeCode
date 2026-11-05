@@ -1,5 +1,8 @@
 export const WORLD_WIDTH = 800;
 export const WORLD_HEIGHT = 500;
+const GUARD_SIGHT = 160;
+const GUARD_FOV = 70;
+const GUARD_TURN_SPEED = 180;
 
 export interface IChip {
   x: number;
@@ -20,11 +23,41 @@ export interface ICircle {
   r: number;
 }
 
+export interface IPoint {
+  x: number;
+  y: number;
+}
+
+export interface IGuardLeg {
+  t0: number;
+  t1: number;
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  a0: number;
+  a1: number;
+}
+
+export interface IGuard {
+  route: IPoint[];
+  speed: number;
+  sight: number;
+  fov: number;
+  legs: IGuardLeg[];
+  period: number;
+}
+
+export interface IGuardPose extends IPoint {
+  angle: number;
+}
+
 export interface IScene {
   start: { x: number; y: number; angle: number };
   chips: IChip[];
   obstacles: IRect[];
   hazards: (IRect | ICircle)[];
+  guards: IGuard[];
 }
 
 export interface ILevel {
@@ -91,6 +124,63 @@ function parseHazard(value: unknown, where: string): IRect | ICircle {
   return parseRect(source, where);
 }
 
+function headingBetween(from: IPoint, to: IPoint): number {
+  return (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI;
+}
+
+function shortestTurn(change: number): number {
+  return (((change + 180) % 360) + 360) % 360 - 180;
+}
+
+function guardLegs(
+  route: IPoint[],
+  speed: number
+): { legs: IGuardLeg[]; period: number } {
+  const legs: IGuardLeg[] = [];
+  let time = 0;
+  let angle = headingBetween(route[0], route[1]);
+  const add = (duration: number, from: IPoint, to: IPoint, end: number) => {
+    if (duration > 0) {
+      legs.push({
+        t0: time,
+        t1: time + duration,
+        x0: from.x,
+        y0: from.y,
+        x1: to.x,
+        y1: to.y,
+        a0: angle,
+        a1: end
+      });
+    }
+    time += duration;
+    angle = end;
+  };
+  const turnTo = (at: IPoint, to: IPoint) => {
+    const change = shortestTurn(headingBetween(at, to) - angle);
+    add(Math.abs(change) / GUARD_TURN_SPEED, at, at, angle + change);
+  };
+  route.forEach((from, index) => {
+    const to = route[(index + 1) % route.length];
+    turnTo(from, to);
+    add(Math.hypot(to.x - from.x, to.y - from.y) / speed, from, to, angle);
+  });
+  turnTo(route[0], route[1]);
+  return { legs, period: time };
+}
+
+export function guardPose(guard: IGuard, time: number): IGuardPose {
+  const moment = time % guard.period;
+  const leg =
+    guard.legs.find(item => moment < item.t1) ??
+    guard.legs[guard.legs.length - 1];
+  const progress = (moment - leg.t0) / (leg.t1 - leg.t0);
+  return {
+    x: leg.x0 + (leg.x1 - leg.x0) * progress,
+    y: leg.y0 + (leg.y1 - leg.y0) * progress,
+    angle: leg.a0 + (leg.a1 - leg.a0) * progress
+  };
+}
+
 function list(value: unknown, where: string): unknown[] {
   if (value === undefined) {
     return [];
@@ -99,6 +189,29 @@ function list(value: unknown, where: string): unknown[] {
     throw new Error(`${where} must be a list.`);
   }
   return value;
+}
+
+function parseGuard(value: unknown, where: string): IGuard {
+  const source = asObject(value, where);
+  const [speed] = numbers(source, ['speed'], where);
+  if (speed <= 0) {
+    throw new Error(`${where}: "speed" must be more than 0.`);
+  }
+  const route = list(source.route, `${where}.route`).map((item, index) => {
+    const pointWhere = `${where}.route[${index}]`;
+    const [x, y] = numbers(asObject(item, pointWhere), ['x', 'y'], pointWhere);
+    return { x, y };
+  });
+  if (new Set(route.map(point => `${point.x},${point.y}`)).size < 2) {
+    throw new Error(`${where}.route needs at least two different points.`);
+  }
+  return {
+    route,
+    speed,
+    sight: GUARD_SIGHT,
+    fov: GUARD_FOV,
+    ...guardLegs(route, speed)
+  };
 }
 
 function parseScene(value: unknown, where: string): IScene {
@@ -126,6 +239,9 @@ function parseScene(value: unknown, where: string): IScene {
     ),
     hazards: list(source.hazards, `${where}.hazards`).map((item, index) =>
       parseHazard(item, `${where}.hazards[${index}]`)
+    ),
+    guards: list(source.guards, `${where}.guards`).map((item, index) =>
+      parseGuard(item, `${where}.guards[${index}]`)
     )
   };
 }

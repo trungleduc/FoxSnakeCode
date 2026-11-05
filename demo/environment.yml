@@ -4,3 +4,5 @@ channels:
   - https://repo.prefix.dev/conda-forge
 dependencies:
   - xeus-python
+  - pip:
+    - ../dist/foxsnakecode-0.0.0-py3-none-any.whl

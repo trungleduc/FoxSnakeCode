@@ -1,0 +1,64 @@
+{
+  "title": "Operation Night Patrol",
+  "levels": [
+    {
+      "title": "1. First Patrol",
+      "instructions": "HQ: A Sentry Bug is on patrol. The yellow cone is what it can see, and touching it counts too. Use `wait(seconds)` to let it walk past, then move.",
+      "starterCode": "step(600)\n",
+      "scene": {
+        "start": { "x": 100, "y": 250, "angle": 0 },
+        "chips": [{ "x": 700, "y": 250 }],
+        "guards": [
+          { "route": [{ "x": 400, "y": 70 }, { "x": 400, "y": 430 }], "speed": 80 }
+        ]
+      }
+    },
+    {
+      "title": "2. Crate Cover",
+      "instructions": "HQ: There's no room to pass in this corridor, but crates block a Sentry Bug's view. Duck into the gap with `turn(-90)` and `step(150)`, then `wait` until it has gone by.",
+      "starterCode": "step(340)\n",
+      "scene": {
+        "start": { "x": 60, "y": 250, "angle": 0 },
+        "chips": [{ "x": 730, "y": 250 }],
+        "obstacles": [
+          { "x": 150, "y": 0, "w": 200, "h": 160 },
+          { "x": 450, "y": 0, "w": 250, "h": 160 },
+          { "x": 150, "y": 340, "w": 550, "h": 160 }
+        ],
+        "guards": [
+          { "route": [{ "x": 770, "y": 250 }, { "x": 120, "y": 250 }], "speed": 80 }
+        ]
+      }
+    },
+    {
+      "title": "3. Shift Change",
+      "instructions": "HQ: Two Sentry Bugs, moving at different speeds. Your code can watch them: `guards[0].y` is how far down the first one is. Hold with a `while` loop until it has passed, then do the same for the second.",
+      "starterCode": "while guards[0].y < 320:\n    wait(0.1)\nstep(365)\n",
+      "scene": {
+        "start": { "x": 60, "y": 250, "angle": 0 },
+        "chips": [{ "x": 740, "y": 250 }],
+        "guards": [
+          { "route": [{ "x": 300, "y": 60 }, { "x": 300, "y": 440 }], "speed": 120 },
+          { "route": [{ "x": 550, "y": 60 }, { "x": 550, "y": 440 }], "speed": 60 }
+        ]
+      }
+    },
+    {
+      "title": "4. Night Watch",
+      "instructions": "HQ: Final sweep. The red chip is a decoy, a laser blocks the low route to the last chip, and a Sentry Bug holds the high lane. Grab the first chip, drop down out of its sight, wait for it to pass, then slip over the laser.",
+      "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n\ngo(chips[0])\n",
+      "scene": {
+        "start": { "x": 80, "y": 420, "angle": -90 },
+        "chips": [
+          { "x": 200, "y": 100 },
+          { "x": 450, "y": 260, "trapped": true },
+          { "x": 700, "y": 420 }
+        ],
+        "hazards": [{ "x": 597, "y": 220, "w": 6, "h": 280 }],
+        "guards": [
+          { "route": [{ "x": 760, "y": 120 }, { "x": 300, "y": 120 }], "speed": 100 }
+        ]
+      }
+    }
+  ]
+}

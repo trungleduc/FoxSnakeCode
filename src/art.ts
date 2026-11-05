@@ -1,6 +1,8 @@
 import { LabIcon } from '@jupyterlab/ui-components';
 import {
   ICircle,
+  IGuard,
+  IGuardPose,
   IRect,
   IScene,
   isCircle,
@@ -12,6 +14,8 @@ export const fscIcon = new LabIcon({
   name: 'foxsnakecode:file',
   svgstr: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="#d9692b" d="M1 1l4 3h6l4-3-1 8-6 6-6-6z"/><path fill="#fff4e3" d="M3.4 9.4L8 13.5l4.6-4.1L9 10.2 8 12l-1-1.8z"/><circle cx="5.4" cy="7" r="1" fill="#14222f"/><circle cx="10.6" cy="7" r="1" fill="#14222f"/></svg>`
 });
+
+const CONE_RAYS = 24;
 
 function defs(id: string): string {
   return `
@@ -145,6 +149,92 @@ function chip(x: number, y: number, trapped: boolean, index: number, id: string)
   </g>`;
 }
 
+function guardRoute(guard: IGuard): string {
+  const points = guard.route.map(point => `${point.x} ${point.y}`).join('L');
+  return `<path class="fsc-guard-route" d="M${points}Z"/>`;
+}
+
+function guardMarkup(index: number): string {
+  return `
+  <g class="fsc-guard" data-guard="${index}">
+    <path class="fsc-guard-cone"/>
+    <g class="fsc-guard-body">
+      <ellipse cx="0" cy="21" rx="20" ry="5" fill="#02060c" opacity="0.5"/>
+      <g class="fsc-guard-sprite">
+        <g class="fsc-guard-bounce">
+          <path d="M-14 8L-22 14M-15 13L-21 20M-9 16L-13 22M14 8L22 14M15 13L21 20M9 16L13 22" fill="none" stroke="#2A2F36" stroke-width="3.2" stroke-linecap="round"/>
+          <path d="M-5 -17Q-9 -27 -15 -28M5 -17Q9 -27 15 -28" fill="none" stroke="#0F2E33" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="-16" cy="-28.5" r="3" fill="#FFC93C" stroke="#0F2E33" stroke-width="1.2"/>
+          <circle cx="16" cy="-28.5" r="3" fill="#FFC93C" stroke="#0F2E33" stroke-width="1.2"/>
+          <ellipse cx="0" cy="4" rx="19" ry="16" fill="#C8404F" stroke="#0F2E33" stroke-width="1.6"/>
+          <path d="M0 -11V20" stroke="#0F2E33" stroke-width="1.6"/>
+          <g fill="#7A1F2B"><circle cx="-9" cy="4" r="3"/><circle cx="9" cy="4" r="3"/><circle cx="-7" cy="13" r="2.2"/><circle cx="7" cy="13" r="2.2"/></g>
+          <path d="M-14 -7C-14 -21 14 -21 14 -7C14 -3 -14 -3 -14 -7Z" fill="#3D4A6B" stroke="#0F2E33" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="4" cy="-10" r="6.2" fill="#FFFFFF" stroke="#0F2E33" stroke-width="1.4"/>
+          <circle cx="6" cy="-10" r="3" fill="#14181F"/>
+          <circle cx="7" cy="-11.2" r="1" fill="#FFFFFF"/>
+          <path d="M-9 -9H-4" stroke="#7E93A3" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      </g>
+      <g class="fsc-guard-lamp">
+        <rect x="16" y="-5" width="11" height="10" rx="2" fill="#2A2F36" stroke="#7E93A3" stroke-width="1"/>
+        <rect x="25" y="-6.5" width="4" height="13" rx="1.5" fill="#FFE680"/>
+      </g>
+    </g>
+  </g>`;
+}
+
+function rayLength(
+  pose: IGuardPose,
+  angle: number,
+  range: number,
+  obstacles: IRect[]
+): number {
+  const radians = (angle * Math.PI) / 180;
+  const axes = (rect: IRect): number[][] => [
+    [pose.x, Math.cos(radians), rect.x, rect.x + rect.w],
+    [pose.y, Math.sin(radians), rect.y, rect.y + rect.h]
+  ];
+  let nearest = range;
+  for (const obstacle of obstacles) {
+    let near = 0;
+    let far = nearest;
+    for (const [origin, direction, low, high] of axes(obstacle)) {
+      if (Math.abs(direction) < 1e-9) {
+        if (origin < low || origin > high) {
+          far = -1;
+        }
+        continue;
+      }
+      const first = (low - origin) / direction;
+      const second = (high - origin) / direction;
+      near = Math.max(near, Math.min(first, second));
+      far = Math.min(far, Math.max(first, second));
+    }
+    if (near <= far) {
+      nearest = near;
+    }
+  }
+  return nearest;
+}
+
+export function visionCone(
+  guard: IGuard,
+  pose: IGuardPose,
+  obstacles: IRect[]
+): string {
+  let path = `M${pose.x.toFixed(1)} ${pose.y.toFixed(1)}`;
+  for (let ray = 0; ray <= CONE_RAYS; ray++) {
+    const angle = pose.angle - guard.fov / 2 + (guard.fov * ray) / CONE_RAYS;
+    const length = rayLength(pose, angle, guard.sight, obstacles);
+    const radians = (angle * Math.PI) / 180;
+    const x = pose.x + Math.cos(radians) * length;
+    const y = pose.y + Math.sin(radians) * length;
+    path += `L${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+  return `${path}Z`;
+}
+
 export function sceneMarkup(scene: IScene, id: string): string {
   const hazards = scene.hazards
     .map(hazard =>
@@ -163,9 +253,11 @@ export function sceneMarkup(scene: IScene, id: string): string {
     <rect x="${WORLD_WIDTH - 5}" width="5" height="${WORLD_HEIGHT}"/>
   </g>
   <circle class="fsc-start" cx="${scene.start.x}" cy="${scene.start.y}" r="24"/>
+  ${scene.guards.map(guardRoute).join('')}
   ${hazards}
   ${scene.obstacles.map(obstacle => crate(obstacle, id)).join('')}
   ${scene.chips.map((c, index) => chip(c.x, c.y, !!c.trapped, index, id)).join('')}
+  ${scene.guards.map((_, index) => guardMarkup(index)).join('')}
   <g class="fsc-actor"></g>
   <rect width="${WORLD_WIDTH}" height="${WORLD_HEIGHT}" fill="url(#${id}-vignette)" pointer-events="none"/>`;
 }

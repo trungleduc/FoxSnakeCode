@@ -1,12 +1,10 @@
-import { FOX_MARKUP, sceneMarkup } from './art';
+import { FOX_MARKUP, sceneMarkup, visionCone } from './art';
 import { GameAudio } from './audio';
 import { GameEvent } from './engine';
-import { IScene, WORLD_HEIGHT, WORLD_WIDTH } from './format';
+import { guardPose, IScene, WORLD_HEIGHT, WORLD_WIDTH } from './format';
 
-const WALK_SPEED = 240;
 const TURN_SPEED = 360;
 const BUMP_TIME = 260;
-const MIN_COMMAND_TIME = 70;
 const MAX_PLAY_TIME = 30000;
 const FOOTSTEP_DISTANCE = 45;
 
@@ -36,6 +34,8 @@ export class Stage {
     this._scene = scene;
     this.node.innerHTML = sceneMarkup(scene, this._id);
     this._actor = this.node.querySelector('.fsc-actor') as SVGGElement;
+    this._guardNodes = Array.from(this.node.querySelectorAll('.fsc-guard'));
+    this._guardFacing = this._guardNodes.map(() => 1);
     this.reset();
   }
 
@@ -56,12 +56,17 @@ export class Stage {
       .forEach(chip => chip.classList.remove('fsc-chip-taken'));
     this._drawActorMarkup();
     this._drawPose();
+    this._drawGuards(0);
     this._reportChips();
   }
 
-  setOutcome(outcome: 'win' | 'fail' | null): void {
+  setOutcome(outcome: 'win' | 'fail' | 'spotted' | null): void {
     this.node.classList.toggle('fsc-win', outcome === 'win');
-    this.node.classList.toggle('fsc-fail', outcome === 'fail');
+    this.node.classList.toggle(
+      'fsc-fail',
+      outcome === 'fail' || outcome === 'spotted'
+    );
+    this.node.classList.toggle('fsc-spotted', outcome === 'spotted');
   }
 
   play(events: GameEvent[]): Promise<void> {
@@ -69,10 +74,12 @@ export class Stage {
     const durations = events.map(event => this._duration(event));
     const total = durations.reduce((sum, time) => sum + time, 0);
     const rate = total > MAX_PLAY_TIME ? total / MAX_PLAY_TIME : 1;
+    this.node.classList.add('fsc-patrolling');
     return new Promise<void>(resolve => {
       this._finishPlay = resolve;
       let index = 0;
       let eventTime = 0;
+      let finishedTime = 0;
       let from = { x: this._x, y: this._y, angle: this._angle };
       let last: number | null = null;
       let announced = -1;
@@ -99,11 +106,14 @@ export class Stage {
           this._finishEvent(event);
           from = { x: this._x, y: this._y, angle: this._angle };
           index++;
+          finishedTime += eventTime;
           eventTime = 0;
         }
         this._drawPose();
+        this._drawGuards((finishedTime + eventTime) / 1000);
         if (index >= events.length) {
           this._setWalking(false);
+          this.node.classList.remove('fsc-patrolling');
           this._frame = 0;
           this._finishPlay = null;
           resolve();
@@ -121,6 +131,7 @@ export class Stage {
       this._frame = 0;
     }
     this._setWalking(false);
+    this.node.classList.remove('fsc-patrolling');
     clearTimeout(this._bumpTimer);
     this.node.classList.remove('fsc-bump');
     const finish = this._finishPlay;
@@ -129,11 +140,7 @@ export class Stage {
   }
 
   private _duration(event: GameEvent): number {
-    if (event.t === 'move') {
-      const walk = (event.d / WALK_SPEED) * 1000;
-      return Math.max(walk, MIN_COMMAND_TIME) + (event.blocked ? BUMP_TIME : 0);
-    }
-    return MIN_COMMAND_TIME + 280;
+    return event.s * 1000;
   }
 
   private _applyEvent(
@@ -141,17 +148,20 @@ export class Stage {
     from: { x: number; y: number; angle: number },
     progress: number
   ): void {
+    if (event.t === 'wait') {
+      this._setWalking(false);
+      return;
+    }
     if (event.t === 'turn') {
+      const duration = this._duration(event);
       const change = event.a - from.angle;
-      const time = Math.min((Math.abs(change) / TURN_SPEED) * 1000, 350);
-      const amount = time ? Math.min(1, (progress * 350) / time) : 1;
+      const time = Math.min((Math.abs(change) / TURN_SPEED) * 1000, duration);
+      const amount = time ? Math.min(1, (progress * duration) / time) : 1;
       this._angle = from.angle + change * amount;
       this._setWalking(false);
       return;
     }
-    const walkShare = event.blocked
-      ? Math.max(0, 1 - BUMP_TIME / this._duration(event))
-      : 1;
+    const walkShare = event.s ? Math.min(1, event.walk / event.s) : 1;
     const walked = walkShare ? Math.min(1, progress / walkShare) : 1;
     const nextX = from.x + (event.x - from.x) * walked;
     const nextY = from.y + (event.y - from.y) * walked;
@@ -174,6 +184,9 @@ export class Stage {
   }
 
   private _finishEvent(event: GameEvent): void {
+    if (event.t === 'wait') {
+      return;
+    }
     if (event.t === 'turn') {
       this._angle = event.a;
       return;
@@ -245,6 +258,36 @@ export class Stage {
     this._sprite.setAttribute('transform', `scale(${this._facing} 1)`);
   }
 
+  private _drawGuards(time: number): void {
+    const scene = this._scene;
+    if (!scene) {
+      return;
+    }
+    this._guardNodes.forEach((node, index) => {
+      const guard = scene.guards[index];
+      const pose = guardPose(guard, time);
+      node
+        .querySelector('.fsc-guard-cone')
+        ?.setAttribute('d', visionCone(guard, pose, scene.obstacles));
+      node
+        .querySelector('.fsc-guard-body')
+        ?.setAttribute(
+          'transform',
+          `translate(${pose.x.toFixed(1)} ${pose.y.toFixed(1)})`
+        );
+      node
+        .querySelector('.fsc-guard-lamp')
+        ?.setAttribute('transform', `rotate(${pose.angle.toFixed(1)})`);
+      const cosine = Math.cos((pose.angle * Math.PI) / 180);
+      if (Math.abs(cosine) > 0.01) {
+        this._guardFacing[index] = cosine < 0 ? -1 : 1;
+      }
+      node
+        .querySelector('.fsc-guard-sprite')
+        ?.setAttribute('transform', `scale(${this._guardFacing[index]} 1)`);
+    });
+  }
+
   private _id: string;
   private _onChips: (collected: number, total: number) => void;
   private _audio: GameAudio;
@@ -253,6 +296,8 @@ export class Stage {
   private _actor: SVGGElement | null = null;
   private _heading: SVGGElement | null = null;
   private _sprite: SVGGElement | null = null;
+  private _guardNodes: Element[] = [];
+  private _guardFacing: number[] = [];
   private _x = 0;
   private _y = 0;
   private _angle = 0;

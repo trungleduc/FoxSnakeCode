@@ -24,9 +24,14 @@ let nextHqAvatarId = 0;
 const COMMANDS: [string, string][] = [
   ['step(distance)', 'Walk forward. A negative number walks backward.'],
   ['turn(degrees)', 'Turn right. A negative number turns left.'],
-  ['turn_to(target)', 'Face a chip or an (x, y) position.'],
-  ['distance_to(target)', 'Get the distance to a chip or an (x, y) position.'],
-  ['chips', 'The list of chips. Each has x, y, trapped and collected.']
+  ['turn_to(target)', 'Face a chip, a guard or an (x, y) position.'],
+  [
+    'distance_to(target)',
+    'Get the distance to a chip, a guard or an (x, y) position.'
+  ],
+  ['wait(seconds)', 'Stay still for a number of seconds.'],
+  ['chips', 'The list of chips. Each has x, y, trapped and collected.'],
+  ['guards', 'The list of guards. Each has x, y and angle.']
 ];
 
 type Phase = 'starting' | 'idle' | 'running' | 'playing' | 'stopping' | 'broken';
@@ -448,7 +453,7 @@ export class FscPanel extends SplitPanel {
         return;
       }
       case 'failed': {
-        this._stage.setOutcome('fail');
+        this._stage.setOutcome(result.reason === 'guard' ? 'spotted' : 'fail');
         this._audio.alarm();
         const messages: Record<string, [string, string]> = {
           light: [
@@ -459,7 +464,11 @@ export class FscPanel extends SplitPanel {
             'ALARM TRIPPED',
             `${MASCOT} broke a laser beam. Plot a new route.`
           ],
-          trap: ['DECOY CHIP', 'It was rigged. Check .trapped before you grab.']
+          trap: ['DECOY CHIP', 'It was rigged. Check .trapped before you grab.'],
+          guard: [
+            "ALERT: YOU'VE BEEN SPOTTED",
+            'Stay out of the vision cone, or put a crate between you.'
+          ]
         };
         const [title, detail] = messages[result.reason ?? ''] ?? [
           'ALARM TRIPPED',

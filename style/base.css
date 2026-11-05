@@ -360,6 +360,32 @@ select.fsc-level-select {
   animation: fsc-laser-flicker 1.1s linear infinite;
 }
 
+.fsc-guard-route {
+  fill: none;
+  stroke: #ffe680;
+  stroke-dasharray: 4 8;
+  stroke-linecap: round;
+  stroke-width: 2;
+  opacity: 0.35;
+}
+
+.fsc-guard-cone {
+  fill: #ffe680;
+  stroke: #ffe680;
+  stroke-width: 1.5;
+  opacity: 0.24;
+}
+
+.fsc-spotted .fsc-guard-cone {
+  fill: #ff2d48;
+  stroke: #ff2d48;
+  opacity: 0.5;
+}
+
+.fsc-patrolling .fsc-guard-bounce {
+  animation: fsc-walk-bob 0.32s ease-in-out infinite alternate;
+}
+
 .fsc-chip-inner {
   animation: fsc-chip-bob 1.8s ease-in-out infinite;
 }
@@ -538,6 +564,7 @@ select.fsc-level-select {
   .fsc-blink,
   .fsc-walking .fsc-leg,
   .fsc-walking .fsc-bounce,
+  .fsc-patrolling .fsc-guard-bounce,
   .fsc-bump .fsc-bounce,
   .fsc-win .fsc-bounce,
   .fsc-fail .fsc-bounce {

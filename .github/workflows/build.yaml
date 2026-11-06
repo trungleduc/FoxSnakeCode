@@ -24,6 +24,7 @@ jobs:
             pip
             jupyterlab=4
             nodejs=22
+            specta
 
       - name: Install dependencies
         shell: bash -l {0}

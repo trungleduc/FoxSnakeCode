@@ -22,6 +22,10 @@ const MAX_HINT_LENGTH = 300;
 const MAX_HINT_QUESTIONS = 10;
 const HINT_CARD_GAP = 8;
 const HINT_CARD_MAX_HEIGHT = 400;
+const HINT_CONNECT_NOTICE =
+  'Connect an AI provider and I can give you hints on this mission.';
+const HINT_INSTALL_NOTICE =
+  'Hints need the jupyter-ai-lite extension. Install it with `pip install jupyter-ai-lite`, then restart JupyterLab. On a hosted site, ask whoever runs it to add it.';
 const HINT_STARTERS = [
   'Where do I start?',
   'Why did my run fail?',
@@ -331,7 +335,6 @@ export class FscPanel extends SplitPanel {
         this._hintButton.focus();
       }
     });
-    this._hintButton.hidden = !this._hints;
     this._hintButton.setAttribute('aria-expanded', 'false');
     this._hintButton.addEventListener('click', () => {
       if (this._hintCard.hidden) {
@@ -425,8 +428,12 @@ export class FscPanel extends SplitPanel {
 
   private _renderHintState(): void {
     const ready = !!this._hints?.ready;
+    setInlineCode(
+      this._hintNotice,
+      this._hints ? HINT_CONNECT_NOTICE : HINT_INSTALL_NOTICE
+    );
     this._hintNotice.hidden = ready;
-    this._hintSetup.hidden = ready && !this._hintFailed;
+    this._hintSetup.hidden = !this._hints || (ready && !this._hintFailed);
     this._hintForm.hidden = !ready || this._hintCapped;
     this._hintStarters.hidden = !ready || this._hintLog.hasChildNodes();
   }
@@ -987,11 +994,7 @@ export class FscPanel extends SplitPanel {
   private _hintCard = element('div', 'fsc-chat');
   private _hintBody = element('div', 'fsc-chat-body');
   private _hintLog = element('div', 'fsc-hint-log');
-  private _hintNotice = element(
-    'p',
-    'fsc-chat-notice',
-    'Connect an AI provider and I can give you hints on this mission.'
-  );
+  private _hintNotice = element('p', 'fsc-chat-notice');
   private _hintStarters = element('div', 'fsc-chat-starters');
   private _hintForm = element('form', 'fsc-hint-form');
   private _hintInput = element('input', 'fsc-hint-input');

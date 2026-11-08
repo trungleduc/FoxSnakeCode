@@ -12,7 +12,6 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
-dependencies = ["jupyter-ai-lite>=0.21,<0.22"]
 dynamic = ["version", "description", "authors", "keywords"]
 classifiers = [
     "Framework :: Jupyter",
@@ -22,6 +21,9 @@ classifiers = [
     "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
     "Programming Language :: Python :: 3",
 ]
+
+[project.optional-dependencies]
+ai = ["jupyter-ai-lite>=0.21,<0.22"]
 
 [tool.hatch.version]
 source = "nodejs"

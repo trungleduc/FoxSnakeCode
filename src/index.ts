@@ -11,12 +11,6 @@ import {
   DocumentWidget,
   IDocumentWidget
 } from '@jupyterlab/docregistry';
-import {
-  CommandIds,
-  IAgentManagerFactory,
-  IAISettingsModel,
-  IProviderRegistry
-} from '@jupyter-ai/jupyternaut-lite';
 import { ILauncher } from '@jupyterlab/launcher';
 import { Contents, ServiceManager } from '@jupyterlab/services';
 import { fscIcon } from './art';
@@ -59,33 +53,38 @@ class FscWidgetFactory extends ABCWidgetFactory<IDocumentWidget<FscPanel>> {
   private _hints: HintService | null;
 }
 
+async function loadHints(app: JupyterFrontEnd): Promise<HintService | null> {
+  try {
+    const ai = await import('@jupyter-ai/jupyternaut-lite');
+    const [factory, settings, providers] = await Promise.all([
+      app.resolveOptionalService(ai.IAgentManagerFactory),
+      app.resolveOptionalService(ai.IAISettingsModel),
+      app.resolveOptionalService(ai.IProviderRegistry)
+    ]);
+    if (!factory || !settings || !providers) {
+      return null;
+    }
+    return new HintService(factory, settings, providers, () => {
+      void app.commands.execute(ai.CommandIds.openSettings);
+    });
+  } catch {
+    return null;
+  }
+}
+
 const plugin: JupyterFrontEndPlugin<void> = {
   id: 'foxsnakecode:plugin',
   description: 'Open .fsc coding puzzles in a split code and game panel.',
   autoStart: true,
   requires: [IEditorServices],
-  optional: [
-    ILayoutRestorer,
-    ILauncher,
-    IAgentManagerFactory,
-    IAISettingsModel,
-    IProviderRegistry
-  ],
-  activate: (
+  optional: [ILayoutRestorer, ILauncher],
+  activate: async (
     app: JupyterFrontEnd,
     editorServices: IEditorServices,
     restorer: ILayoutRestorer | null,
-    launcher: ILauncher | null,
-    agentFactory: IAgentManagerFactory | null,
-    aiSettings: IAISettingsModel | null,
-    aiProviders: IProviderRegistry | null
+    launcher: ILauncher | null
   ) => {
-    const hints =
-      agentFactory && aiSettings && aiProviders
-        ? new HintService(agentFactory, aiSettings, aiProviders, () => {
-            void app.commands.execute(CommandIds.openSettings);
-          })
-        : null;
+    const hints = await loadHints(app);
 
     app.docRegistry.addFileType({
       name: FILE_TYPE,

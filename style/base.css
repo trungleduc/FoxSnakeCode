@@ -607,7 +607,8 @@
   font-weight: 500;
 }
 
-.fsc-bubble code {
+.fsc-bubble code,
+.fsc-chat-notice code {
   padding: 1px 5px;
   border-radius: 5px;
   background: rgba(0, 0, 0, 0.32);
@@ -649,6 +650,10 @@
   font-size: 14.5px;
   line-height: 1.45;
   text-align: center;
+}
+
+.fsc-chat-notice:has(+ .fsc-chat-starters[hidden] + .fsc-chat-connect[hidden]) {
+  margin-bottom: auto;
 }
 
 .fsc-chat-notice[hidden],

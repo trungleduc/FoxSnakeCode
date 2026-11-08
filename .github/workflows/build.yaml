@@ -36,7 +36,7 @@ jobs:
           set -eux
           jlpm install
           jlpm build:prod
-          python -m pip install .
+          python -m pip install ".[ai]"
 
       - name: Enable persistent storage for the deployed demo
         shell: bash -l {0}

@@ -28,7 +28,7 @@ FoxSnakeCode runs in JupyterLab and JupyterLite. Your code runs on a Python kern
 
 ## Hints from Sudo Snake
 
-Press **Ask for a hint** during a mission to chat with Sudo Snake. Hints use [jupyter-ai-lite](https://github.com/jupyterlite/ai), so players connect their own AI provider or sign in with OpenRouter from **Set up AI**. By default the key is kept in memory and cleared when the page reloads. Never put your own API key in a deployed site, because anyone can read it.
+Press **Ask Sudo Snake** during a mission to chat with Sudo Snake. Hints are optional and need [jupyter-ai-lite](https://github.com/jupyterlite/ai) in the JupyterLab or JupyterLite host: install it with `pip install jupyter-ai-lite`. Without it the game works as usual and the button explains how to enable hints. Players connect their own AI provider or sign in with OpenRouter from **Connect AI**. By default the key is kept in memory and cleared when the page reloads. Never put your own API key in a deployed site, because anyone can read it.
 
 Sudo Snake only sees the current level, the player's code and their last result, and has no tools. Its instructions keep it on the game and away from full solutions, but they run in the player's browser and are not a guarantee. The demo site turns off the general AI chat and code completion.
 
@@ -37,7 +37,7 @@ Sudo Snake only sees the current level, the player's code and their last result,
 ```bash
 micromamba create -n cgs -c conda-forge python=3.12 'jupyterlab=4.*' 'nodejs=22' xeus-python jupyterlite-core jupyterlite-xeus pip
 micromamba activate cgs
-pip install -e .
+pip install -e ".[ai]"
 jupyter labextension develop . --overwrite
 jlpm install
 jlpm build

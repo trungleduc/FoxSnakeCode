@@ -1,6 +1,12 @@
 import { ISessionContext } from '@jupyterlab/apputils';
 import { Kernel, KernelMessage } from '@jupyterlab/services';
-import { buildRunCode, IRunResult, readRunOutput } from './engine';
+import {
+  buildLoadCode,
+  buildRunCode,
+  IRunResult,
+  readMissionsOutput,
+  readRunOutput
+} from './engine';
 import { IScene } from './format';
 
 const READY_TIMEOUT = 60000;
@@ -17,6 +23,20 @@ export class Runner {
   constructor(sessionContext: ISessionContext, kernelManager: Kernel.IManager) {
     this._sessionContext = sessionContext;
     this._kernelManager = kernelManager;
+  }
+
+  async loadMissions(): Promise<string> {
+    const kernel = await this._readyKernel();
+    const { stdout, kernelError } = await this._collect(
+      kernel,
+      buildLoadCode(),
+      new Promise<void>(() => undefined)
+    );
+    const missions = readMissionsOutput(stdout);
+    if (missions === null) {
+      throw new Error(kernelError || 'The kernel did not return the missions.');
+    }
+    return missions;
   }
 
   async run(scene: IScene, code: string): Promise<IRunResult> {
@@ -60,11 +80,41 @@ export class Runner {
     if (!kernel || this._stopRequested) {
       return { status: 'stopped', events: [] };
     }
+    const { stdout, stderr, kernelError } = await this._collect(
+      kernel,
+      buildRunCode(scene, code),
+      abandoned
+    );
+
+    if (this._stopRequested) {
+      return { status: 'stopped', events: [] };
+    }
+    const result = readRunOutput(stdout);
+    if (!result) {
+      return {
+        status: 'error',
+        events: [],
+        error: {
+          type: 'KernelError',
+          message: kernelError || 'The kernel did not return a result.'
+        },
+        output: stdout + stderr
+      };
+    }
+    result.output = (result.output ?? '') + stderr;
+    return result;
+  }
+
+  private async _collect(
+    kernel: Kernel.IKernelConnection,
+    code: string,
+    abandoned: Promise<void>
+  ): Promise<{ stdout: string; stderr: string; kernelError: string }> {
     let stdout = '';
     let stderr = '';
     let kernelError = '';
     const future = kernel.requestExecute({
-      code: buildRunCode(scene, code),
+      code,
       silent: false,
       store_history: false,
       allow_stdin: false,
@@ -87,24 +137,7 @@ export class Runner {
       kernelError = kernelError || (error as Error).message;
     }
     future.dispose();
-
-    if (this._stopRequested) {
-      return { status: 'stopped', events: [] };
-    }
-    const result = readRunOutput(stdout);
-    if (!result) {
-      return {
-        status: 'error',
-        events: [],
-        error: {
-          type: 'KernelError',
-          message: kernelError || 'The kernel did not return a result.'
-        },
-        output: stdout + stderr
-      };
-    }
-    result.output = (result.output ?? '') + stderr;
-    return result;
+    return { stdout, stderr, kernelError };
   }
 
   private async _readyKernel(): Promise<Kernel.IKernelConnection> {

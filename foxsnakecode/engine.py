@@ -1,6 +1,7 @@
 import base64
 import json
 import math
+import os
 import sys
 
 WIDTH = 800
@@ -321,8 +322,18 @@ def _run(payload):
     return result
 
 
+def _send(output, text):
+    output.write("\n\x1eFSC" + text + "\x1e\n")
+    output.flush()
+
+
 def run_mission(encoded_payload):
     output = sys.stdout
     result = _run(json.loads(base64.b64decode(encoded_payload).decode("utf-8")))
-    output.write("\n\x1eFSC" + json.dumps(result) + "\x1e\n")
-    output.flush()
+    _send(output, json.dumps(result))
+
+
+def load_missions():
+    path = os.path.join(os.path.dirname(__file__), "missions.json")
+    with open(path, encoding="utf-8") as file:
+        _send(sys.stdout, file.read())

@@ -16,6 +16,10 @@ export function buildRunCode(scene: IScene, code: string): string {
   );
 }
 
+export function buildLoadCode(): string {
+  return 'from foxsnakecode.engine import load_missions\nload_missions()';
+}
+
 export type GameEvent =
   | {
       t: 'move';
@@ -54,4 +58,8 @@ export function readRunOutput(stdout: string): IRunResult | null {
   const result = JSON.parse(match[1]) as IRunResult;
   result.output = stdout.replace(RESULT_PATTERN, '');
   return result;
+}
+
+export function readMissionsOutput(stdout: string): string | null {
+  return RESULT_PATTERN.exec(stdout)?.[1] ?? null;
 }

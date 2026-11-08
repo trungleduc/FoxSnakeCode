@@ -61,15 +61,17 @@ export interface IScene {
 }
 
 export interface ILevel {
+  id: string;
   title: string;
+  boss: boolean;
   instructions: string;
   starterCode: string;
   scene: IScene;
 }
 
 export interface IProgress {
-  currentLevel: number;
-  solved: number[];
+  currentLevel: string;
+  solved: string[];
   code: Record<string, string>;
 }
 
@@ -77,7 +79,6 @@ export interface IMission {
   title: string;
   levels: ILevel[];
   progress: IProgress;
-  raw: Record<string, unknown>;
 }
 
 export function isCircle(hazard: IRect | ICircle): hazard is ICircle {
@@ -248,8 +249,13 @@ function parseScene(value: unknown, where: string): IScene {
 
 function parseLevel(value: unknown, where: string): ILevel {
   const source = asObject(value, where);
+  if (typeof source.id !== 'string' || !source.id) {
+    throw new Error(`${where}: "id" must be a non-empty string.`);
+  }
   return {
+    id: source.id,
     title: typeof source.title === 'string' ? source.title : where,
+    boss: source.boss === true,
     instructions:
       typeof source.instructions === 'string' ? source.instructions : '',
     starterCode:
@@ -258,7 +264,8 @@ function parseLevel(value: unknown, where: string): ILevel {
   };
 }
 
-function parseProgress(value: unknown, levelCount: number): IProgress {
+function parseProgress(value: unknown, levels: ILevel[]): IProgress {
+  const ids = new Set(levels.map(level => level.id));
   const source =
     typeof value === 'object' && value !== null && !Array.isArray(value)
       ? (value as Record<string, unknown>)
@@ -274,47 +281,53 @@ function parseProgress(value: unknown, levelCount: number): IProgress {
   }
   return {
     currentLevel:
-      Number.isInteger(current) &&
-      (current as number) >= 0 &&
-      (current as number) < levelCount
-        ? (current as number)
-        : 0,
+      typeof current === 'string' && ids.has(current) ? current : levels[0].id,
     solved: Array.isArray(source.solved)
       ? source.solved.filter(
-          (item): item is number =>
-            Number.isInteger(item) && item >= 0 && item < levelCount
+          (item): item is string => typeof item === 'string' && ids.has(item)
         )
       : [],
     code
   };
 }
 
-export function parseMission(text: string): IMission {
+function parseSave(text: string): Record<string, unknown> {
+  if (!text.trim()) {
+    return {};
+  }
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
   } catch (error) {
     throw new Error(`This file is not valid JSON: ${(error as Error).message}`);
   }
-  const raw = asObject(parsed, 'The file');
-  const levelSources = raw.levels === undefined ? [raw] : raw.levels;
-  if (!Array.isArray(levelSources) || levelSources.length === 0) {
-    throw new Error('"levels" must be a list with at least one level.');
-  }
-  const levels = levelSources.map((level, index) =>
+  return asObject(parsed, 'The file');
+}
+
+export function parseMission(missions: string, save: string): IMission {
+  const source = asObject(JSON.parse(missions), 'The missions');
+  const levels = list(source.levels, 'The missions').map((level, index) =>
     parseLevel(level, `Level ${index + 1}`)
   );
+  if (levels.length === 0) {
+    throw new Error('"levels" must be a list with at least one level.');
+  }
   return {
-    title: typeof raw.title === 'string' ? raw.title : 'FoxSnakeCode',
+    title: typeof source.title === 'string' ? source.title : 'FoxSnakeCode',
     levels,
-    progress: parseProgress(raw.progress, levels.length),
-    raw
+    progress: parseProgress(parseSave(save).progress, levels)
   };
 }
 
 export function serializeMission(mission: IMission): string {
+  return JSON.stringify({ progress: mission.progress }, null, 2) + '\n';
+}
+
+export function isUnlocked(mission: IMission, index: number): boolean {
+  const { levels, progress } = mission;
   return (
-    JSON.stringify({ ...mission.raw, progress: mission.progress }, null, 2) +
-    '\n'
+    index === 0 ||
+    progress.solved.includes(levels[index].id) ||
+    progress.solved.includes(levels[index - 1].id)
   );
 }

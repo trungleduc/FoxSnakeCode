@@ -91,7 +91,6 @@ try {
   }
   updateFederatedExtension(path.join(inputPath, 'static'), jsonPath);
   cleanAndCopy(inputPath, outputPath);
-  cleanAndCopy('demo/files', 'demo/_output/files');
   await updateKernelPackage();
 } catch (err) {
   console.error('Update failed:', err);

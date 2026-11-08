@@ -18,10 +18,11 @@
 
 ## How it plays
 
-1. Double-click a `.fsc` mission file.
-2. Read your briefing from Sudo Snake.
-3. Write Python, then press Run.
-4. Watch Grep Fox dodge searchlights, lasers and decoys to grab every data chip.
+1. Click FoxSnakeCode in the launcher to start a new game, or double-click a saved `.fsc` file.
+2. Pick the next open level on the map. Solving a level unlocks the one after it, and every 10th level is a boss.
+3. Read your briefing from Sudo Snake.
+4. Write Python, then press Run.
+5. Watch Grep Fox dodge searchlights, lasers and decoys to grab every data chip.
 
 FoxSnakeCode runs in JupyterLab and JupyterLite. Your code runs on a Python kernel, and xeus-python is preferred. The `foxsnakecode` package must be installed in the same environment as the kernel.
 
@@ -37,13 +38,13 @@ jlpm build
 jupyter lab
 ```
 
-Then open `demo/files/first-mission.fsc`.
+Then click FoxSnakeCode in the launcher.
 
-The game logic is in `foxsnakecode/engine.py`. After editing it, press Stop or restart the kernel to load the new code.
+The game logic is in `foxsnakecode/engine.py` and the levels are in `foxsnakecode/missions.json`. After editing the engine, press Stop or restart the kernel to load the new code. After editing the levels, close and reopen the game.
 
 ## JupyterLite demo site
 
-The `demo` folder holds a JupyterLite site with xeus-python running in the browser. Put missions in `demo/files`, then build the site with the extension installed:
+The `demo` folder holds a JupyterLite site with xeus-python running in the browser. Build the site with the extension installed:
 
 ```bash
 pip install build hatchling hatch-nodejs-version hatch-jupyter-builder
@@ -54,9 +55,9 @@ This builds the `foxsnakecode` wheel and installs it into the site's kernel. The
 
 After changing the extension, the Python package or the missions, `jlpm update:demo` copies them into an existing `demo/_output` without a full rebuild.
 
-A local demo build keeps files in memory only, so nothing is saved in the browser and reloading the page starts the mission fresh.
+A local demo build keeps files in memory only, so nothing is saved in the browser and reloading the page loses any game you started.
 
-The site deployed to GitHub Pages saves progress in the player's browser instead. Returning players keep their saved copy of a mission, so they won't see later edits to that file unless they clear their browser data or the update ships under a new file name.
+The site deployed to GitHub Pages saves games in the player's browser instead.
 
 Stop restarts the kernel, so the next Run can take a few seconds in JupyterLite.
 
@@ -74,17 +75,16 @@ Stop restarts the kernel, so the next Run can take a few seconds in JupyterLite.
 
 A level is solved when every chip that isn't trapped has been collected. Searchlights, lasers, trapped chips and being spotted by a guard end the attempt, while crates and walls just block the way.
 
-## The `.fsc` file format
+## Adding levels
 
-A `.fsc` file is JSON. The world is 800 by 500 steps, with `x` increasing to the right and `y` increasing downward. An `angle` of 0 faces right.
-
-A file can hold a list of levels:
+Levels are in `foxsnakecode/missions.json`, and their order in the list is their order on the map. The world is 800 by 500 steps, with `x` increasing to the right and `y` increasing downward. An `angle` of 0 faces right.
 
 ```json
 {
-  "title": "My Mission",
+  "title": "FoxSnakeCode",
   "levels": [
     {
+      "id": "first-steps",
       "title": "First Steps",
       "instructions": "Reach the chip with `step`.",
       "starterCode": "step(100)\n",
@@ -105,22 +105,24 @@ A file can hold a list of levels:
 }
 ```
 
-For a single level, put `instructions`, `starterCode` and `scene` at the top level instead of using `levels`. The level picker is then hidden.
+Each level needs a unique `id`. Saved games refer to levels by `id`, so never change one after release; new levels can go anywhere in the list without breaking saves. Add `"boss": true` to mark a boss level.
 
 In `hazards`, an item with `r` is a searchlight and an item with `w` and `h` is a laser. Text between backticks in `instructions` is shown as code.
 
 In `guards`, each guard walks its `route` at `speed` steps per second, then returns to the first point and starts again. Grep Fox is spotted inside a guard's vision cone or by touching the guard, and crates block the cone. Put guard routes where they don't pass through crates.
 
-### Saved progress
+## The `.fsc` file
 
-Players' work is saved automatically to a `progress` section in the same file, so they can close it and continue later:
+A `.fsc` file holds only the player's save and starts empty, so each file is a separate playthrough. Work is saved automatically so players can close it and continue later:
 
 ```json
-"progress": {
-  "currentLevel": 2,
-  "solved": [0, 1],
-  "code": { "0": "step(300)\n" }
+{
+  "progress": {
+    "currentLevel": "first-steps",
+    "solved": ["first-steps"],
+    "code": { "first-steps": "step(300)\n" }
+  }
 }
 ```
 
-Levels in `solved` and `code` are identified by their position in the list, starting at 0. Sharing a file also shares this section, including the player's answers.
+Sharing a file also shares the player's answers.

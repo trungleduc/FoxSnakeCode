@@ -11,12 +11,14 @@ import {
   DocumentWidget,
   IDocumentWidget
 } from '@jupyterlab/docregistry';
-import { ServiceManager } from '@jupyterlab/services';
+import { ILauncher } from '@jupyterlab/launcher';
+import { Contents, ServiceManager } from '@jupyterlab/services';
 import { fscIcon } from './art';
 import { FscPanel } from './panel';
 
 const FACTORY = 'FoxSnakeCode';
 const FILE_TYPE = 'fsc';
+const CREATE_COMMAND = 'foxsnakecode:create';
 
 class FscWidgetFactory extends ABCWidgetFactory<IDocumentWidget<FscPanel>> {
   constructor(
@@ -51,11 +53,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description: 'Open .fsc coding puzzles in a split code and game panel.',
   autoStart: true,
   requires: [IEditorServices],
-  optional: [ILayoutRestorer],
+  optional: [ILayoutRestorer, ILauncher],
   activate: (
     app: JupyterFrontEnd,
     editorServices: IEditorServices,
-    restorer: ILayoutRestorer | null
+    restorer: ILayoutRestorer | null,
+    launcher: ILauncher | null
   ) => {
     app.docRegistry.addFileType({
       name: FILE_TYPE,
@@ -96,6 +99,23 @@ const plugin: JupyterFrontEndPlugin<void> = {
       void tracker.add(widget);
     });
     app.docRegistry.addWidgetFactory(factory);
+
+    app.commands.addCommand(CREATE_COMMAND, {
+      label: 'FoxSnakeCode',
+      caption: 'Start a new FoxSnakeCode game',
+      icon: fscIcon,
+      execute: async args => {
+        const model: Contents.IModel = await app.commands.execute(
+          'docmanager:new-untitled',
+          { path: (args.cwd as string) ?? '', type: 'file', ext: '.fsc' }
+        );
+        return app.commands.execute('docmanager:open', {
+          path: model.path,
+          factory: FACTORY
+        });
+      }
+    });
+    launcher?.add({ command: CREATE_COMMAND, category: 'Other' });
   }
 };
 

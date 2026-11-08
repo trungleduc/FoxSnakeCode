@@ -329,6 +329,9 @@ export const FOX_MARKUP = `
     </g>
   </g>`;
 
+export const BOSS_BADGE =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 5 7l5 5 2-8 2 8 5-5 2 12z" fill="currentColor"/></svg>';
+
 export function sudoSnakeAvatar(id: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="140 40 320 320">
 <defs>

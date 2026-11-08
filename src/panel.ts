@@ -8,9 +8,11 @@ import { GameAudio } from './audio';
 import { IRunResult } from './engine';
 import {
   IMission,
+  isUnlocked,
   parseMission,
   serializeMission
 } from './format';
+import { MissionMap } from './map';
 import { Runner } from './runner';
 import { Stage } from './stage';
 
@@ -111,10 +113,13 @@ export class FscPanel extends SplitPanel {
     this.addWidget(this._buildPlaySide());
     this.setRelativeSizes([0.4, 0.6]);
 
+    this._map = new MissionMap(index => void this._goToLevel(index));
+    this._map.setMessage('Establishing kernel link…');
+    this.node.appendChild(this._map.node);
+
     this._context.ready.then(() => {
       this._context.model.contentChanged.connect(this._onFileChanged, this);
       this._context.pathChanged.connect(this._onPathChanged, this);
-      this._loadFile();
       void this._startKernel();
     });
   }
@@ -137,11 +142,7 @@ export class FscPanel extends SplitPanel {
 
     const brief = new Widget();
     brief.addClass('fsc-brief');
-    this._levelSelect.setAttribute('aria-label', 'Level');
-    this._levelSelect.addEventListener('change', () => {
-      void this._goToLevel(Number(this._levelSelect.value));
-    });
-    brief.node.append(this._levelSelect, this._levelTitle);
+    brief.node.append(this._levelTitle);
 
     const help = element('details', 'fsc-help');
     help.appendChild(element('summary', '', 'Field manual'));
@@ -189,7 +190,9 @@ export class FscPanel extends SplitPanel {
       this._renderSoundButton();
     });
     this._renderSoundButton();
+    this._mapButton.addEventListener('click', () => void this._openMap());
     header.append(
+      this._mapButton,
       this._missionTitle,
       this._agentName,
       this._chipCount,
@@ -208,7 +211,7 @@ export class FscPanel extends SplitPanel {
 
     this._nextButton.addEventListener('click', () => {
       if (this._mission) {
-        void this._goToLevel(this._mission.progress.currentLevel + 1);
+        void this._goToLevel(this._currentIndex() + 1);
       }
     });
     this._banner.setAttribute('role', 'status');
@@ -225,14 +228,27 @@ export class FscPanel extends SplitPanel {
     this._soundButton.setAttribute('aria-pressed', String(on));
   }
 
+  private _currentIndex(): number {
+    const mission = this._mission;
+    return mission
+      ? mission.levels.findIndex(
+          level => level.id === mission.progress.currentLevel
+        )
+      : -1;
+  }
+
   private _loadFile(): void {
+    if (this._missionsText === null) {
+      return;
+    }
     const text = this._context.model.toString();
     this._lastFileText = text;
     let mission: IMission;
     try {
-      mission = parseMission(text);
+      mission = parseMission(this._missionsText, text);
     } catch (error) {
       this._mission = null;
+      this._map.hide();
       this._setPhase('broken');
       this._showBanner(
         'fail',
@@ -243,32 +259,24 @@ export class FscPanel extends SplitPanel {
     }
     this._mission = mission;
     this._missionTitle.textContent = mission.title;
-    this._levelSelect.hidden = mission.levels.length < 2;
-    this._levelTitle.hidden = mission.levels.length >= 2;
-    this._renderLevelOptions();
-    this._showLevel(mission.progress.currentLevel);
+    this._showMap();
     if (this._phase === 'broken') {
       this._setPhase(this._kernelReady ? 'idle' : 'starting');
     }
   }
 
-  private _renderLevelOptions(): void {
-    const mission = this._mission;
-    if (!mission) {
-      return;
+  private _showMap(): void {
+    if (this._mission) {
+      this._map.render(this._mission, this._currentIndex());
+      this._map.show();
     }
-    this._levelSelect.textContent = '';
-    mission.levels.forEach((level, index) => {
-      const solved = mission.progress.solved.includes(index);
-      const option = element(
-        'option',
-        '',
-        `${solved ? '✓ ' : ''}${level.title}`
-      );
-      option.value = String(index);
-      this._levelSelect.appendChild(option);
-    });
-    this._levelSelect.value = String(mission.progress.currentLevel);
+  }
+
+  private async _openMap(): Promise<void> {
+    if (this._mission) {
+      await this._reset();
+      this._showMap();
+    }
   }
 
   private _showLevel(index: number): void {
@@ -277,14 +285,14 @@ export class FscPanel extends SplitPanel {
       return;
     }
     const level = mission.levels[index];
-    this._levelTitle.textContent = level.title;
+    this._levelTitle.textContent = `${index + 1}. ${level.title}`;
     setInlineCode(this._instructions, level.instructions);
     this._hq.hidden = !level.instructions;
     this._banner.hidden = true;
     this._showOutput('');
     this._stage.load(level.scene);
     this._loadingCode = true;
-    const code = mission.progress.code[String(index)] ?? level.starterCode;
+    const code = mission.progress.code[level.id] ?? level.starterCode;
     this._editorModel.sharedModel.setSource(code);
     this._editorModel.sharedModel.clearUndoHistory();
     this._loadingCode = false;
@@ -292,13 +300,18 @@ export class FscPanel extends SplitPanel {
 
   private async _goToLevel(index: number): Promise<void> {
     const mission = this._mission;
-    if (!mission || index < 0 || index >= mission.levels.length) {
+    if (
+      !mission ||
+      index < 0 ||
+      index >= mission.levels.length ||
+      !isUnlocked(mission, index)
+    ) {
       return;
     }
     await this._halt();
-    mission.progress.currentLevel = index;
-    this._levelSelect.value = String(index);
+    mission.progress.currentLevel = mission.levels[index].id;
     this._showLevel(index);
+    this._map.hide();
     this._writeProgress();
   }
 
@@ -324,13 +337,19 @@ export class FscPanel extends SplitPanel {
         throw new Error('The Python kernel did not start.');
       }
       await this._sessionContext.ready;
+      this._missionsText = await this._runner.loadMissions();
+      if (this.isDisposed) {
+        return;
+      }
       this._kernelReady = true;
+      this._map.setMessage('');
+      this._loadFile();
       if (this._phase === 'starting') {
         this._setPhase('idle');
       }
     } catch (error) {
       if (!this.isDisposed) {
-        this._status.textContent = (error as Error).message;
+        this._map.setMessage((error as Error).message);
       }
     }
   }
@@ -350,7 +369,7 @@ export class FscPanel extends SplitPanel {
       return;
     }
     this._audio.start();
-    const levelIndex = mission.progress.currentLevel;
+    const levelIndex = this._currentIndex();
     const runId = ++this._runId;
     this._flushSave();
     this._stage.reset();
@@ -417,7 +436,7 @@ export class FscPanel extends SplitPanel {
       buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Restore' })]
     });
     if (answer.button.accept) {
-      const level = mission.levels[mission.progress.currentLevel];
+      const level = mission.levels[this._currentIndex()];
       this._editorModel.sharedModel.setSource(level.starterCode);
     }
   }
@@ -431,20 +450,25 @@ export class FscPanel extends SplitPanel {
       case 'solved': {
         this._stage.setOutcome('win');
         this._audio.win();
-        if (!mission.progress.solved.includes(levelIndex)) {
-          mission.progress.solved.push(levelIndex);
-          mission.progress.solved.sort((a, b) => a - b);
+        const level = mission.levels[levelIndex];
+        if (!mission.progress.solved.includes(level.id)) {
+          mission.progress.solved.push(level.id);
           this._writeProgress();
-          this._renderLevelOptions();
         }
         const hasNext = levelIndex + 1 < mission.levels.length;
         const cleared =
           mission.progress.solved.length === mission.levels.length;
         this._showBanner(
           'win',
-          cleared ? 'MISSION ACCOMPLISHED' : 'OBJECTIVE SECURED',
+          cleared
+            ? 'MISSION ACCOMPLISHED'
+            : level.boss
+            ? 'BOSS DEFEATED'
+            : 'OBJECTIVE SECURED',
           cleared
             ? `${MASCOT} vanished without a trace.`
+            : level.boss
+            ? `${MASCOT} outsmarted the boss. The next sector is open.`
             : hasNext
             ? `${MASCOT} slipped out with the data.`
             : `${MASCOT} slipped out with the data. Some earlier objectives are still open.`,
@@ -568,7 +592,7 @@ export class FscPanel extends SplitPanel {
     if (!mission || this._loadingCode) {
       return;
     }
-    const key = String(mission.progress.currentLevel);
+    const key = mission.progress.currentLevel;
     mission.progress.code[key] = this._editorModel.sharedModel.getSource();
     this._writeProgress();
   }
@@ -614,8 +638,10 @@ export class FscPanel extends SplitPanel {
   private _sessionContext: SessionContext;
   private _runner: Runner;
   private _stage: Stage;
+  private _map: MissionMap;
   private _audio = new GameAudio(() => this.isVisible && !document.hidden);
   private _editorModel: CodeEditor.Model;
+  private _missionsText: string | null = null;
   private _mission: IMission | null = null;
   private _phase: Phase = 'starting';
   private _kernelReady = false;
@@ -624,7 +650,6 @@ export class FscPanel extends SplitPanel {
   private _lastFileText = '';
   private _saveTimer = 0;
 
-  private _levelSelect = element('select', 'jp-mod-styled fsc-level-select');
   private _levelTitle = element('h2', 'fsc-level-title');
   private _instructions = element('p', 'fsc-instructions');
   private _hq = element('div', 'fsc-hq');
@@ -636,6 +661,7 @@ export class FscPanel extends SplitPanel {
   private _missionTitle = element('span', 'fsc-mission-title');
   private _agentName = element('span', 'fsc-agent-name', MASCOT);
   private _soundButton = element('button', 'fsc-sound-button');
+  private _mapButton = element('button', 'fsc-map-button', 'Map');
   private _chipCount = element('span', 'fsc-chip-count');
   private _banner = element('div', 'fsc-banner');
   private _bannerText = element('div', 'fsc-banner-text');

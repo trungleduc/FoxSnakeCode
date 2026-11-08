@@ -11,9 +11,16 @@ import {
   DocumentWidget,
   IDocumentWidget
 } from '@jupyterlab/docregistry';
+import {
+  CommandIds,
+  IAgentManagerFactory,
+  IAISettingsModel,
+  IProviderRegistry
+} from '@jupyter-ai/jupyternaut-lite';
 import { ILauncher } from '@jupyterlab/launcher';
 import { Contents, ServiceManager } from '@jupyterlab/services';
 import { fscIcon } from './art';
+import { HintService } from './hint';
 import { FscPanel } from './panel';
 
 const FACTORY = 'FoxSnakeCode';
@@ -24,11 +31,13 @@ class FscWidgetFactory extends ABCWidgetFactory<IDocumentWidget<FscPanel>> {
   constructor(
     options: DocumentRegistry.IWidgetFactoryOptions<IDocumentWidget<FscPanel>>,
     editorServices: IEditorServices,
-    serviceManager: ServiceManager.IManager
+    serviceManager: ServiceManager.IManager,
+    hints: HintService | null
   ) {
     super(options);
     this._editorServices = editorServices;
     this._serviceManager = serviceManager;
+    this._hints = hints;
   }
 
   protected createNewWidget(
@@ -37,7 +46,8 @@ class FscWidgetFactory extends ABCWidgetFactory<IDocumentWidget<FscPanel>> {
     const content = new FscPanel({
       context,
       editorServices: this._editorServices,
-      serviceManager: this._serviceManager
+      serviceManager: this._serviceManager,
+      hints: this._hints
     });
     const widget = new DocumentWidget({ content, context });
     widget.toolbar.hide();
@@ -46,6 +56,7 @@ class FscWidgetFactory extends ABCWidgetFactory<IDocumentWidget<FscPanel>> {
 
   private _editorServices: IEditorServices;
   private _serviceManager: ServiceManager.IManager;
+  private _hints: HintService | null;
 }
 
 const plugin: JupyterFrontEndPlugin<void> = {
@@ -53,13 +64,29 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description: 'Open .fsc coding puzzles in a split code and game panel.',
   autoStart: true,
   requires: [IEditorServices],
-  optional: [ILayoutRestorer, ILauncher],
+  optional: [
+    ILayoutRestorer,
+    ILauncher,
+    IAgentManagerFactory,
+    IAISettingsModel,
+    IProviderRegistry
+  ],
   activate: (
     app: JupyterFrontEnd,
     editorServices: IEditorServices,
     restorer: ILayoutRestorer | null,
-    launcher: ILauncher | null
+    launcher: ILauncher | null,
+    agentFactory: IAgentManagerFactory | null,
+    aiSettings: IAISettingsModel | null,
+    aiProviders: IProviderRegistry | null
   ) => {
+    const hints =
+      agentFactory && aiSettings && aiProviders
+        ? new HintService(agentFactory, aiSettings, aiProviders, () => {
+            void app.commands.execute(CommandIds.openSettings);
+          })
+        : null;
+
     app.docRegistry.addFileType({
       name: FILE_TYPE,
       displayName: 'FoxSnakeCode Mission',
@@ -78,7 +105,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
         defaultFor: [FILE_TYPE]
       },
       editorServices,
-      app.serviceManager
+      app.serviceManager,
+      hints
     );
 
     const tracker = new WidgetTracker<IDocumentWidget<FscPanel>>({

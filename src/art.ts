@@ -343,7 +343,9 @@ export const TOOL_ICONS = {
     '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'
   ),
   wait: toolIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>'),
-  more: toolIcon('<path d="M12 5v14M5 12h14"/>')
+  more: toolIcon('<path d="M12 5v14M5 12h14"/>'),
+  send: toolIcon('<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>'),
+  close: toolIcon('<path d="M6 6l12 12M18 6L6 18"/>')
 };
 
 export const LOCK_BADGE =

@@ -12,11 +12,21 @@ import {
   parseMission,
   serializeMission
 } from './format';
+import { HintService, hintInstructions, IHintMessage } from './hint';
 import { MissionMap } from './map';
 import { Runner } from './runner';
 import { Stage } from './stage';
 
 const SAVE_DELAY = 1000;
+const MAX_HINT_LENGTH = 300;
+const MAX_HINT_QUESTIONS = 10;
+const HINT_CARD_GAP = 8;
+const HINT_CARD_MAX_HEIGHT = 400;
+const HINT_STARTERS = [
+  'Where do I start?',
+  'Why did my run fail?',
+  'What is this level teaching me?'
+];
 
 const MASCOT = 'Grep Fox';
 const HQ_NAME = 'Sudo Snake';
@@ -81,6 +91,7 @@ export interface IFscPanelOptions {
   context: DocumentRegistry.IContext<DocumentRegistry.IModel>;
   editorServices: IEditorServices;
   serviceManager: ServiceManager.IManager;
+  hints: HintService | null;
 }
 
 export class FscPanel extends SplitPanel {
@@ -89,6 +100,8 @@ export class FscPanel extends SplitPanel {
     this.addClass('fsc-panel');
     this._context = options.context;
     this._serviceManager = options.serviceManager;
+    this._hints = options.hints;
+    this._hints?.stateChanged.connect(this._renderHintState, this);
 
     this._sessionContext = new SessionContext({
       sessionManager: options.serviceManager.sessions,
@@ -144,6 +157,7 @@ export class FscPanel extends SplitPanel {
       return;
     }
     window.clearTimeout(this._saveTimer);
+    this._hintResize.disconnect();
     this._stage.stop();
     this._audio.dispose();
     this._sessionContext.dispose();
@@ -165,7 +179,7 @@ export class FscPanel extends SplitPanel {
       commands.append(element('dt', '', name), element('dd', '', description));
     }
     help.appendChild(commands);
-    brief.node.appendChild(help);
+    brief.node.append(help, this._hintButton);
 
     const actions = new Widget();
     actions.addClass('fsc-actions');
@@ -192,6 +206,9 @@ export class FscPanel extends SplitPanel {
     side.addWidget(output);
     side.addWidget(actions);
     side.addWidget(this._buildToolbar());
+    side.node.appendChild(this._buildHintChat());
+    this._hintResize.observe(side.node);
+    this._hintResize.observe(this._editor.node);
     return side;
   }
 
@@ -302,6 +319,213 @@ export class FscPanel extends SplitPanel {
     return side;
   }
 
+  private _buildHintChat(): HTMLElement {
+    const card = this._hintCard;
+    card.hidden = true;
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-label', `Chat with ${HQ_NAME}`);
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        this._closeHintChat();
+        this._hintButton.focus();
+      }
+    });
+    this._hintButton.hidden = !this._hints;
+    this._hintButton.setAttribute('aria-expanded', 'false');
+    this._hintButton.addEventListener('click', () => {
+      if (this._hintCard.hidden) {
+        this._openHintChat();
+      } else {
+        this._closeHintChat();
+      }
+    });
+
+    const head = element('div', 'fsc-chat-head');
+    const avatar = element('span', 'fsc-chat-avatar');
+    avatar.innerHTML = sudoSnakeAvatar(`fsc-hq-clip-${++nextHqAvatarId}`);
+    avatar.setAttribute('aria-hidden', 'true');
+    const title = element('div', 'fsc-chat-title');
+    title.append(
+      element('strong', '', HQ_NAME),
+      element('span', '', 'Hints for this mission')
+    );
+    const close = element('button', 'fsc-chat-close');
+    close.innerHTML = TOOL_ICONS.close;
+    close.setAttribute('aria-label', 'Close');
+    close.addEventListener('click', () => this._closeHintChat());
+    head.append(avatar, title, close);
+
+    this._hintLog.setAttribute('aria-live', 'polite');
+    for (const prompt of HINT_STARTERS) {
+      const starter = element('button', 'fsc-chat-starter', prompt);
+      starter.type = 'button';
+      starter.addEventListener('click', () => {
+        void this._sendHintQuestion(prompt);
+      });
+      this._hintStarters.appendChild(starter);
+    }
+    this._hintSetup.type = 'button';
+    this._hintSetup.addEventListener('click', () => {
+      this._hints?.openSettings();
+    });
+    this._hintBody.append(
+      this._hintLog,
+      this._hintNotice,
+      this._hintStarters,
+      this._hintSetup
+    );
+
+    this._hintInput.type = 'text';
+    this._hintInput.maxLength = MAX_HINT_LENGTH;
+    this._hintInput.placeholder = 'Ask about this mission…';
+    this._hintInput.setAttribute('aria-label', 'Your question');
+    this._hintSend.innerHTML = TOOL_ICONS.send;
+    this._hintSend.setAttribute('aria-label', 'Send');
+    this._hintForm.append(this._hintInput, this._hintSend);
+    this._hintForm.addEventListener('submit', event => {
+      event.preventDefault();
+      void this._sendHintQuestion(this._hintInput.value);
+    });
+
+    card.append(head, this._hintBody, this._hintForm);
+    return card;
+  }
+
+  private _openHintChat(): void {
+    this._hintCard.hidden = false;
+    this._hintButton.setAttribute('aria-expanded', 'true');
+    this._renderHintState();
+    this._placeHintCard();
+    this._scrollHintChat();
+    if (!this._hintForm.hidden) {
+      this._hintInput.focus();
+    }
+  }
+
+  private _closeHintChat(): void {
+    this._hintCard.hidden = true;
+    this._hintButton.setAttribute('aria-expanded', 'false');
+  }
+
+  private _placeHintCard(): void {
+    const card = this._hintCard;
+    const side = card.parentElement;
+    if (card.hidden || !side) {
+      return;
+    }
+    const editor = this._editor.node;
+    const editorBottom = editor.offsetTop + editor.offsetHeight;
+    card.style.bottom = `${side.clientHeight - editorBottom + HINT_CARD_GAP}px`;
+    card.style.height = `${Math.min(
+      editor.offsetHeight - 2 * HINT_CARD_GAP,
+      HINT_CARD_MAX_HEIGHT
+    )}px`;
+  }
+
+  private _renderHintState(): void {
+    const ready = !!this._hints?.ready;
+    this._hintNotice.hidden = ready;
+    this._hintSetup.hidden = ready && !this._hintFailed;
+    this._hintForm.hidden = !ready || this._hintCapped;
+    this._hintStarters.hidden = !ready || this._hintLog.hasChildNodes();
+  }
+
+  private _scrollHintChat(): void {
+    this._hintBody.scrollTop = this._hintBody.scrollHeight;
+  }
+
+  private _addHintMessage(from: 'you' | 'hq', text: string): HTMLElement {
+    const message = element('div', `fsc-msg fsc-hint-${from}`);
+    if (from === 'hq') {
+      const avatar = element('span', 'fsc-msg-avatar');
+      avatar.innerHTML = sudoSnakeAvatar(`fsc-hq-clip-${++nextHqAvatarId}`);
+      avatar.setAttribute('aria-hidden', 'true');
+      message.appendChild(avatar);
+    }
+    const bubble = element('div', 'fsc-bubble');
+    setInlineCode(bubble, text);
+    message.appendChild(bubble);
+    this._hintLog.appendChild(message);
+    this._scrollHintChat();
+    return bubble;
+  }
+
+  private _resetHintChat(): void {
+    this._hintRequest++;
+    this._hintHistory = [];
+    this._hintOutcome = '';
+    this._hintFailed = false;
+    this._hintCapped = false;
+    this._hintLog.textContent = '';
+    this._hintInput.value = '';
+    this._hintInput.disabled = false;
+    this._hintSend.disabled = false;
+    this._closeHintChat();
+  }
+
+  private async _sendHintQuestion(text: string): Promise<void> {
+    const mission = this._mission;
+    const question = text.trim();
+    if (!this._hints || !mission || !question || this._hintSend.disabled) {
+      return;
+    }
+    const asked = this._hintHistory.filter(item => item.role === 'user').length;
+    if (asked >= MAX_HINT_QUESTIONS) {
+      this._addHintMessage(
+        'hq',
+        "That's all the help HQ can give on this mission. Trust your code and try it."
+      );
+      this._hintCapped = true;
+      this._renderHintState();
+      return;
+    }
+    this._hintInput.value = '';
+    this._hintFailed = false;
+    this._addHintMessage('you', question);
+    this._hintHistory.push({ role: 'user', content: question });
+    const reply = this._addHintMessage('hq', '');
+    reply.setAttribute('aria-label', 'Thinking');
+    const dots = element('span', 'fsc-typing');
+    dots.append(element('i', ''), element('i', ''), element('i', ''));
+    reply.appendChild(dots);
+    this._renderHintState();
+    const request = ++this._hintRequest;
+    this._hintInput.disabled = true;
+    this._hintSend.disabled = true;
+    try {
+      const answer = await this._hints.ask(
+        hintInstructions(
+          mission.levels[this._currentIndex()],
+          this._editorModel.sharedModel.getSource(),
+          this._hintOutcome
+        ),
+        this._hintHistory
+      );
+      if (request !== this._hintRequest) {
+        return;
+      }
+      this._hintHistory.push({ role: 'assistant', content: answer });
+      setInlineCode(reply, answer.replace(/```[a-z]*\n?/gi, '`'));
+    } catch (error) {
+      if (request !== this._hintRequest) {
+        return;
+      }
+      this._hintHistory.pop();
+      this._hintFailed = true;
+      setInlineCode(
+        reply,
+        `I can't reach HQ right now: ${(error as Error).message}`
+      );
+    }
+    reply.removeAttribute('aria-label');
+    this._hintInput.disabled = false;
+    this._hintSend.disabled = false;
+    this._renderHintState();
+    this._scrollHintChat();
+    this._hintInput.focus();
+  }
+
   private _renderSoundButton(): void {
     const on = !this._audio.muted;
     this._soundButton.textContent = on ? 'Sound: on' : 'Sound: off';
@@ -353,6 +577,7 @@ export class FscPanel extends SplitPanel {
 
   private async _openMap(): Promise<void> {
     if (this._mission) {
+      this._closeHintChat();
       await this._reset();
       this._showMap();
     }
@@ -367,6 +592,7 @@ export class FscPanel extends SplitPanel {
     this._levelTitle.textContent = `${index + 1} · ${level.title}`;
     setInlineCode(this._instructions, level.instructions);
     this._hq.hidden = !level.instructions;
+    this._resetHintChat();
     this._banner.hidden = true;
     this._showOutput('');
     this._stage.load(level.scene);
@@ -487,6 +713,15 @@ export class FscPanel extends SplitPanel {
       return;
     }
     this._setPhase('idle');
+    this._hintOutcome = [
+      result.status,
+      result.reason,
+      result.error?.line ? `line ${result.error.line}` : '',
+      result.error?.type,
+      result.error?.message
+    ]
+      .filter(Boolean)
+      .join(' ');
     this._showResult(result, levelIndex);
   }
 
@@ -722,6 +957,13 @@ export class FscPanel extends SplitPanel {
 
   private _context: DocumentRegistry.IContext<DocumentRegistry.IModel>;
   private _serviceManager: ServiceManager.IManager;
+  private _hints: HintService | null;
+  private _hintHistory: IHintMessage[] = [];
+  private _hintOutcome = '';
+  private _hintRequest = 0;
+  private _hintFailed = false;
+  private _hintCapped = false;
+  private _hintResize = new ResizeObserver(() => this._placeHintCard());
   private _sessionContext: SessionContext;
   private _runner: Runner;
   private _stage: Stage;
@@ -742,6 +984,20 @@ export class FscPanel extends SplitPanel {
   private _levelTitle = element('span', 'fsc-level-title');
   private _instructions = element('p', 'fsc-instructions');
   private _hq = element('div', 'fsc-hq');
+  private _hintCard = element('div', 'fsc-chat');
+  private _hintBody = element('div', 'fsc-chat-body');
+  private _hintLog = element('div', 'fsc-hint-log');
+  private _hintNotice = element(
+    'p',
+    'fsc-chat-notice',
+    'Connect an AI provider and I can give you hints on this mission.'
+  );
+  private _hintStarters = element('div', 'fsc-chat-starters');
+  private _hintForm = element('form', 'fsc-hint-form');
+  private _hintInput = element('input', 'fsc-hint-input');
+  private _hintSend = element('button', 'fsc-hint-send');
+  private _hintButton = element('button', 'fsc-chat-open', 'Ask Sudo Snake');
+  private _hintSetup = element('button', 'fsc-chat-connect', 'Connect AI');
   private _runButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept fsc-run', 'Run');
   private _resetButton = element('button', 'jp-Button jp-mod-styled jp-mod-reject', 'Reset');
   private _restoreButton = element('button', 'fsc-link-button', 'Restore starter code');

@@ -38,6 +38,7 @@
     "watch:labextension": "jupyter-builder watch ."
   },
   "dependencies": {
+    "@jupyter-ai/jupyternaut-lite": "~0.21.0",
     "@jupyterlab/application": "^4.0.0",
     "@jupyterlab/apputils": "^4.0.0",
     "@jupyterlab/codeeditor": "^4.0.0",
@@ -56,6 +57,12 @@
   },
   "jupyterlab": {
     "extension": true,
-    "outputDir": "foxsnakecode/labextension"
+    "outputDir": "foxsnakecode/labextension",
+    "sharedPackages": {
+      "@jupyter-ai/jupyternaut-lite": {
+        "bundled": false,
+        "singleton": true
+      }
+    }
   }
 }

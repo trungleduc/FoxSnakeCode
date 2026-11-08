@@ -1,6 +1,16 @@
 {
   "jupyter-config-data": {
     "enableMemoryStorage": true,
-    "contentsStorageDrivers": ["memoryStorageDriver"]
+    "contentsStorageDrivers": ["memoryStorageDriver"],
+    "disabledExtensions": [
+      "jupyterlab-chat-extension",
+      "@jupyter-ai/jupyternaut-lite:plugin",
+      "@jupyter-ai/jupyternaut-lite:mention",
+      "@jupyter-ai/jupyternaut-lite:skills-command",
+      "@jupyter-ai/jupyternaut-lite:stop-button",
+      "@jupyter-ai/jupyternaut-lite:chat-components-callbacks",
+      "@jupyter-ai/jupyternaut-lite:completion-status",
+      "@jupyterlab/completer-extension:inline-completer"
+    ]
   }
 }

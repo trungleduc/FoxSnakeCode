@@ -146,8 +146,7 @@ export class FscPanel extends SplitPanel {
     this.setRelativeSizes([0.4, 0.6]);
 
     this._map = new MissionMap(index => void this._goToLevel(index));
-    this._map.setMessage('Establishing kernel link…');
-    this.node.appendChild(this._map.node);
+    this.node.append(this._map.node, this._map.splash);
 
     this._context.ready.then(() => {
       this._context.model.contentChanged.connect(this._onFileChanged, this);
@@ -659,14 +658,20 @@ export class FscPanel extends SplitPanel {
         return;
       }
       this._kernelReady = true;
-      this._map.setMessage('');
       this._loadFile();
+      if (this._mission) {
+        this._map.showSplashStart(
+          this._mission.progress.solved.length ? 'Continue' : 'Start'
+        );
+      } else {
+        this._map.hideSplash();
+      }
       if (this._phase === 'starting') {
         this._setPhase('idle');
       }
     } catch (error) {
       if (!this.isDisposed) {
-        this._map.setMessage((error as Error).message);
+        this._map.showSplashError((error as Error).message);
       }
     }
   }

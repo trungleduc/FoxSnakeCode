@@ -1,6 +1,6 @@
 {
   "name": "foxsnakecode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A coding puzzle game for JupyterLab and JupyterLite",
   "keywords": [
     "jupyter",

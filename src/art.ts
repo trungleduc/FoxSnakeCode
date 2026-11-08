@@ -329,6 +329,26 @@ export const FOX_MARKUP = `
     </g>
   </g>`;
 
+function toolIcon(body: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+}
+
+export const TOOL_ICONS = {
+  step: toolIcon(
+    '<g fill="currentColor" stroke="none"><ellipse cx="12" cy="16.5" rx="5" ry="4"/><circle cx="5.5" cy="11" r="2.2"/><circle cx="9.5" cy="6.5" r="2.2"/><circle cx="14.5" cy="6.5" r="2.2"/><circle cx="18.5" cy="11" r="2.2"/></g>'
+  ),
+  left: toolIcon('<path d="M9 9l-5 5 5 5"/><path d="M4 14h9a6 6 0 0 0 6-6V5"/>'),
+  right: toolIcon('<path d="M15 9l5 5-5 5"/><path d="M20 14h-9a6 6 0 0 1-6-6V5"/>'),
+  face: toolIcon(
+    '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'
+  ),
+  wait: toolIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>'),
+  more: toolIcon('<path d="M12 5v14M5 12h14"/>')
+};
+
+export const LOCK_BADGE =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
+
 export const BOSS_BADGE =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19 5 7l5 5 2-8 2 8 5-5 2 12z" fill="currentColor"/></svg>';
 

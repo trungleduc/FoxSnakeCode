@@ -3,10 +3,52 @@
 }
 
 .fsc-panel > .lm-SplitPanel-handle {
-  background: var(--jp-border-color2);
+  background: #243647;
 }
 
 .fsc-code-side {
+  --jp-layout-color0: #0a121b;
+  --jp-layout-color1: #0d1824;
+  --jp-layout-color2: #1d2d3d;
+  --jp-cell-editor-background: #0a121b;
+  --jp-border-color0: #4a6378;
+  --jp-border-color1: #33485c;
+  --jp-border-color2: #243647;
+  --jp-ui-font-color0: #ffffff;
+  --jp-ui-font-color1: #e6edf3;
+  --jp-ui-font-color2: #9fb3c4;
+  --jp-ui-font-color3: #6c8aa3;
+  --jp-content-font-color0: #ffffff;
+  --jp-content-font-color1: #e6edf3;
+  --jp-content-font-color2: #9fb3c4;
+  --jp-content-link-color: #7cc4ff;
+  --jp-editor-cursor-color: #ffc93c;
+  --jp-editor-selected-background: #2a3f54;
+  --jp-editor-selected-focused-background: #33506b;
+  --jp-mirror-editor-keyword-color: #7cffb2;
+  --jp-mirror-editor-atom-color: #ffc93c;
+  --jp-mirror-editor-number-color: #ffc93c;
+  --jp-mirror-editor-def-color: #7cc4ff;
+  --jp-mirror-editor-variable-color: #e6edf3;
+  --jp-mirror-editor-variable-2-color: #7cc4ff;
+  --jp-mirror-editor-variable-3-color: #7cc4ff;
+  --jp-mirror-editor-punctuation-color: #9fb3c4;
+  --jp-mirror-editor-property-color: #7cc4ff;
+  --jp-mirror-editor-operator-color: #ff9ecf;
+  --jp-mirror-editor-comment-color: #8aa5ba;
+  --jp-mirror-editor-string-color: #ffb38a;
+  --jp-mirror-editor-string-2-color: #ffb38a;
+  --jp-mirror-editor-meta-color: #ff9ecf;
+  --jp-mirror-editor-qualifier-color: #7cc4ff;
+  --jp-mirror-editor-builtin-color: #37f5d6;
+  --jp-mirror-editor-bracket-color: #9fb3c4;
+  --jp-mirror-editor-tag-color: #7cffb2;
+  --jp-mirror-editor-attribute-color: #7cc4ff;
+  --jp-mirror-editor-header-color: #7cc4ff;
+  --jp-mirror-editor-quote-color: #7cffb2;
+  --jp-mirror-editor-link-color: #7cc4ff;
+  --jp-mirror-editor-error-color: #ff5a6e;
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   min-width: 260px;
@@ -17,17 +59,12 @@
 }
 
 .fsc-brief {
+  position: relative;
+  z-index: 5;
   flex: 0 0 auto;
-  max-height: 45%;
-  overflow-y: auto;
-  padding: 12px 14px 8px;
-}
-
-.fsc-level-title {
-  margin: 0 0 6px;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--jp-ui-font-color0);
+  padding: 8px 14px;
+  overflow: visible;
+  border-bottom: 1px solid var(--jp-border-color2);
 }
 
 .fsc-instructions {
@@ -53,7 +90,16 @@
 }
 
 .fsc-help dl {
-  margin: 6px 0 0;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  max-height: 320px;
+  margin: 0;
+  padding: 4px 14px 12px;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--jp-border-color0);
+  background: var(--jp-layout-color1);
 }
 
 .fsc-help dt {
@@ -74,12 +120,119 @@
   gap: 8px;
   padding: 8px 14px;
   border-top: 1px solid var(--jp-border-color2);
-  border-bottom: 1px solid var(--jp-border-color2);
 }
 
 .fsc-actions .jp-Button {
   min-width: 68px;
   font-size: 16px;
+}
+
+.fsc-actions .fsc-run {
+  min-width: 132px;
+  height: 44px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.fsc-toolbar {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px 14px 10px;
+  overflow: visible;
+  border-top: 1px solid var(--jp-border-color2);
+}
+
+.fsc-tool {
+  display: block;
+  width: 100%;
+  height: 58px;
+  padding: 5px 2px 3px;
+  border: 2px solid var(--jp-border-color0);
+  border-radius: 8px;
+  background: var(--jp-layout-color2);
+  color: var(--jp-ui-font-color1);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fsc-tool svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 1px;
+}
+
+.fsc-tool:hover:enabled {
+  border-color: #ffc93c;
+  background: #2a3f54;
+}
+
+.fsc-tool:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.fsc-more {
+  position: relative;
+}
+
+.fsc-more-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: 300px;
+  padding: 4px;
+  border: 1px solid var(--jp-border-color0);
+  border-radius: 8px;
+  background: var(--jp-layout-color2);
+}
+
+.fsc-more-menu[hidden] {
+  display: none;
+}
+
+.fsc-more-item {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--jp-ui-font-color1);
+  font-family: var(--jp-code-font-family);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fsc-more-item:hover {
+  background: #2a3f54;
+}
+
+@container (max-width: 400px) {
+  .fsc-tool {
+    height: 44px;
+    padding: 8px 0;
+  }
+
+  .fsc-tool span {
+    display: none;
+  }
+
+  .fsc-toolbar {
+    gap: 5px;
+  }
+
+  .fsc-more-item {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
 }
 
 .fsc-link-button {
@@ -144,6 +297,7 @@
   background: #0a121b;
   color: #e6edf3;
   font-family: var(--jp-ui-font-family);
+  container-type: inline-size;
 }
 
 .fsc-hud {
@@ -156,15 +310,13 @@
   border-bottom: 1px solid #243647;
 }
 
-.fsc-mission-title {
+.fsc-level-title {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  letter-spacing: 0.08em;
   text-overflow: ellipsis;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -175,6 +327,28 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+@container (max-width: 720px) {
+  .fsc-agent-name {
+    display: none;
+  }
+}
+
+@container (max-width: 560px) {
+  .fsc-hud {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .fsc-level-title {
+    font-size: 14px;
+  }
+
+  .fsc-chip-count,
+  .fsc-sound-button {
+    font-size: 13px;
+  }
 }
 
 .fsc-chip-count {
@@ -259,6 +433,7 @@
 }
 
 .fsc-stage {
+  position: relative;
   flex: 1 1 0;
   min-height: 0;
   display: flex;
@@ -273,8 +448,45 @@
   border-radius: 6px;
 }
 
+.fsc-chip {
+  cursor: help;
+}
+
+.fsc-chip-card {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  border: 1px solid #37f5d6;
+  border-radius: 6px;
+  background: #0d1824;
+  color: #e6edf3;
+  font-family: var(--jp-code-font-family);
+  font-size: 15px;
+  line-height: 1.35;
+  white-space: pre;
+  pointer-events: none;
+}
+
+.fsc-chip-card[hidden] {
+  display: none;
+}
+
+.fsc-chip-card strong {
+  color: #37f5d6;
+}
+
+.fsc-chip-card-trap {
+  color: #ff5a6e;
+}
+
 .fsc-banner {
-  flex: 0 0 auto;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -327,7 +539,7 @@
   position: absolute;
   inset: 0;
   z-index: 10;
-  padding: 16px;
+  padding: 0 16px 24px;
   overflow-y: auto;
   background: #0a121b;
   color: #e6edf3;
@@ -336,6 +548,14 @@
 
 .fsc-map[hidden] {
   display: none;
+}
+
+.fsc-map-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 14px 0 10px;
+  background: #0a121b;
 }
 
 .fsc-map-title {
@@ -371,6 +591,7 @@
   stroke-dasharray: 2 14;
   stroke-linecap: round;
   stroke-width: 6;
+  vector-effect: non-scaling-stroke;
 }
 
 .fsc-map-line-done {
@@ -384,13 +605,16 @@
   margin: -26px 0 0 -26px;
   padding: 0;
   border: 3px solid #4a6378;
-  border-radius: 50%;
   background: #1d2d3d;
   color: #e6edf3;
   font: inherit;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.fsc-map-path button.fsc-map-stop {
+  border-radius: 50%;
 }
 
 .fsc-map-stop:hover:enabled {
@@ -423,8 +647,30 @@
 }
 
 .fsc-map-locked {
-  opacity: 0.45;
+  border-color: #2a3a4a;
+  background: #121c28;
+  color: #6c8aa3;
   cursor: default;
+}
+
+.fsc-map-lock {
+  position: absolute;
+  top: -13px;
+  right: -13px;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border: 1px solid #2a3a4a;
+  border-radius: 50%;
+  background: #0a121b;
+  color: #9fb3c4;
+}
+
+.fsc-map-lock svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 
 .fsc-map-current {
@@ -436,7 +682,10 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 50%;
-  width: 130px;
+  width: max-content;
+  max-width: 130px;
+  padding: 1px 5px;
+  background: #0a121b;
   color: #c9d4de;
   font-size: 13px;
   font-weight: 400;

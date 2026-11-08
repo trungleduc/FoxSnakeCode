@@ -3,7 +3,7 @@ import { CodeEditor, CodeEditorWrapper, IEditorServices } from '@jupyterlab/code
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
 import { Panel, SplitPanel, Widget } from '@lumino/widgets';
-import { sudoSnakeAvatar } from './art';
+import { sudoSnakeAvatar, TOOL_ICONS } from './art';
 import { GameAudio } from './audio';
 import { IRunResult } from './engine';
 import {
@@ -34,6 +34,21 @@ const COMMANDS: [string, string][] = [
   ['wait(seconds)', 'Stay still for a number of seconds.'],
   ['chips', 'The list of chips. Each has x, y, trapped and collected.'],
   ['guards', 'The list of guards. Each has x, y and angle.']
+];
+
+const TOOLS: [string, string, string][] = [
+  ['step', TOOL_ICONS.step, 'step(100)'],
+  ['left', TOOL_ICONS.left, 'turn(-90)'],
+  ['right', TOOL_ICONS.right, 'turn(90)'],
+  ['face', TOOL_ICONS.face, 'turn_to(chips[0])'],
+  ['wait', TOOL_ICONS.wait, 'wait(1)']
+];
+
+const MORE_TOOLS = [
+  'step(distance_to(chips[0]))',
+  'for i in range(4):\n    ',
+  'if not c.trapped:\n    ',
+  'def grab(chip):\n    '
 ];
 
 type Phase = 'starting' | 'idle' | 'running' | 'playing' | 'stopping' | 'broken';
@@ -97,19 +112,19 @@ export class FscPanel extends SplitPanel {
     }, this._audio);
 
     this._editorModel = new CodeEditor.Model({ mimeType: 'text/x-python' });
-    const editor = new CodeEditorWrapper({
+    this._editor = new CodeEditorWrapper({
       factory: options.editorServices.factoryService.newDocumentEditor,
       model: this._editorModel,
       editorOptions: { config: { lineNumbers: true } }
     });
-    editor.addClass('fsc-editor');
+    this._editor.addClass('fsc-editor');
     this._editorModel.sharedModel.changed.connect((_, change) => {
       if (change.sourceChange) {
         this._onCodeChanged();
       }
     });
 
-    this.addWidget(this._buildCodeSide(editor));
+    this.addWidget(this._buildCodeSide());
     this.addWidget(this._buildPlaySide());
     this.setRelativeSizes([0.4, 0.6]);
 
@@ -136,13 +151,12 @@ export class FscPanel extends SplitPanel {
     super.dispose();
   }
 
-  private _buildCodeSide(editor: CodeEditorWrapper): Panel {
+  private _buildCodeSide(): Panel {
     const side = new Panel();
     side.addClass('fsc-code-side');
 
     const brief = new Widget();
     brief.addClass('fsc-brief');
-    brief.node.append(this._levelTitle);
 
     const help = element('details', 'fsc-help');
     help.appendChild(element('summary', '', 'Field manual'));
@@ -174,10 +188,76 @@ export class FscPanel extends SplitPanel {
     output.node.appendChild(this._output);
 
     side.addWidget(brief);
-    side.addWidget(actions);
-    side.addWidget(editor);
+    side.addWidget(this._editor);
     side.addWidget(output);
+    side.addWidget(actions);
+    side.addWidget(this._buildToolbar());
     return side;
+  }
+
+  private _buildToolbar(): Widget {
+    const toolbar = this._toolbar;
+    toolbar.addClass('fsc-toolbar');
+    for (const [label, icon, code] of TOOLS) {
+      const button = element('button', 'fsc-tool');
+      button.innerHTML = icon;
+      button.appendChild(element('span', '', label));
+      button.title = code;
+      button.addEventListener('click', () => this._insertCode(code));
+      toolbar.node.appendChild(button);
+    }
+
+    const more = element('div', 'fsc-more');
+    const menu = element('div', 'fsc-more-menu');
+    menu.hidden = true;
+    for (const code of MORE_TOOLS) {
+      const item = element('button', 'fsc-more-item', code.trimEnd());
+      item.addEventListener('click', () => {
+        menu.hidden = true;
+        this._insertCode(code);
+      });
+      menu.appendChild(item);
+    }
+    const toggle = element('button', 'fsc-tool');
+    toggle.innerHTML = TOOL_ICONS.more;
+    toggle.appendChild(element('span', '', 'more'));
+    toggle.addEventListener('click', () => {
+      menu.hidden = !menu.hidden;
+    });
+    this.node.addEventListener('pointerdown', event => {
+      if (!more.contains(event.target as Node)) {
+        menu.hidden = true;
+      }
+    });
+    more.append(menu, toggle);
+    toolbar.node.appendChild(more);
+    return toolbar;
+  }
+
+  private _insertCode(code: string): void {
+    const editor = this._editor.editor;
+    const shared = this._editorModel.sharedModel;
+    const { line } = editor.getCursorPosition();
+    const lines = shared.getSource().split('\n');
+    const current = lines[line] ?? '';
+    const blank = !current.trim();
+    const indent =
+      (/^\s*/.exec(current)?.[0] ?? '') +
+      (current.trimEnd().endsWith(':') ? '    ' : '');
+    const parts = code.split('\n').map(part => indent + part);
+    const text = parts.join('\n');
+    const start = lines.slice(0, line).join('\n').length + (line ? 1 : 0);
+    const end = start + current.length;
+    if (blank) {
+      shared.updateSource(start, end, text);
+    } else {
+      shared.updateSource(end, end, `\n${text}`);
+    }
+    editor.setCursorPosition({
+      line: line + (blank ? 0 : 1) + parts.length - 1,
+      column: parts[parts.length - 1].length
+    });
+    editor.focus();
   }
 
   private _buildPlaySide(): Widget {
@@ -193,7 +273,7 @@ export class FscPanel extends SplitPanel {
     this._mapButton.addEventListener('click', () => void this._openMap());
     header.append(
       this._mapButton,
-      this._missionTitle,
+      this._levelTitle,
       this._agentName,
       this._chipCount,
       this._soundButton
@@ -207,7 +287,7 @@ export class FscPanel extends SplitPanel {
     this._hq.append(hqAvatar, hqMessage);
 
     const stageHolder = element('div', 'fsc-stage');
-    stageHolder.appendChild(this._stage.node);
+    stageHolder.append(this._stage.node, this._stage.card);
 
     this._nextButton.addEventListener('click', () => {
       if (this._mission) {
@@ -258,7 +338,6 @@ export class FscPanel extends SplitPanel {
       return;
     }
     this._mission = mission;
-    this._missionTitle.textContent = mission.title;
     this._showMap();
     if (this._phase === 'broken') {
       this._setPhase(this._kernelReady ? 'idle' : 'starting');
@@ -285,7 +364,7 @@ export class FscPanel extends SplitPanel {
       return;
     }
     const level = mission.levels[index];
-    this._levelTitle.textContent = `${index + 1}. ${level.title}`;
+    this._levelTitle.textContent = `${index + 1} · ${level.title}`;
     setInlineCode(this._instructions, level.instructions);
     this._hq.hidden = !level.instructions;
     this._banner.hidden = true;
@@ -296,6 +375,11 @@ export class FscPanel extends SplitPanel {
     this._editorModel.sharedModel.setSource(code);
     this._editorModel.sharedModel.clearUndoHistory();
     this._loadingCode = false;
+    const lines = code.split('\n');
+    this._editor.editor.setCursorPosition({
+      line: lines.length - 1,
+      column: lines[lines.length - 1].length
+    });
   }
 
   private async _goToLevel(index: number): Promise<void> {
@@ -576,6 +660,9 @@ export class FscPanel extends SplitPanel {
     const usable = phase !== 'broken' && phase !== 'stopping';
     this._resetButton.disabled = !usable;
     this._restoreButton.disabled = !usable;
+    this._toolbar.node.querySelectorAll('button').forEach(button => {
+      button.disabled = !usable;
+    });
     const messages: Record<Phase, string> = {
       starting: 'Establishing kernel link…',
       idle: '',
@@ -641,6 +728,8 @@ export class FscPanel extends SplitPanel {
   private _map: MissionMap;
   private _audio = new GameAudio(() => this.isVisible && !document.hidden);
   private _editorModel: CodeEditor.Model;
+  private _editor: CodeEditorWrapper;
+  private _toolbar = new Widget();
   private _missionsText: string | null = null;
   private _mission: IMission | null = null;
   private _phase: Phase = 'starting';
@@ -650,7 +739,7 @@ export class FscPanel extends SplitPanel {
   private _lastFileText = '';
   private _saveTimer = 0;
 
-  private _levelTitle = element('h2', 'fsc-level-title');
+  private _levelTitle = element('span', 'fsc-level-title');
   private _instructions = element('p', 'fsc-instructions');
   private _hq = element('div', 'fsc-hq');
   private _runButton = element('button', 'jp-Button jp-mod-styled jp-mod-accept fsc-run', 'Run');
@@ -658,7 +747,6 @@ export class FscPanel extends SplitPanel {
   private _restoreButton = element('button', 'fsc-link-button', 'Restore starter code');
   private _status = element('span', 'fsc-status', 'Establishing kernel link…');
   private _output = element('pre', 'fsc-output');
-  private _missionTitle = element('span', 'fsc-mission-title');
   private _agentName = element('span', 'fsc-agent-name', MASCOT);
   private _soundButton = element('button', 'fsc-sound-button');
   private _mapButton = element('button', 'fsc-map-button', 'Map');

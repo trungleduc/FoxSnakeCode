@@ -1,4 +1,4 @@
-import { BOSS_BADGE } from './art';
+import { BOSS_BADGE, LOCK_BADGE } from './art';
 import { IMission, isUnlocked } from './format';
 
 const COLUMNS = 5;
@@ -24,7 +24,10 @@ export class MissionMap {
     this._message.className = 'fsc-map-message';
     this._message.setAttribute('role', 'status');
     this._path.className = 'fsc-map-path';
-    this.node.append(this._title, this._message, this._path);
+    const header = document.createElement('div');
+    header.className = 'fsc-map-header';
+    header.append(this._title, this._message);
+    this.node.append(header, this._path);
   }
 
   readonly node = document.createElement('div');
@@ -38,7 +41,7 @@ export class MissionMap {
     const height = Math.ceil(levels.length / COLUMNS) * ROW_HEIGHT;
     const solvedCount = progress.solved.length;
     this._title.textContent = `${mission.title}: ${solvedCount} / ${levels.length} solved`;
-    this._path.style.aspectRatio = `${WIDTH} / ${height}`;
+    this._path.style.height = `${height}px`;
 
     const lines = levels.slice(1).map((_, index) => {
       const from = position(index);
@@ -46,7 +49,7 @@ export class MissionMap {
       const done = progress.solved.includes(levels[index].id);
       return `<line class="fsc-map-line${done ? ' fsc-map-line-done' : ''}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`;
     });
-    this._path.innerHTML = `<svg viewBox="0 0 ${WIDTH} ${height}" aria-hidden="true">${lines.join('')}</svg>`;
+    this._path.innerHTML = `<svg viewBox="0 0 ${WIDTH} ${height}" preserveAspectRatio="none" aria-hidden="true">${lines.join('')}</svg>`;
 
     levels.forEach((level, index) => {
       const solved = progress.solved.includes(level.id);
@@ -59,7 +62,7 @@ export class MissionMap {
       stop.classList.toggle('fsc-map-boss', level.boss);
       stop.classList.toggle('fsc-map-current', index === current);
       stop.style.left = `${(point.x / WIDTH) * 100}%`;
-      stop.style.top = `${(point.y / height) * 100}%`;
+      stop.style.top = `${point.y}px`;
       stop.disabled = !unlocked;
       stop.setAttribute(
         'aria-label',
@@ -71,6 +74,12 @@ export class MissionMap {
         stop.innerHTML = BOSS_BADGE;
       } else {
         stop.textContent = String(index + 1);
+      }
+      if (!unlocked) {
+        const lock = document.createElement('span');
+        lock.className = 'fsc-map-lock';
+        lock.innerHTML = LOCK_BADGE;
+        stop.appendChild(lock);
       }
       const label = document.createElement('span');
       label.className = 'fsc-map-label';

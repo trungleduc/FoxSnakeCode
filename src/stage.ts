@@ -7,6 +7,7 @@ const TURN_SPEED = 360;
 const BUMP_TIME = 260;
 const MAX_PLAY_TIME = 30000;
 const FOOTSTEP_DISTANCE = 45;
+const CARD_GAP = 6;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -14,6 +15,7 @@ let nextStageId = 0;
 
 export class Stage {
   readonly node: SVGSVGElement;
+  readonly card: HTMLDivElement;
 
   constructor(
     onChips: (collected: number, total: number) => void,
@@ -27,6 +29,15 @@ export class Stage {
     this.node.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.node.setAttribute('role', 'img');
     this.node.classList.add('fsc-scene');
+    this.card = document.createElement('div');
+    this.card.className = 'fsc-chip-card';
+    this.card.hidden = true;
+    this.node.addEventListener('pointerover', event => {
+      this._showCard(
+        (event.target as Element).closest('[data-chip]:not(.fsc-chip-taken)')
+      );
+    });
+    this.node.addEventListener('pointerleave', () => this._hideCard());
   }
 
   load(scene: IScene): void {
@@ -41,6 +52,7 @@ export class Stage {
 
   reset(): void {
     this.stop();
+    this._hideCard();
     const scene = this._scene;
     if (!scene) {
       return;
@@ -202,11 +214,50 @@ export class Stage {
       return;
     }
     chip.classList.add('fsc-chip-taken');
+    this._hideCard();
     if (!this._scene?.chips[index].trapped) {
       this._collected++;
       this._reportChips();
       this._audio.chip();
     }
+  }
+
+  private _showCard(target: Element | null): void {
+    const holder = this.card.parentElement;
+    const index = Number(target?.getAttribute('data-chip'));
+    const chip = target ? this._scene?.chips[index] : undefined;
+    if (!target || !chip || !holder) {
+      this._hideCard();
+      return;
+    }
+    this.card.textContent = '';
+    const name = document.createElement('strong');
+    name.textContent = `chips[${index}]`;
+    const place = document.createElement('span');
+    place.textContent = `x = ${chip.x}   y = ${chip.y}`;
+    this.card.append(name, place);
+    if (chip.trapped) {
+      const trapped = document.createElement('span');
+      trapped.className = 'fsc-chip-card-trap';
+      trapped.textContent = 'trapped = True';
+      this.card.appendChild(trapped);
+    }
+    this.card.hidden = false;
+
+    const area = holder.getBoundingClientRect();
+    const box = target.getBoundingClientRect();
+    const width = this.card.offsetWidth;
+    const height = this.card.offsetHeight;
+    const above = box.top - area.top - height - CARD_GAP;
+    const left = box.left - area.left + box.width / 2 - width / 2;
+    this.card.style.left = `${Math.max(0, Math.min(left, area.width - width))}px`;
+    this.card.style.top = `${
+      above >= 0 ? above : box.bottom - area.top + CARD_GAP
+    }px`;
+  }
+
+  private _hideCard(): void {
+    this.card.hidden = true;
   }
 
   private _reportChips(): void {

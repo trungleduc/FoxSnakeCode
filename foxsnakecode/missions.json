@@ -4,7 +4,7 @@
     {
       "id": "hello-fox",
       "title": "Hello, Fox",
-      "instructions": "HQ: Grep Fox, this is Sudo Snake. Your first order: type `step(100)` and press Run. One floor panel is 100 steps wide.",
+      "instructions": "Grep Fox, this is Sudo Snake. Your first order: type `step(100)` and press Run. One floor panel is 100 steps wide.",
       "starterCode": "",
       "scene": {
         "start": {
@@ -23,7 +23,7 @@
     {
       "id": "long-hall",
       "title": "Long Hall",
-      "instructions": "HQ: Same order, longer hall. The number inside `step()` says how far to go. Count the floor panels and change it.",
+      "instructions": "Same order, longer hall. The number inside `step()` says how far to go. Count the floor panels and change it.",
       "starterCode": "step(100)\n",
       "scene": {
         "start": {
@@ -56,7 +56,7 @@
     {
       "id": "corner",
       "title": "Corner",
-      "instructions": "HQ: The hall bends. `turn(90)` turns right and `turn(-90)` turns left. Walk to the corner, turn, and keep going.",
+      "instructions": "The hall bends. `turn(90)` turns right and `turn(-90)` turns left. Walk to the corner, turn, and keep going.",
       "starterCode": "step(300)\n",
       "scene": {
         "start": {
@@ -83,7 +83,7 @@
     {
       "id": "two-chips",
       "title": "Two Chips",
-      "instructions": "HQ: Two chips on a Z-shaped path. Your orders run from top to bottom, so put them in the order you want them done.",
+      "instructions": "Two chips on a Z-shaped path. Your orders run from top to bottom, so put them in the order you want them done.",
       "starterCode": "step(300)\nturn(90)\n",
       "scene": {
         "start": {
@@ -120,7 +120,7 @@
     {
       "id": "detour",
       "title": "Detour",
-      "instructions": "HQ: A wall of crates blocks the straight route. Plan a way around it before you run. Going over the top or under the bottom both work.",
+      "instructions": "A wall of crates blocks the straight route. Plan a way around it before you run. Going over the top or under the bottom both work.",
       "starterCode": "step(100)\nturn(-90)\n",
       "scene": {
         "start": {
@@ -147,7 +147,7 @@
     {
       "id": "backtrack",
       "title": "Backtrack",
-      "instructions": "HQ: The first chip is up a dead end. Grab it, then use `turn(180)` to face back the way you came and go on to the second chip.",
+      "instructions": "The first chip is up a dead end. Grab it, then use `turn(180)` to face back the way you came and go on to the second chip.",
       "starterCode": "step(200)\nturn(-90)\nstep(200)\n",
       "scene": {
         "start": {
@@ -190,7 +190,7 @@
     {
       "id": "first-bug",
       "title": "First Bug",
-      "instructions": "HQ: A Sentry Bug is crossing your path. The yellow cone is what it can see, and touching it counts too. Use `wait(seconds)` to let it walk past, then go.",
+      "instructions": "A Sentry Bug is crossing your path. The yellow cone is what it can see, and touching it counts too. Use `wait(seconds)` to let it walk past, then go.",
       "starterCode": "step(500)\n",
       "scene": {
         "start": {
@@ -224,7 +224,7 @@
     {
       "id": "server-room",
       "title": "Server Room",
-      "instructions": "HQ: Three chips and one Sentry Bug. Follow the halls to the first two chips, stop one panel before the bug's path, and wait for your moment to cross. Then finish the job.",
+      "instructions": "Three chips and one Sentry Bug. Follow the halls to the first two chips, stop one panel before the bug's path, and wait for your moment to cross. Then finish the job.",
       "starterCode": "step(200)\nturn(-90)\n",
       "scene": {
         "start": {
@@ -280,7 +280,7 @@
     {
       "id": "square-dance",
       "title": "Square Dance",
-      "instructions": "HQ: Four sides, all the same. Don't write it out four times. `for i in range(4):` repeats the lines indented under it. Add a `turn(90)` to the loop and set the distance.",
+      "instructions": "Four sides, all the same. Don't write it out four times. `for i in range(4):` repeats the lines indented under it. Add a `turn(90)` to the loop and set the distance.",
       "starterCode": "for i in range(4):\n    step(100)\n",
       "scene": {
         "start": {
@@ -320,7 +320,7 @@
       "id": "boss-gatehouse",
       "title": "Boss: Gatehouse",
       "boss": true,
-      "instructions": "HQ: Boss fight. Grab the first chip, then go around the crate wall to the top lane. A Sentry Bug patrols the crossing, so hold your position with `wait` until it has turned around at the top and walked back past your lane. Cross behind it, then collect the last two chips.",
+      "instructions": "Boss fight. Grab the first chip, then go around the crate wall to the top lane. A Sentry Bug patrols the crossing, so hold your position with `wait` until it has turned around at the top and walked back past your lane. Cross behind it, then collect the last two chips.",
       "starterCode": "step(150)\n",
       "scene": {
         "start": {
@@ -370,7 +370,7 @@
     {
       "id": "staircase",
       "title": "Staircase",
-      "instructions": "HQ: A loop can repeat several lines. Each stair is 100 steps along and 75 steps up. Write one whole stair inside the loop, ending with Grep Fox facing right again, then repeat it 5 times.",
+      "instructions": "A loop can repeat several lines. Each stair is 100 steps along and 75 steps up. Write one whole stair inside the loop, ending with Grep Fox facing right again, then repeat it 5 times.",
       "starterCode": "for i in range(5):\n    step(100)\n    turn(-90)\n",
       "scene": {
         "start": {
@@ -445,7 +445,7 @@
     {
       "id": "long-stair",
       "title": "Long Stair",
-      "instructions": "HQ: 12 stairs, each 60 steps along and 30 steps up. That's far too much to type out, but your loop doesn't care. Change one number.",
+      "instructions": "12 stairs, each 60 steps along and 30 steps up. That's far too much to type out, but your loop doesn't care. Change one number.",
       "starterCode": "for i in range(2):\n    step(60)\n    turn(-90)\n    step(30)\n    turn(90)\n",
       "scene": {
         "start": {
@@ -476,7 +476,7 @@
     {
       "id": "zigzag",
       "title": "Zigzag",
-      "instructions": "HQ: Up 300, right 75, down 300, right 75, and the whole pattern happens 4 times. Put all of one pattern inside the loop, including the turns.",
+      "instructions": "Up 300, right 75, down 300, right 75, and the whole pattern happens 4 times. Put all of one pattern inside the loop, including the turns.",
       "starterCode": "for i in range(4):\n    turn(-90)\n    step(300)\n    turn(90)\n    step(75)\n",
       "scene": {
         "start": {
@@ -545,7 +545,7 @@
     {
       "id": "spiral-out",
       "title": "Spiral Out",
-      "instructions": "HQ: Each side of this spiral is longer than the last. The loop variable `i` counts for you: `range(1, 3)` gives 1, then 2. Your code already walks `i * 60` steps, so make the range long enough for 5 sides.",
+      "instructions": "Each side of this spiral is longer than the last. The loop variable `i` counts for you: `range(1, 3)` gives 1, then 2. Your code already walks `i * 60` steps, so make the range long enough for 5 sides.",
       "starterCode": "for i in range(1, 3):\n    step(i * 60)\n    turn(90)\n",
       "scene": {
         "start": {
@@ -576,7 +576,7 @@
     {
       "id": "three-rooms",
       "title": "Three Rooms",
-      "instructions": "HQ: Three rooms in a row. Walk around each room with 4 sides of 100 steps, then `step(200)` to reach the next one. That's a loop inside a loop, so watch your indents.",
+      "instructions": "Three rooms in a row. Walk around each room with 4 sides of 100 steps, then `step(200)` to reach the next one. That's a loop inside a loop, so watch your indents.",
       "starterCode": "for side in range(4):\n    step(100)\n    turn(90)\n",
       "scene": {
         "start": {
@@ -635,7 +635,7 @@
     {
       "id": "bug-parade",
       "title": "Bug Parade",
-      "instructions": "HQ: A parade of Sentry Bugs. You're safe when you stop halfway between two of them, so `step(200)` takes you from one safe spot to the next. Put a `wait` inside the loop and find the right number of seconds.",
+      "instructions": "A parade of Sentry Bugs. You're safe when you stop halfway between two of them, so `step(200)` takes you from one safe spot to the next. Put a `wait` inside the loop and find the right number of seconds.",
       "starterCode": "for i in range(3):\n    step(200)\n",
       "scene": {
         "start": {
@@ -695,7 +695,7 @@
     {
       "id": "fractal-garden",
       "title": "Fractal Garden",
-      "instructions": "HQ: A growing spiral with a small room at each corner. Your code walks the spiral. At each corner, add a loop that walks a 50-step square, then turn. You'll need 4 corners in all.",
+      "instructions": "A growing spiral with a small room at each corner. Your code walks the spiral. At each corner, add a loop that walks a 50-step square, then turn. You'll need 4 corners in all.",
       "starterCode": "for i in range(1, 3):\n    step(i * 70)\n    turn(90)\n",
       "scene": {
         "start": {
@@ -734,7 +734,7 @@
     {
       "id": "infiltration",
       "title": "Infiltration",
-      "instructions": "HQ: Grep Fox, you're inside. Your target is one data chip. Each floor panel is 100 steps wide, and `step(100)` won't get you all the way. Adjust the number and press Run.",
+      "instructions": "Grep Fox, you're inside. Your target is one data chip. Each floor panel is 100 steps wide, and `step(100)` won't get you all the way. Adjust the number and press Run.",
       "starterCode": "step(100)\n",
       "scene": {
         "start": {
@@ -753,7 +753,7 @@
     {
       "id": "blind-corner",
       "title": "Blind Corner",
-      "instructions": "HQ: Crates ahead, and you can't go through them. Go around. `turn(90)` turns right and `turn(-90)` turns left.",
+      "instructions": "Crates ahead, and you can't go through them. Go around. `turn(90)` turns right and `turn(-90)` turns left.",
       "starterCode": "step(400)\n",
       "scene": {
         "start": {
@@ -781,7 +781,7 @@
       "id": "boss-growing-vaults",
       "title": "Boss: Growing Vaults",
       "boss": true,
-      "instructions": "HQ: Boss fight. Three vaults, each wider than the last: 100, 150, then 200 steps. Lasers fill the gaps between them, so stay on the floor line when you move on. Walk around each vault with `turn(-90)`, then `step(size + 50)` to reach the next one.",
+      "instructions": "Boss fight. Three vaults, each wider than the last: 100, 150, then 200 steps. Lasers fill the gaps between them, so stay on the floor line when you move on. Walk around each vault with `turn(-90)`, then `step(size + 50)` to reach the next one.",
       "starterCode": "for i in range(1, 4):\n    size = 50 + i * 50\n    # walk the 4 sides of this vault\n    # then step to the next vault\n",
       "scene": {
         "start": {
@@ -854,7 +854,7 @@
     {
       "id": "crate-alley",
       "title": "Crate Alley",
-      "instructions": "HQ: Four chips in this alley. Collect them in order. You can give as many orders as you need, one on each line.",
+      "instructions": "Four chips in this alley. Collect them in order. You can give as many orders as you need, one on each line.",
       "starterCode": "step(200)\nturn(-90)\n",
       "scene": {
         "start": {
@@ -899,7 +899,7 @@
     {
       "id": "service-stairs",
       "title": "Service Stairs",
-      "instructions": "HQ: These stairs repeat, so don't write every order. Put one stair inside a `for` loop: move 100 steps, turn left, move 75 steps, turn right.",
+      "instructions": "These stairs repeat, so don't write every order. Put one stair inside a `for` loop: move 100 steps, turn left, move 75 steps, turn right.",
       "starterCode": "for i in range(5):\n    step(100)\n    # add the rest of one stair here\n",
       "scene": {
         "start": {
@@ -934,7 +934,7 @@
     {
       "id": "perimeter-sweep",
       "title": "Perimeter Sweep",
-      "instructions": "HQ: Sweep the perimeter around the crate. Each side is the same, so one loop can handle the whole patrol.",
+      "instructions": "Sweep the perimeter around the crate. Each side is the same, so one loop can handle the whole patrol.",
       "starterCode": "for i in range(4):\n    # walk one side, then turn the corner\n    pass\n",
       "scene": {
         "start": {
@@ -969,7 +969,7 @@
     {
       "id": "searchlight-yard",
       "title": "Searchlight Yard",
-      "instructions": "HQ: Stay out of the searchlight. The chips form a hexagon around it: each side is 150 steps and each corner is a 60 degree turn.",
+      "instructions": "Stay out of the searchlight. The chips form a hexagon around it: each side is 150 steps and each corner is a 60 degree turn.",
       "starterCode": "for i in range(6):\n    step(150)\n",
       "scene": {
         "start": {
@@ -1011,7 +1011,7 @@
     {
       "id": "target-list",
       "title": "Target List",
-      "instructions": "HQ: Here's your target list. `chips` holds every chip in the room. `turn_to(c)` faces a chip and `distance_to(c)` tells you how far away it is, so you never need to measure.",
+      "instructions": "Here's your target list. `chips` holds every chip in the room. `turn_to(c)` faces a chip and `distance_to(c)` tells you how far away it is, so you never need to measure.",
       "starterCode": "for c in chips:\n    turn_to(c)\n    # now walk to the chip\n",
       "scene": {
         "start": {
@@ -1046,7 +1046,7 @@
     {
       "id": "standard-procedure",
       "title": "Standard Procedure",
-      "instructions": "HQ: Time for a standard procedure. A function gives a name to orders you use often. Fill in `grab`, then choose your route carefully: `chips[0]` is across the searchlight, so start with the chip nearest you.",
+      "instructions": "Time for a standard procedure. A function gives a name to orders you use often. Fill in `grab`, then choose your route carefully: `chips[0]` is across the searchlight, so start with the chip nearest you.",
       "starterCode": "def grab(chip):\n    turn_to(chip)\n    # walk to the chip\n\ngrab(chips[0])\n",
       "scene": {
         "start": {
@@ -1080,7 +1080,7 @@
     {
       "id": "recon-grid",
       "title": "Recon Grid",
-      "instructions": "HQ: Functions can take inputs. Finish `square(size)`, sweep the small square, take 200 steps to reach the big one, then sweep that too.",
+      "instructions": "Functions can take inputs. Finish `square(size)`, sweep the small square, take 200 steps to reach the big one, then sweep that too.",
       "starterCode": "def square(size):\n    for i in range(4):\n        step(size)\n        # turn the corner\n\nsquare(100)\n",
       "scene": {
         "start": {
@@ -1127,7 +1127,7 @@
     {
       "id": "cargo-bay",
       "title": "Cargo Bay",
-      "instructions": "HQ: Crates block the way through the cargo bay. Put your detour in a function: turn left, walk 100, turn right, walk 200, turn right, walk 100, turn left. Then use a loop to repeat it. Keep clear of the laser.",
+      "instructions": "Crates block the way through the cargo bay. Put your detour in a function: turn left, walk 100, turn right, walk 200, turn right, walk 100, turn left. Then use a loop to repeat it. Keep clear of the laser.",
       "starterCode": "def around_crate():\n    turn(-90)\n    step(100)\n    # finish the detour\n\nstep(100)\n",
       "scene": {
         "start": {
@@ -1186,7 +1186,7 @@
     {
       "id": "decoy-vault",
       "title": "Decoy Vault",
-      "instructions": "HQ: Intel confirms the red chips are decoys wired to the alarm. Every chip has a `trapped` value, so use `if not c.trapped:` to leave them alone.",
+      "instructions": "Intel confirms the red chips are decoys wired to the alarm. Every chip has a `trapped` value, so use `if not c.trapped:` to leave them alone.",
       "starterCode": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n",
       "scene": {
         "start": {
@@ -1229,7 +1229,7 @@
       "id": "boss-double-cross",
       "title": "Boss: Double Cross",
       "boss": true,
-      "instructions": "HQ: Boss fight. Write a `grab` function, loop over `chips` and skip the decoy. A Sentry Bug walks through the only gap between the lasers, so a short `wait` after each chip you grab will let it pass.",
+      "instructions": "Boss fight. Write a `grab` function, loop over `chips` and skip the decoy. A Sentry Bug walks through the only gap between the lasers, so a short `wait` after each chip you grab will let it pass.",
       "starterCode": "def grab(chip):\n    # face the chip and walk to it\n    pass\n\nfor c in chips:\n    # grab the chip unless it is trapped, then wait\n    pass\n",
       "scene": {
         "start": {
@@ -1299,7 +1299,7 @@
     {
       "id": "extraction",
       "title": "Extraction",
-      "instructions": "HQ: This is it. Use everything you've learned. Write a `grab` function, loop over `chips`, and skip the decoys. Watch out for the searchlight and the lasers, then get out.",
+      "instructions": "This is it. Use everything you've learned. Write a `grab` function, loop over `chips`, and skip the decoys. Watch out for the searchlight and the lasers, then get out.",
       "starterCode": "def grab(chip):\n    # face the chip and walk to it\n    pass\n\nfor c in chips:\n    # grab the chip unless it is trapped\n    pass\n",
       "scene": {
         "start": {
@@ -1360,7 +1360,7 @@
     {
       "id": "first-patrol",
       "title": "First Patrol",
-      "instructions": "HQ: A Sentry Bug is on patrol. The yellow cone is what it can see, and touching it counts too. Use `wait(seconds)` to let it walk past, then move.",
+      "instructions": "A Sentry Bug is on patrol. The yellow cone is what it can see, and touching it counts too. Use `wait(seconds)` to let it walk past, then move.",
       "starterCode": "step(600)\n",
       "scene": {
         "start": {
@@ -1394,7 +1394,7 @@
     {
       "id": "crate-cover",
       "title": "Crate Cover",
-      "instructions": "HQ: There's no room to pass in this corridor, but crates block a Sentry Bug's view. Duck into the gap with `turn(-90)` and `step(150)`, then `wait` until it has gone by.",
+      "instructions": "There's no room to pass in this corridor, but crates block a Sentry Bug's view. Duck into the gap with `turn(-90)` and `step(150)`, then `wait` until it has gone by.",
       "starterCode": "step(340)\n",
       "scene": {
         "start": {
@@ -1448,7 +1448,7 @@
     {
       "id": "shift-change",
       "title": "Shift Change",
-      "instructions": "HQ: Two Sentry Bugs, moving at different speeds. Your code can watch them: `guards[0].y` is how far down the first one is. Hold with a `while` loop until it has passed, then do the same for the second.",
+      "instructions": "Two Sentry Bugs, moving at different speeds. Your code can watch them: `guards[0].y` is how far down the first one is. Hold with a `while` loop until it has passed, then do the same for the second.",
       "starterCode": "while guards[0].y < 320:\n    wait(0.1)\nstep(365)\n",
       "scene": {
         "start": {
@@ -1495,7 +1495,7 @@
     {
       "id": "night-watch",
       "title": "Night Watch",
-      "instructions": "HQ: Final sweep. The red chip is a decoy, a laser blocks the low route to the last chip, and a Sentry Bug holds the high lane. Grab the first chip, drop down out of its sight, wait for it to pass, then slip over the laser.",
+      "instructions": "Final sweep. The red chip is a decoy, a laser blocks the low route to the last chip, and a Sentry Bug holds the high lane. Grab the first chip, drop down out of its sight, wait for it to pass, then slip over the laser.",
       "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n\ngo(chips[0])\n",
       "scene": {
         "start": {

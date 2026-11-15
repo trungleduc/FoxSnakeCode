@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/trungleduc/FoxSnakeCode/compare/v1.0.2...v1.1.0) (2026-11-15)
+
+
+### Features
+
+* new release ([93f183c](https://github.com/trungleduc/FoxSnakeCode/commit/93f183c4769ab159cd8dbdbce4751ce833aef7dd))
+
 ## [1.0.2](https://github.com/trungleduc/FoxSnakeCode/compare/v1.0.1...v1.0.2) (2026-11-08)
 
 

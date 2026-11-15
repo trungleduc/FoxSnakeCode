@@ -76,10 +76,22 @@ Stop restarts the kernel, so the next Run can take a few seconds in JupyterLite.
 | `turn_to(target)` | Face a chip, a guard or an `(x, y)` position. |
 | `distance_to(target)` | Get the distance to a chip, a guard or an `(x, y)` position. |
 | `wait(seconds)` | Stay still for a number of seconds. |
+| `print(value)` | Show a value under the code. |
+| `has_key(color)` | `True` once Grep Fox holds the keycard of that color. |
+| `ahead()` | Get how far Grep Fox can walk before a wall, crate or closed door. Unlocked as the Scanner gadget. |
+| `hack(answer)` | Next to a terminal, send the answer worked out from its `data`. A wrong answer sets off the alarm. Unlocked as the Hacking kit gadget. |
+| `launch_drone()` | Launch the drone and get it back as an object with `step`, `turn`, `turn_to`, `distance_to`, `ahead`, `zap()` and `battery`. Unlocked as the Drone gadget. |
+| `fox` | Grep Fox as an object, with the same methods as the drone plus `wait`. |
 | `chips` | The list of chips. Each has `x`, `y`, `trapped` and `collected`. |
+| `exit_pad`, `intel` | The exit pad and the bonus intel chip, or `None`. |
+| `keys`, `doors` | Keycards and doors. Each has `x`, `y` and `color`; doors also have `open`. |
+| `lasers` | The list of lasers. Each has `x`, `y`, `w`, `h` and `on`. |
+| `terminals`, `fuses` | Terminals (with `data` and `hacked`) and fuse boxes (with `zapped`). |
 | `guards` | The list of guards. Each has `x`, `y` and `angle`, and they update as time passes. |
 
-A level is solved when every chip that isn't trapped has been collected. Searchlights, lasers, trapped chips and being spotted by a guard end the attempt, while crates and walls just block the way.
+A level is solved when every chip that isn't trapped has been collected and, if the room has an exit pad, Grep Fox stands on it. Searchlights, lasers, trapped chips, a wrong hack answer and being spotted by a guard end the attempt, while crates, walls and closed doors just block the way.
+
+The drone flies over lasers and searchlights, but walls and closed doors stop it, guards can spot it, and every step uses battery. `zap()` next to a fuse box switches off the hazards wired to it.
 
 ## Adding levels
 
@@ -111,6 +123,26 @@ Levels are in `foxsnakecode/missions.json`, and their order in the list is their
 }
 ```
 
+Optional scene fields:
+
+- `exit`: `{ "x", "y" }`, the pad Grep Fox must reach after the chips.
+- `intel`: `{ "x", "y" }`, an optional bonus chip, shown on the map once collected.
+- `keys` and `doors`: keycards `{ "x", "y", "color" }` open every door `{ "x", "y", "w", "h", "color" }` of the same color.
+- `terminals`: `{ "x", "y", "data", "answer", "color" }`. A correct `hack(answer)` opens the doors of that color.
+- `fuses`: `{ "x", "y", "hazards" }`, where `hazards` lists positions in the `hazards` list that a zap turns off.
+- `drone`: `{ "battery" }` makes the drone available in the room.
+- `values`: names and numbers, like `{ "size": 150 }`, given to the player's code as variables and shown on the map as HQ INTEL.
+- A laser with `"on"` and `"off"` seconds blinks.
+
+The top-level `chapters` list names the chapters on the map. Every 10 levels in order form one chapter, so the first name is for levels 1 to 10, the second for 11 to 20, and so on.
+
+Optional level fields:
+
+- `variants`: more scenes. The code must solve the main `scene` and every variant, so hard-coded numbers stop working when the rooms differ.
+- `par`: `{ "lines", "commands" }` targets for the 2nd and 3rd star. Lines count non-empty, non-comment lines; commands count the orders run (the most of any room).
+- `hints`: a list of written hints, shown one at a time when the player asks Sudo Snake. Each one should give a little more away than the last, without giving the full answer.
+- `gadget`: `"drone"`, `"scanner"` or `"hack"`. Solving this level unlocks the gadget, which adds its commands to the field manual.
+
 Each level needs a unique `id`. Saved games refer to levels by `id`, so never change one after release; new levels can go anywhere in the list without breaking saves. Add `"boss": true` to mark a boss level.
 
 In `hazards`, an item with `r` is a searchlight and an item with `w` and `h` is a laser. Text between backticks in `instructions` is shown as code.
@@ -126,7 +158,9 @@ A `.fsc` file holds only the player's save and starts empty, so each file is a s
   "progress": {
     "currentLevel": "first-steps",
     "solved": ["first-steps"],
-    "code": { "first-steps": "step(300)\n" }
+    "code": { "first-steps": "step(300)\n" },
+    "stars": { "first-steps": 3 },
+    "intel": []
   }
 }
 ```

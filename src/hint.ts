@@ -18,13 +18,14 @@ export function hintInstructions(
   code: string,
   outcome: string
 ): string {
-  const { start, chips, obstacles, hazards, guards } = level.scene;
+  const { start, chips, obstacles, hazards, guards, ...extras } = level.scene;
   const scene = {
     start,
     chips: chips.map((chip, index) => ({ index, ...chip })),
     crates: obstacles,
     hazards,
-    guards: guards.map(guard => ({ route: guard.route, speed: guard.speed }))
+    guards: guards.map(guard => ({ route: guard.route, speed: guard.speed })),
+    ...extras
   };
   return `You are Sudo Snake, mission control in the Python coding game FoxSnakeCode. You are helping a beginner who plays as Grep Fox.
 
@@ -38,9 +39,11 @@ Rules you must always follow:
 
 How the game works:
 - The world is ${WORLD_WIDTH} by ${WORLD_HEIGHT} steps. x grows to the right and y grows downward. An angle of 0 faces right.
-- Commands: step(distance), turn(degrees) where positive turns right, turn_to(target), distance_to(target), wait(seconds).
-- chips is a list; each has x, y, trapped and collected. guards is a list; each has x, y and angle.
-- A level is solved when every chip that is not trapped is collected. Searchlights, lasers, trapped chips and being seen by a guard end the attempt. Crates block movement and block a guard's view.
+- Commands: step(distance), turn(degrees) where positive turns right, turn_to(target), distance_to(target), wait(seconds), ahead() for the free distance in front, has_key(color), hack(answer) next to a terminal, launch_drone() which returns a drone with step, turn, turn_to, distance_to, ahead, zap and battery. fox is Grep Fox as an object with the same methods.
+- chips is a list; each has x, y, trapped and collected. guards is a list; each has x, y and angle. keys, doors, lasers (with on), terminals (with data) and fuses are lists too; exit_pad and intel are single objects or None.
+- A level is solved when every chip that is not trapped is collected and, if there is an exit pad, Grep Fox reaches it. Searchlights, lasers, trapped chips, a wrong hack answer and being seen by a guard end the attempt. Crates and closed doors block movement and a guard's view. A keycard opens the doors of its color. The drone flies over lasers and searchlights and a zapped fuse box turns off its hazards.
+- Some levels check the code in ${level.variants.length + 1} versions of the room, and only the first is shown here, so hard-coded numbers may not work everywhere.
+- Stars: a level can set a target number of lines (${level.par.lines ?? 'none'}) and of commands run (${level.par.commands ?? 'none'}).
 
 Current level: ${JSON.stringify(level.title)}
 Briefing: ${JSON.stringify(level.instructions)}

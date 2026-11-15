@@ -3,14 +3,17 @@ import { CodeEditor, CodeEditorWrapper, IEditorServices } from '@jupyterlab/code
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { ServiceManager } from '@jupyterlab/services';
 import { Panel, SplitPanel, Widget } from '@lumino/widgets';
-import { sudoSnakeAvatar, TOOL_ICONS } from './art';
+import { starMarkup, sudoSnakeAvatar, TOOL_ICONS } from './art';
 import { GameAudio } from './audio';
 import { IRunResult } from './engine';
 import {
+  countLines,
   IMission,
   isUnlocked,
   parseMission,
-  serializeMission
+  serializeMission,
+  starsFor,
+  unlockedGadgets
 } from './format';
 import { HintService, hintInstructions, IHintMessage } from './hint';
 import { MissionMap } from './map';
@@ -23,9 +26,9 @@ const MAX_HINT_QUESTIONS = 10;
 const HINT_CARD_GAP = 8;
 const HINT_CARD_MAX_HEIGHT = 400;
 const HINT_CONNECT_NOTICE =
-  'Connect an AI provider and I can give you hints on this mission.';
+  'Connect an AI provider and you can also ask me your own questions.';
 const HINT_INSTALL_NOTICE =
-  'Hints need the jupyter-ai-lite extension. Install it with `pip install jupyter-ai-lite`, then restart JupyterLab. On a hosted site, ask whoever runs it to add it.';
+  'Asking your own questions needs the jupyter-ai-lite extension. Install it with `pip install jupyter-ai-lite`, then restart JupyterLab. On a hosted site, ask whoever runs it to add it.';
 const HINT_STARTERS = [
   'Where do I start?',
   'Why did my run fail?',
@@ -37,7 +40,7 @@ const HQ_NAME = 'Sudo Snake';
 
 let nextHqAvatarId = 0;
 
-const COMMANDS: [string, string][] = [
+const COMMANDS: [string, string, string?][] = [
   ['step(distance)', 'Walk forward. A negative number walks backward.'],
   ['turn(degrees)', 'Turn right. A negative number turns left.'],
   ['turn_to(target)', 'Face a chip, a guard or an (x, y) position.'],
@@ -46,9 +49,40 @@ const COMMANDS: [string, string][] = [
     'Get the distance to a chip, a guard or an (x, y) position.'
   ],
   ['wait(seconds)', 'Stay still for a number of seconds.'],
+  ['print(value)', 'Show a value under your code, to check what it holds.'],
+  ['HQ INTEL', 'Names HQ gives you for this room, like size. Use them like any variable.'],
+  [
+    'Stars',
+    "★ for solving. ★★ for staying within the line target (blank and comment lines don't count). ★★★ for staying within the command target: the orders Grep Fox runs, counted in the room that needs the most."
+  ],
   ['chips', 'The list of chips. Each has x, y, trapped and collected.'],
-  ['guards', 'The list of guards. Each has x, y and angle.']
+  ['exit_pad', 'Where to finish, once every chip is collected. Has x and y.'],
+  ['intel', 'An optional bonus chip, or None. Has x, y and collected.'],
+  ['has_key(color)', "True once Grep Fox holds that keycard, like has_key('red')."],
+  ['keys, doors', 'Keycards and the doors they open. Each has x, y and color.'],
+  ['lasers', 'The list of lasers. Each has x, y, w, h and on.'],
+  ['guards', 'The list of guards. Each has x, y and angle.'],
+  [
+    'launch_drone()',
+    'Send out the drone and get it back as an object, like d = launch_drone().',
+    'drone'
+  ],
+  [
+    'd.step() d.turn() d.zap()',
+    'Steer the drone. It flies over lasers and lights, uses d.battery, and zaps fuse boxes.',
+    'drone'
+  ],
+  ['fox', 'Grep Fox as an object: fox.step(), fox.turn(), fox.x, fox.y.', 'drone'],
+  ['ahead()', 'How far you can walk before a wall, crate or closed door.', 'scanner'],
+  ['hack(answer)', 'Next to a terminal, answer the question about its data.', 'hack'],
+  ['terminals', 'The list of terminals. Each has x, y, data and hacked.', 'hack']
 ];
+
+const GADGET_NAMES: Record<string, string> = {
+  drone: 'Drone',
+  scanner: 'Scanner',
+  hack: 'Hacking kit'
+};
 
 const TOOLS: [string, string, string][] = [
   ['step', TOOL_ICONS.step, 'step(100)'],
@@ -177,11 +211,7 @@ export class FscPanel extends SplitPanel {
 
     const help = element('details', 'fsc-help');
     help.appendChild(element('summary', '', 'Field manual'));
-    const commands = element('dl', '');
-    for (const [name, description] of COMMANDS) {
-      commands.append(element('dt', '', name), element('dd', '', description));
-    }
-    help.appendChild(commands);
+    help.appendChild(this._commands);
     brief.node.append(help, this._hintButton);
 
     const actions = new Widget();
@@ -196,6 +226,7 @@ export class FscPanel extends SplitPanel {
       this._runButton,
       this._resetButton,
       this._restoreButton,
+      this._lineCount,
       this._status
     );
     this._status.setAttribute('role', 'status');
@@ -303,7 +334,11 @@ export class FscPanel extends SplitPanel {
     hqAvatar.innerHTML = sudoSnakeAvatar(`fsc-hq-clip-${++nextHqAvatarId}`);
     hqAvatar.setAttribute('aria-hidden', 'true');
     const hqMessage = element('div', 'fsc-hq-message');
-    hqMessage.append(element('strong', 'fsc-hq-name', HQ_NAME), this._instructions);
+    hqMessage.append(
+      element('strong', 'fsc-hq-name', HQ_NAME),
+      this._instructions,
+      this._targets
+    );
     this._hq.append(hqAvatar, hqMessage);
 
     const stageHolder = element('div', 'fsc-stage');
@@ -371,7 +406,19 @@ export class FscPanel extends SplitPanel {
     this._hintSetup.addEventListener('click', () => {
       this._hints?.openSettings();
     });
+    this._tipButton.type = 'button';
+    this._tipButton.addEventListener('click', () => {
+      this._tipCount++;
+      this._renderTips();
+      this._scrollHintChat();
+    });
+    this._tips.append(
+      element('strong', 'fsc-tips-title', 'Hints from HQ'),
+      this._tipList,
+      this._tipButton
+    );
     this._hintBody.append(
+      this._tips,
       this._hintLog,
       this._hintNotice,
       this._hintStarters,
@@ -457,7 +504,29 @@ export class FscPanel extends SplitPanel {
     return bubble;
   }
 
+  private _renderTips(): void {
+    const mission = this._mission;
+    const index = this._currentIndex();
+    const hints = mission && index >= 0 ? mission.levels[index].hints : [];
+    this._tips.hidden = !hints.length;
+    this._tipList.textContent = '';
+    hints.slice(0, this._tipCount).forEach((hint, number) => {
+      const item = element('p', 'fsc-tip');
+      item.appendChild(element('strong', '', `Hint ${number + 1}: `));
+      const text = element('span', '');
+      setInlineCode(text, hint);
+      item.appendChild(text);
+      this._tipList.appendChild(item);
+    });
+    this._tipButton.hidden = this._tipCount >= hints.length;
+    this._tipButton.textContent = this._tipCount
+      ? `Next hint (${this._tipCount + 1} of ${hints.length})`
+      : `Show hint 1 of ${hints.length}`;
+  }
+
   private _resetHintChat(): void {
+    this._tipCount = 0;
+    this._renderTips();
     this._hintRequest++;
     this._hintHistory = [];
     this._hintOutcome = '';
@@ -595,8 +664,22 @@ export class FscPanel extends SplitPanel {
       return;
     }
     const level = mission.levels[index];
-    this._levelTitle.textContent = `${index + 1} · ${level.title}`;
+    const rooms = level.variants.length + 1;
+    this._levelTitle.textContent = `${index + 1} · ${level.title}${
+      rooms > 1 ? ` · ${rooms} rooms` : ''
+    }`;
+    this._renderCommands();
     setInlineCode(this._instructions, level.instructions);
+    const targets = [
+      level.par.lines !== undefined
+        ? `★★ ${level.par.lines} ${level.par.lines === 1 ? 'line' : 'lines'} or fewer`
+        : '',
+      level.par.commands !== undefined
+        ? `★★★ ${level.par.commands} ${level.par.commands === 1 ? 'command' : 'commands'} or fewer`
+        : ''
+    ].filter(Boolean);
+    this._targets.textContent = targets.join(' · ');
+    this._targets.hidden = !targets.length;
     this._hq.hidden = !level.instructions;
     this._resetHintChat();
     this._banner.hidden = true;
@@ -607,11 +690,41 @@ export class FscPanel extends SplitPanel {
     this._editorModel.sharedModel.setSource(code);
     this._editorModel.sharedModel.clearUndoHistory();
     this._loadingCode = false;
+    this._renderLineCount();
     const lines = code.split('\n');
     this._editor.editor.setCursorPosition({
       line: lines.length - 1,
       column: lines[lines.length - 1].length
     });
+  }
+
+  private _renderLineCount(): void {
+    const mission = this._mission;
+    const index = this._currentIndex();
+    if (!mission || index < 0) {
+      return;
+    }
+    const target = mission.levels[index].par.lines;
+    const lines = countLines(this._editorModel.sharedModel.getSource());
+    this._lineCount.textContent =
+      target === undefined ? `Lines: ${lines}` : `Lines: ${lines} / ${target}`;
+    this._lineCount.classList.toggle(
+      'fsc-line-count-ok',
+      target !== undefined && lines <= target
+    );
+  }
+
+  private _renderCommands(): void {
+    const unlocked = this._mission ? unlockedGadgets(this._mission) : new Set();
+    this._commands.textContent = '';
+    for (const [name, description, gadget] of COMMANDS) {
+      if (!gadget || unlocked.has(gadget)) {
+        this._commands.append(
+          element('dt', '', name),
+          element('dd', '', description)
+        );
+      }
+    }
   }
 
   private async _goToLevel(index: number): Promise<void> {
@@ -692,18 +805,19 @@ export class FscPanel extends SplitPanel {
     }
     this._audio.start();
     const levelIndex = this._currentIndex();
+    const level = mission.levels[levelIndex];
+    const scenes = [level.scene, ...level.variants];
+    const code = this._editorModel.sharedModel.getSource();
     const runId = ++this._runId;
     this._flushSave();
+    this._clearMark();
     this._stage.reset();
     this._banner.hidden = true;
     this._showOutput('');
     this._setPhase('running');
     let result: IRunResult;
     try {
-      result = await this._runner.run(
-        mission.levels[levelIndex].scene,
-        this._editorModel.sharedModel.getSource()
-      );
+      result = await this._runner.run(scenes, code);
     } catch (error) {
       result = {
         status: 'error',
@@ -719,6 +833,7 @@ export class FscPanel extends SplitPanel {
       return;
     }
     this._showOutput(result.output ?? '');
+    this._stage.load(scenes[result.room ?? 0] ?? level.scene);
     this._setPhase('playing');
     await this._stage.play(result.events);
     if (runId !== this._runId || this.isDisposed) {
@@ -734,7 +849,29 @@ export class FscPanel extends SplitPanel {
     ]
       .filter(Boolean)
       .join(' ');
-    this._showResult(result, levelIndex);
+    this._showResult(result, levelIndex, code);
+  }
+
+  private _lineNote(code: string, line: number | null | undefined): string {
+    if (!line) {
+      return '';
+    }
+    const text = (code.split('\n')[line - 1] ?? '').trim();
+    this._editor.editor.setSelection({
+      start: { line: line - 1, column: 0 },
+      end: { line: line - 1, column: code.split('\n')[line - 1]?.length ?? 0 }
+    });
+    this._marked = true;
+    return text ? `Line ${line} (${text}): ` : `Line ${line}: `;
+  }
+
+  private _clearMark(): void {
+    if (this._marked) {
+      this._marked = false;
+      this._editor.editor.setCursorPosition(
+        this._editor.editor.getSelection().end
+      );
+    }
   }
 
   private async _halt(): Promise<void> {
@@ -772,20 +909,50 @@ export class FscPanel extends SplitPanel {
     }
   }
 
-  private _showResult(result: IRunResult, levelIndex: number): void {
+  private _showResult(
+    result: IRunResult,
+    levelIndex: number,
+    code: string
+  ): void {
     const mission = this._mission;
     if (!mission) {
       return;
     }
+    const lines = countLines(code);
+    const level = mission.levels[levelIndex];
+    const rooms = level.variants.length + 1;
+    const room = result.room ?? 0;
+    const scene = [level.scene, ...level.variants][room] ?? level.scene;
+    const where = rooms > 1 ? `Room ${room + 1} of ${rooms}: ` : '';
     switch (result.status) {
       case 'solved': {
         this._stage.setOutcome('win');
         this._audio.win();
-        const level = mission.levels[levelIndex];
-        if (!mission.progress.solved.includes(level.id)) {
-          mission.progress.solved.push(level.id);
-          this._writeProgress();
+        const progress = mission.progress;
+        const commands = result.commands ?? 0;
+        const stars = starsFor(level.par, lines, commands);
+        const best = progress.stars[level.id] ?? 0;
+        if (!progress.solved.includes(level.id)) {
+          progress.solved.push(level.id);
         }
+        progress.stars[level.id] = Math.max(progress.stars[level.id] ?? 0, stars);
+        if (result.intel && !progress.intel.includes(level.id)) {
+          progress.intel.push(level.id);
+        }
+        this._writeProgress();
+        this._renderCommands();
+        const gadget = level.gadget ? GADGET_NAMES[level.gadget] ?? level.gadget : '';
+        const report = [
+          level.par.lines !== undefined
+            ? `${lines} lines (target ${level.par.lines})`
+            : `${lines} lines`,
+          level.par.commands !== undefined
+            ? `${commands} commands (target ${level.par.commands})`
+            : `${commands} commands`,
+          ...(result.intel ? ['bonus intel found'] : []),
+          ...(rooms > 1 ? [`all ${rooms} rooms cleared`] : []),
+          ...(gadget ? [`new gadget: ${gadget}`] : [])
+        ].join(' · ');
         const hasNext = levelIndex + 1 < mission.levels.length;
         const cleared =
           mission.progress.solved.length === mission.levels.length;
@@ -803,7 +970,10 @@ export class FscPanel extends SplitPanel {
             : hasNext
             ? `${MASCOT} slipped out with the data.`
             : `${MASCOT} slipped out with the data. Some earlier objectives are still open.`,
-          hasNext
+          hasNext,
+          report,
+          stars,
+          best
         );
         return;
       }
@@ -823,19 +993,29 @@ export class FscPanel extends SplitPanel {
           guard: [
             "ALERT: YOU'VE BEEN SPOTTED",
             'Stay out of the vision cone, or put a crate between you.'
+          ],
+          drone: [
+            'DRONE SPOTTED',
+            'A guard saw the drone. Fly it out of the vision cone.'
+          ],
+          hack: [
+            'ACCESS DENIED',
+            "The terminal rejected that answer. Check how you worked it out with print()."
           ]
         };
         const [title, detail] = messages[result.reason ?? ''] ?? [
           'ALARM TRIPPED',
           `${MASCOT} was detected. Plot a new route.`
         ];
-        this._showBanner('fail', title, detail);
+        this._showBanner(
+          'fail',
+          title,
+          where + this._lineNote(code, result.line) + detail
+        );
         return;
       }
       case 'incomplete': {
-        const left = mission.levels[levelIndex].scene.chips.filter(
-          chip => !chip.trapped
-        ).length;
+        const left = scene.chips.filter(chip => !chip.trapped).length;
         const taken = new Set<number>();
         for (const event of result.events) {
           if (event.t === 'move') {
@@ -843,12 +1023,24 @@ export class FscPanel extends SplitPanel {
           }
         }
         const remaining = left - taken.size;
+        const bump = [...result.events]
+          .reverse()
+          .find(event => event.t === 'move' && event.blocked);
+        const blocked = bump?.line
+          ? ` ${this._lineNote(code, bump.line)}${
+              bump.t === 'move' && bump.who === 'drone' ? 'the drone' : MASCOT
+            } walked into a wall or a closed door.`
+          : '';
         this._showBanner(
           'info',
           'OBJECTIVE INCOMPLETE',
-          `Your orders ran out with ${remaining} ${
-            remaining === 1 ? 'chip' : 'chips'
-          } still in the building.`
+          where +
+            (remaining > 0 || !scene.exit
+              ? `Your orders ran out with ${remaining} ${
+                  remaining === 1 ? 'chip' : 'chips'
+                } still in the building.`
+              : `Every chip is collected, but ${MASCOT} still needs to reach the exit pad.`) +
+            blocked
         );
         return;
       }
@@ -859,16 +1051,16 @@ export class FscPanel extends SplitPanel {
           this._showBanner(
             'fail',
             'MISSION TIMEOUT',
-            'Your orders never end. Check for an endless loop.'
+            where + 'Your orders never end. Check for an endless loop.'
           );
           return;
         }
-        const where = error.line ? `Line ${error.line}: ` : '';
+        const line = `${where}${this._lineNote(code, error.line)}`;
         const message = error.message ? `: ${error.message}` : '';
         this._showBanner(
           'fail',
           'ORDERS NOT UNDERSTOOD',
-          `${where}${error.type ?? 'Error'}${message}`
+          `${line}${error.type ?? 'Error'}${message}`
         );
         return;
       }
@@ -879,7 +1071,10 @@ export class FscPanel extends SplitPanel {
     kind: 'win' | 'fail' | 'info',
     title: string,
     detail: string,
-    next = false
+    next = false,
+    report = '',
+    stars?: number,
+    best = 0
   ): void {
     this._banner.dataset.kind = kind;
     this._bannerText.textContent = '';
@@ -887,6 +1082,21 @@ export class FscPanel extends SplitPanel {
       element('strong', '', title),
       element('span', '', detail)
     );
+    if (report) {
+      const line = element('span', 'fsc-banner-report');
+      if (stars !== undefined) {
+        const earned = element('span', 'fsc-stars');
+        earned.innerHTML = starMarkup(stars);
+        line.append(earned, ' · ');
+      }
+      line.append(report);
+      if (stars !== undefined && best > stars) {
+        const kept = element('span', 'fsc-stars');
+        kept.innerHTML = starMarkup(best);
+        line.append(' · best: ', kept);
+      }
+      this._bannerText.appendChild(line);
+    }
     this._nextButton.hidden = !next;
     this._banner.hidden = false;
   }
@@ -928,6 +1138,7 @@ export class FscPanel extends SplitPanel {
     }
     const key = mission.progress.currentLevel;
     mission.progress.code[key] = this._editorModel.sharedModel.getSource();
+    this._renderLineCount();
     this._writeProgress();
   }
 
@@ -994,7 +1205,15 @@ export class FscPanel extends SplitPanel {
   private _saveTimer = 0;
 
   private _levelTitle = element('span', 'fsc-level-title');
+  private _tips = element('div', 'fsc-tips');
+  private _tipList = element('div', 'fsc-tip-list');
+  private _tipButton = element('button', 'fsc-tip-button');
+  private _tipCount = 0;
+  private _marked = false;
+  private _commands = element('dl', '');
   private _instructions = element('p', 'fsc-instructions');
+  private _targets = element('p', 'fsc-targets');
+  private _lineCount = element('span', 'fsc-line-count');
   private _hq = element('div', 'fsc-hq');
   private _hintCard = element('div', 'fsc-chat');
   private _hintBody = element('div', 'fsc-chat-body');

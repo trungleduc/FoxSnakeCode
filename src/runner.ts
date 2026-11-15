@@ -39,7 +39,7 @@ export class Runner {
     return missions;
   }
 
-  async run(scene: IScene, code: string): Promise<IRunResult> {
+  async run(scenes: IScene[], code: string): Promise<IRunResult> {
     this._stopRequested = false;
     let finished: () => void = () => undefined;
     this._running = new Promise<void>(resolve => {
@@ -49,7 +49,7 @@ export class Runner {
       this._abandon = resolve;
     });
     try {
-      return await this._execute(scene, code, abandoned);
+      return await this._execute(scenes, code, abandoned);
     } finally {
       this._abandon = null;
       finished();
@@ -69,7 +69,7 @@ export class Runner {
   }
 
   private async _execute(
-    scene: IScene,
+    scenes: IScene[],
     code: string,
     abandoned: Promise<void>
   ): Promise<IRunResult> {
@@ -82,7 +82,7 @@ export class Runner {
     }
     const { stdout, stderr, kernelError } = await this._collect(
       kernel,
-      buildRunCode(scene, code),
+      buildRunCode(scenes, code),
       abandoned
     );
 

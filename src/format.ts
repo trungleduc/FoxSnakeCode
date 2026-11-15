@@ -17,6 +17,35 @@ export interface IRect {
   h: number;
 }
 
+export interface ILaser extends IRect {
+  on?: number;
+  off?: number;
+}
+
+export interface IDoor extends IRect {
+  color: string;
+}
+
+export interface IKey {
+  x: number;
+  y: number;
+  color: string;
+}
+
+export interface ITerminal {
+  x: number;
+  y: number;
+  data: unknown[];
+  answer: unknown;
+  color: string;
+}
+
+export interface IFuse {
+  x: number;
+  y: number;
+  hazards: number[];
+}
+
 export interface ICircle {
   x: number;
   y: number;
@@ -56,8 +85,21 @@ export interface IScene {
   start: { x: number; y: number; angle: number };
   chips: IChip[];
   obstacles: IRect[];
-  hazards: (IRect | ICircle)[];
+  hazards: (ILaser | ICircle)[];
   guards: IGuard[];
+  doors: IDoor[];
+  keys: IKey[];
+  terminals: ITerminal[];
+  fuses: IFuse[];
+  exit?: IPoint;
+  intel?: IPoint;
+  drone?: { battery: number };
+  values?: Record<string, number>;
+}
+
+export interface IPar {
+  lines?: number;
+  commands?: number;
 }
 
 export interface ILevel {
@@ -67,21 +109,28 @@ export interface ILevel {
   instructions: string;
   starterCode: string;
   scene: IScene;
+  variants: IScene[];
+  par: IPar;
+  gadget?: string;
+  hints: string[];
 }
 
 export interface IProgress {
   currentLevel: string;
   solved: string[];
   code: Record<string, string>;
+  stars: Record<string, number>;
+  intel: string[];
 }
 
 export interface IMission {
   title: string;
+  chapters: string[];
   levels: ILevel[];
   progress: IProgress;
 }
 
-export function isCircle(hazard: IRect | ICircle): hazard is ICircle {
+export function isCircle(hazard: ILaser | ICircle): hazard is ICircle {
   return 'r' in hazard;
 }
 
@@ -116,13 +165,40 @@ function parseRect(value: unknown, where: string): IRect {
   return { x, y, w, h };
 }
 
-function parseHazard(value: unknown, where: string): IRect | ICircle {
+function parseHazard(value: unknown, where: string): ILaser | ICircle {
   const source = asObject(value, where);
   if ('r' in source) {
     const [x, y, r] = numbers(source, ['x', 'y', 'r'], where);
     return { x, y, r };
   }
-  return parseRect(source, where);
+  const laser: ILaser = parseRect(source, where);
+  if ('on' in source || 'off' in source) {
+    const [on, off] = numbers(source, ['on', 'off'], where);
+    if (on <= 0 || off <= 0) {
+      throw new Error(`${where}: "on" and "off" must be more than 0.`);
+    }
+    laser.on = on;
+    laser.off = off;
+  }
+  return laser;
+}
+
+function parsePoint(value: unknown, where: string): IPoint {
+  const [x, y] = numbers(asObject(value, where), ['x', 'y'], where);
+  return { x, y };
+}
+
+function color(source: Record<string, unknown>, where: string): string {
+  if (typeof source.color !== 'string' || !source.color) {
+    throw new Error(`${where}: "color" must be a non-empty string.`);
+  }
+  return source.color;
+}
+
+export function laserOn(laser: ILaser, time: number): boolean {
+  return laser.on === undefined || laser.off === undefined
+    ? true
+    : time % (laser.on + laser.off) < laser.on;
 }
 
 function headingBetween(from: IPoint, to: IPoint): number {
@@ -232,19 +308,100 @@ function parseScene(value: unknown, where: string): IScene {
   if (!chips.some(chip => !chip.trapped)) {
     throw new Error(`${where} needs at least one chip that is not trapped.`);
   }
-  return {
+  const hazards = list(source.hazards, `${where}.hazards`).map((item, index) =>
+    parseHazard(item, `${where}.hazards[${index}]`)
+  );
+  const scene: IScene = {
     start: { x, y, angle },
     chips,
     obstacles: list(source.obstacles, `${where}.obstacles`).map((item, index) =>
       parseRect(item, `${where}.obstacles[${index}]`)
     ),
-    hazards: list(source.hazards, `${where}.hazards`).map((item, index) =>
-      parseHazard(item, `${where}.hazards[${index}]`)
-    ),
+    hazards,
     guards: list(source.guards, `${where}.guards`).map((item, index) =>
       parseGuard(item, `${where}.guards[${index}]`)
-    )
+    ),
+    doors: list(source.doors, `${where}.doors`).map((item, index) => {
+      const doorWhere = `${where}.doors[${index}]`;
+      const door = asObject(item, doorWhere);
+      return { ...parseRect(door, doorWhere), color: color(door, doorWhere) };
+    }),
+    keys: list(source.keys, `${where}.keys`).map((item, index) => {
+      const keyWhere = `${where}.keys[${index}]`;
+      const key = asObject(item, keyWhere);
+      return { ...parsePoint(key, keyWhere), color: color(key, keyWhere) };
+    }),
+    terminals: list(source.terminals, `${where}.terminals`).map(
+      (item, index) => {
+        const terminalWhere = `${where}.terminals[${index}]`;
+        const terminal = asObject(item, terminalWhere);
+        if (!('answer' in terminal)) {
+          throw new Error(`${terminalWhere}: "answer" is missing.`);
+        }
+        return {
+          ...parsePoint(terminal, terminalWhere),
+          data: list(terminal.data, `${terminalWhere}.data`),
+          answer: terminal.answer,
+          color: color(terminal, terminalWhere)
+        };
+      }
+    ),
+    fuses: list(source.fuses, `${where}.fuses`).map((item, index) => {
+      const fuseWhere = `${where}.fuses[${index}]`;
+      const fuse = asObject(item, fuseWhere);
+      const links = list(fuse.hazards, `${fuseWhere}.hazards`);
+      if (
+        !links.every(
+          link => Number.isInteger(link) && hazards[link as number] !== undefined
+        )
+      ) {
+        throw new Error(`${fuseWhere}: "hazards" must list hazard positions.`);
+      }
+      return { ...parsePoint(fuse, fuseWhere), hazards: links as number[] };
+    })
   };
+  if (source.exit !== undefined) {
+    scene.exit = parsePoint(source.exit, `${where}.exit`);
+  }
+  if (source.intel !== undefined) {
+    scene.intel = parsePoint(source.intel, `${where}.intel`);
+  }
+  if (source.values !== undefined) {
+    const values = asObject(source.values, `${where}.values`);
+    const names = Object.keys(values);
+    if (!names.every(name => /^[A-Za-z_][A-Za-z0-9_]*$/.test(name))) {
+      throw new Error(`${where}.values: names must be valid Python names.`);
+    }
+    scene.values = Object.fromEntries(
+      names.map((name, index) => [
+        name,
+        numbers(values, names, `${where}.values`)[index]
+      ])
+    );
+  }
+  if (source.drone !== undefined) {
+    const [battery] = numbers(
+      asObject(source.drone, `${where}.drone`),
+      ['battery'],
+      `${where}.drone`
+    );
+    scene.drone = { battery };
+  }
+  return scene;
+}
+
+function parsePar(value: unknown, where: string): IPar {
+  if (value === undefined) {
+    return {};
+  }
+  const source = asObject(value, where);
+  const par: IPar = {};
+  for (const key of ['lines', 'commands'] as const) {
+    if (source[key] !== undefined) {
+      [par[key]] = numbers(source, [key], where);
+    }
+  }
+  return par;
 }
 
 function parseLevel(value: unknown, where: string): ILevel {
@@ -260,7 +417,15 @@ function parseLevel(value: unknown, where: string): ILevel {
       typeof source.instructions === 'string' ? source.instructions : '',
     starterCode:
       typeof source.starterCode === 'string' ? source.starterCode : '',
-    scene: parseScene(source.scene, `${where}.scene`)
+    scene: parseScene(source.scene, `${where}.scene`),
+    variants: list(source.variants, `${where}.variants`).map((item, index) =>
+      parseScene(item, `${where}.variants[${index}]`)
+    ),
+    par: parsePar(source.par, `${where}.par`),
+    gadget: typeof source.gadget === 'string' ? source.gadget : undefined,
+    hints: list(source.hints, `${where}.hints`).filter(
+      (hint): hint is string => typeof hint === 'string'
+    )
   };
 }
 
@@ -272,6 +437,14 @@ function parseProgress(value: unknown, levels: ILevel[]): IProgress {
       : {};
   const current = source.currentLevel;
   const code: Record<string, string> = {};
+  const stars: Record<string, number> = {};
+  if (typeof source.stars === 'object' && source.stars !== null) {
+    for (const [key, count] of Object.entries(source.stars)) {
+      if (ids.has(key) && isNumber(count)) {
+        stars[key] = count;
+      }
+    }
+  }
   if (typeof source.code === 'object' && source.code !== null) {
     for (const [key, text] of Object.entries(source.code)) {
       if (typeof text === 'string') {
@@ -287,7 +460,13 @@ function parseProgress(value: unknown, levels: ILevel[]): IProgress {
           (item): item is string => typeof item === 'string' && ids.has(item)
         )
       : [],
-    code
+    code,
+    stars,
+    intel: Array.isArray(source.intel)
+      ? source.intel.filter(
+          (item): item is string => typeof item === 'string' && ids.has(item)
+        )
+      : []
   };
 }
 
@@ -314,6 +493,9 @@ export function parseMission(missions: string, save: string): IMission {
   }
   return {
     title: typeof source.title === 'string' ? source.title : 'FoxSnakeCode',
+    chapters: list(source.chapters, 'The chapters').filter(
+      (name): name is string => typeof name === 'string'
+    ),
     levels,
     progress: parseProgress(parseSave(save).progress, levels)
   };
@@ -321,6 +503,30 @@ export function parseMission(missions: string, save: string): IMission {
 
 export function serializeMission(mission: IMission): string {
   return JSON.stringify({ progress: mission.progress }, null, 2) + '\n';
+}
+
+export function countLines(code: string): number {
+  return code
+    .split('\n')
+    .filter(line => line.trim() && !line.trim().startsWith('#')).length;
+}
+
+export function starsFor(par: IPar, lines: number, commands: number): number {
+  return (
+    1 +
+    (par.lines === undefined || lines <= par.lines ? 1 : 0) +
+    (par.commands === undefined || commands <= par.commands ? 1 : 0)
+  );
+}
+
+export function unlockedGadgets(mission: IMission): Set<string> {
+  return new Set(
+    mission.levels
+      .filter(
+        level => level.gadget && mission.progress.solved.includes(level.id)
+      )
+      .map(level => level.gadget as string)
+  );
 }
 
 export function isUnlocked(mission: IMission, index: number): boolean {

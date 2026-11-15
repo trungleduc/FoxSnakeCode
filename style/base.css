@@ -263,6 +263,30 @@
   color: var(--jp-ui-font-color2);
 }
 
+.fsc-line-count {
+  padding: 2px 8px;
+  border: 1px solid var(--jp-border-color2);
+  border-radius: 10px;
+  color: var(--jp-ui-font-color2);
+  font-family: var(--jp-code-font-family);
+  font-size: 14px;
+}
+
+.fsc-line-count.fsc-line-count-ok {
+  border-color: #ffd84a;
+  color: #ffd84a;
+}
+
+.fsc-targets {
+  margin: 0;
+  color: #ffd84a;
+  font-size: 15px;
+}
+
+.fsc-targets[hidden] {
+  display: none;
+}
+
 .fsc-editor {
   --jp-code-font-size: 18px;
   flex: 1 1 0;
@@ -555,6 +579,61 @@
   overflow-y: auto;
   scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
   scrollbar-width: thin;
+}
+
+.fsc-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 216, 74, 0.35);
+  border-radius: 10px;
+  background: rgba(255, 216, 74, 0.06);
+}
+
+.fsc-tips[hidden] {
+  display: none;
+}
+
+.fsc-tips-title {
+  color: #ffd84a;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fsc-tip {
+  margin: 0;
+  color: #e6edf3;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.fsc-tip code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  font-family: var(--jp-code-font-family);
+}
+
+.fsc-tip-button {
+  align-self: flex-start;
+  padding: 6px 14px;
+  border: 1px solid #ffd84a;
+  border-radius: 14px;
+  background: transparent;
+  color: #ffd84a;
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.fsc-tip-button:hover {
+  background: rgba(255, 216, 74, 0.14);
+}
+
+.fsc-tip-button[hidden] {
+  display: none;
 }
 
 .fsc-hint-log {
@@ -915,9 +994,24 @@
   font-size: 22px;
 }
 
-.fsc-banner-text span {
+.fsc-banner-text > span {
   color: #c9d4de;
   font-size: 18px;
+}
+
+.fsc-banner-text .fsc-banner-report {
+  display: block;
+  margin-top: 4px;
+  color: #ffd84a;
+  font-size: 16px;
+}
+
+.fsc-star-on {
+  color: #ffd84a;
+}
+
+.fsc-star-off {
+  color: #3a4a5a;
 }
 
 .fsc-banner .jp-Button {
@@ -1305,6 +1399,109 @@
   outline-offset: 3px;
 }
 
+.fsc-map-belt {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fsc-map-belt[hidden] {
+  display: none;
+}
+
+.fsc-map-chapters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 900px;
+  margin: 12px auto 0;
+}
+
+.fsc-map-chapter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 2px solid #4a6378;
+  border-radius: 8px;
+  background: #121c28;
+  color: #e6edf3;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fsc-map-chapter strong {
+  color: #ffc93c;
+  font-size: 13px;
+}
+
+.fsc-map-chapter-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fsc-map-chapter-count {
+  min-height: 1.2em;
+  color: #9fb4c7;
+  font-size: 12px;
+}
+
+.fsc-map-chapter-done {
+  border-color: #37f5d6;
+}
+
+.fsc-map-chapter-current {
+  border-color: #ffc93c;
+  background: #1d2d3d;
+}
+
+.fsc-map-chapter:disabled {
+  border-color: #2a3a4a;
+  color: #6c8aa3;
+  cursor: default;
+}
+
+.fsc-map-chapter:disabled strong {
+  color: #6c8aa3;
+}
+
+.fsc-map-chapter .fsc-map-lock {
+  top: -10px;
+  right: -10px;
+}
+
+.fsc-map-gadget {
+  padding: 2px 10px;
+  border: 1px dashed #4a5d70;
+  border-radius: 10px;
+  color: #6c7f92;
+  font-size: 13px;
+}
+
+.fsc-map-gadget-on {
+  border: 1px solid #37f5d6;
+  color: #37f5d6;
+}
+
+.fsc-map-stars {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  width: max-content;
+  color: #ffd84a;
+  font-size: 15px;
+  letter-spacing: 1px;
+  transform: translateX(-50%);
+}
+
 .fsc-map-label {
   position: absolute;
   top: calc(100% + 8px);
@@ -1371,9 +1568,98 @@
   animation: fsc-chip-bob 1.8s ease-in-out infinite;
 }
 
-.fsc-chip-taken {
+.fsc-chip-taken,
+.fsc-taken {
   opacity: 0;
   transition: opacity 0.2s ease-out;
+}
+
+.fsc-values rect {
+  fill: #0a121b;
+  fill-opacity: 0.85;
+  stroke: #ffd84a;
+  stroke-width: 1.5;
+}
+
+.fsc-values text {
+  fill: #ffe9a3;
+  font-family: var(--jp-code-font-family);
+  font-size: 14px;
+}
+
+.fsc-values .fsc-values-title {
+  fill: #ffd84a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.fsc-exit text {
+  fill: #4ee08a;
+  font-family: var(--jp-code-font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.fsc-door {
+  transition: opacity 0.3s ease-out;
+}
+
+.fsc-door.fsc-open {
+  opacity: 0.12;
+}
+
+.fsc-door.fsc-open .fsc-door-lock {
+  display: none;
+}
+
+.fsc-laser.fsc-off,
+.fsc-light.fsc-off {
+  opacity: 0.08;
+  animation: none;
+}
+
+.fsc-terminal-screen {
+  fill: #12324a;
+  stroke: #4da3ff;
+  stroke-width: 1.5;
+}
+
+.fsc-terminal-text {
+  stroke: #4da3ff;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.fsc-hacked .fsc-terminal-screen {
+  fill: #0d2a1f;
+  stroke: #4ee08a;
+}
+
+.fsc-hacked .fsc-terminal-text {
+  stroke: #4ee08a;
+}
+
+.fsc-denied .fsc-terminal-screen {
+  fill: #3a0f16;
+  stroke: #ff5a6e;
+}
+
+.fsc-fuse.fsc-zapped {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.fsc-drone[hidden] {
+  display: none;
+}
+
+.fsc-rotor circle {
+  fill: none;
+  stroke: #37f5d6;
+  stroke-width: 1.5;
+  opacity: 0.8;
 }
 
 .fsc-sprite,
@@ -1540,6 +1826,7 @@
 @media (prefers-reduced-motion: reduce) {
   .fsc-light,
   .fsc-laser,
+  .fsc-door,
   .fsc-chip-inner,
   .fsc-tail,
   .fsc-blink,

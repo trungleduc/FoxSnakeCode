@@ -1,11 +1,17 @@
 import { LabIcon } from '@jupyterlab/ui-components';
 import {
   ICircle,
+  IDoor,
+  IFuse,
   IGuard,
   IGuardPose,
+  IKey,
+  ILaser,
+  IPoint,
   IRect,
   IScene,
   isCircle,
+  ITerminal,
   WORLD_HEIGHT,
   WORLD_WIDTH
 } from './format';
@@ -16,6 +22,33 @@ export const fscIcon = new LabIcon({
 });
 
 const CONE_RAYS = 24;
+
+const KEY_COLORS: Record<string, string> = {
+  red: '#ff5a6e',
+  blue: '#4da3ff',
+  green: '#4ee08a',
+  yellow: '#ffd84a'
+};
+
+function attr(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function keyColor(name: string): string {
+  return attr(KEY_COLORS[name] ?? name);
+}
+
+function card(name: string, lines: string[]): string {
+  return `data-card="${attr(name)}" data-card-lines="${attr(lines.join('|'))}"`;
+}
+
+function place(x: number, y: number): string {
+  return `x = ${x}   y = ${y}`;
+}
 
 function defs(id: string): string {
   return `
@@ -64,6 +97,10 @@ function defs(id: string): string {
       <stop offset="0" stop-color="#37f5d6" stop-opacity="0.55"/>
       <stop offset="1" stop-color="#37f5d6" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="${id}-glow-intel">
+      <stop offset="0" stop-color="#ffd84a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffd84a" stop-opacity="0"/>
+    </radialGradient>
     <radialGradient id="${id}-glow-trap">
       <stop offset="0" stop-color="#ff4d5e" stop-opacity="0.55"/>
       <stop offset="1" stop-color="#ff4d5e" stop-opacity="0"/>
@@ -91,17 +128,17 @@ function crate(rect: IRect, id: string): string {
   </g>`;
 }
 
-function searchlight(light: ICircle, id: string): string {
+function searchlight(light: ICircle, index: number, id: string): string {
   const topX = light.x + 150;
   return `
-  <g class="fsc-light">
+  <g class="fsc-light" data-hazard="${index}">
     <path d="M${topX - 8} -10L${topX + 8} -10L${light.x + light.r} ${light.y}L${light.x - light.r} ${light.y}Z" fill="url(#${id}-beam)"/>
     <circle cx="${light.x}" cy="${light.y}" r="${light.r + 12}" fill="#ffe680" opacity="0.2"/>
     <circle cx="${light.x}" cy="${light.y}" r="${light.r}" fill="url(#${id}-light)" stroke="#fffbe0" stroke-width="2"/>
   </g>`;
 }
 
-function laser(rect: IRect): string {
+function laser(rect: ILaser, index: number): string {
   const horizontal = rect.w >= rect.h;
   const emitters = horizontal
     ? [
@@ -114,7 +151,7 @@ function laser(rect: IRect): string {
       ];
   const pad = 6;
   return `
-  <g class="fsc-laser">
+  <g class="fsc-laser${rect.on ? ' fsc-laser-blink' : ''}" data-hazard="${index}" ${card(`lasers`, [place(rect.x, rect.y), rect.on ? `on ${rect.on}s, off ${rect.off}s` : 'always on'])}>
     <rect x="${rect.x - (horizontal ? 0 : pad)}" y="${rect.y - (horizontal ? pad : 0)}" width="${rect.w + (horizontal ? 0 : pad * 2)}" height="${rect.h + (horizontal ? pad * 2 : 0)}" fill="#ff2d48" opacity="0.28"/>
     <rect x="${rect.x}" y="${rect.y}" width="${rect.w}" height="${rect.h}" fill="#ff5a6e"/>
     ${emitters
@@ -139,13 +176,104 @@ function chip(x: number, y: number, trapped: boolean, index: number, id: string)
     )
     .join('');
   return `
-  <g class="fsc-chip" data-chip="${index}" transform="translate(${x} ${y})">
+  <g class="fsc-chip" data-chip="${index}" ${card(`chips[${index}]`, [place(x, y), ...(trapped ? ['!trapped = True'] : [])])} transform="translate(${x} ${y})">
     <g class="fsc-chip-inner">
       <circle r="28" fill="url(#${id}-glow${trapped ? '-trap' : ''})"/>
       ${pins}
       <rect x="-11" y="-11" width="22" height="22" rx="3" fill="${body}" stroke="${edge}" stroke-width="2"/>
       ${core}
     </g>
+  </g>`;
+}
+
+function exitPad(point: IPoint): string {
+  return `
+  <g class="fsc-exit" ${card('exit_pad', [place(point.x, point.y)])} transform="translate(${point.x} ${point.y})">
+    <circle r="26" fill="#0d2a1f" fill-opacity="0.7" stroke="#4ee08a" stroke-width="3" stroke-dasharray="7 5"/>
+    <path d="M-9 -1L0 -10L9 -1M0 -10V11" stroke="#4ee08a" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text y="42" text-anchor="middle">EXIT</text>
+  </g>`;
+}
+
+function intelChip(point: IPoint, id: string): string {
+  return `
+  <g class="fsc-intel" data-intel="0" ${card('intel', [place(point.x, point.y), 'bonus: optional'])} transform="translate(${point.x} ${point.y})">
+    <g class="fsc-chip-inner">
+      <circle r="28" fill="url(#${id}-glow-intel)"/>
+      <path d="M0 -14L13 0L0 14L-13 0Z" fill="#3a2a05" stroke="#ffd84a" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle r="4.5" fill="#ffd84a"/>
+    </g>
+  </g>`;
+}
+
+function door(rect: IDoor, index: number): string {
+  const tint = keyColor(rect.color);
+  const cx = rect.x + rect.w / 2;
+  const cy = rect.y + rect.h / 2;
+  return `
+  <g class="fsc-door" data-door="${index}" ${card(`doors[${index}]`, [place(rect.x, rect.y), `color = '${rect.color}'`])}>
+    <rect x="${rect.x}" y="${rect.y}" width="${rect.w}" height="${rect.h}" rx="2" fill="${tint}" fill-opacity="0.22" stroke="${tint}" stroke-width="3"/>
+    <g class="fsc-door-lock" transform="translate(${cx} ${cy})">
+      <rect x="-8" y="-3" width="16" height="12" rx="2" fill="${tint}"/>
+      <path d="M-4.5 -3V-6.5a4.5 4.5 0 0 1 9 0V-3" stroke="${tint}" stroke-width="2.6" fill="none"/>
+    </g>
+  </g>`;
+}
+
+function keycard(key: IKey, index: number): string {
+  const tint = keyColor(key.color);
+  return `
+  <g class="fsc-key" data-key="${index}" ${card(`keys[${index}]`, [place(key.x, key.y), `color = '${key.color}'`])} transform="translate(${key.x} ${key.y})">
+    <g class="fsc-chip-inner">
+      <circle r="24" fill="${tint}" opacity="0.16"/>
+      <rect x="-13" y="-9" width="26" height="18" rx="3" fill="#14222f" stroke="${tint}" stroke-width="2.5"/>
+      <rect x="-9" y="-4" width="8" height="8" rx="1.5" fill="${tint}"/>
+      <path d="M3 -2H9M3 2.5H7" stroke="${tint}" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>`;
+}
+
+function terminal(item: ITerminal, index: number): string {
+  const data = JSON.stringify(item.data);
+  return `
+  <g class="fsc-terminal" data-terminal="${index}" ${card(`terminals[${index}]`, [place(item.x, item.y), `data = ${data.length > 40 ? data.slice(0, 39) + '…' : data}`])} transform="translate(${item.x} ${item.y})">
+    <rect x="-18" y="-15" width="36" height="26" rx="3" fill="#0b1620" stroke="#7d93a6" stroke-width="2"/>
+    <rect class="fsc-terminal-screen" x="-14" y="-11" width="28" height="18" rx="1.5"/>
+    <path class="fsc-terminal-text" d="M-10 -6H0M-10 -2H6M-10 2H2"/>
+    <rect x="-6" y="11" width="12" height="6" fill="#2b3a48"/>
+  </g>`;
+}
+
+function fuseBox(fuse: IFuse, index: number): string {
+  return `
+  <g class="fsc-fuse" data-fuse="${index}" ${card(`fuses[${index}]`, [place(fuse.x, fuse.y)])} transform="translate(${fuse.x} ${fuse.y})">
+    <rect x="-13" y="-16" width="26" height="32" rx="3" fill="#2b3a48" stroke="#ffd84a" stroke-width="2"/>
+    <path d="M2 -11L-6 1H0L-2 11L6 -1H0Z" fill="#ffd84a"/>
+  </g>`;
+}
+
+const DRONE_MARKUP = `
+  <g class="fsc-drone-heading">
+    <circle r="18" fill="#37f5d6" opacity="0.14"/>
+    <path d="M-10 -10L10 10M10 -10L-10 10" stroke="#9fb4c7" stroke-width="3" stroke-linecap="round"/>
+    <g class="fsc-rotor"><circle cx="-10" cy="-10" r="5.5"/><circle cx="10" cy="-10" r="5.5"/><circle cx="-10" cy="10" r="5.5"/><circle cx="10" cy="10" r="5.5"/></g>
+    <circle r="6" fill="#14222f" stroke="#37f5d6" stroke-width="2"/>
+    <path d="M6 0H14" stroke="#37f5d6" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(-15 22)">
+    <rect width="30" height="4" rx="2" fill="#1a2733"/>
+    <rect class="fsc-drone-charge" width="30" height="4" rx="2" fill="#4ee08a"/>
+  </g>`;
+
+function valuesPanel(values: Record<string, number>): string {
+  const lines = Object.entries(values).map(([name, value]) => `${name} = ${value}`);
+  const width = Math.max(...lines.map(line => line.length)) * 8.4 + 22;
+  const height = lines.length * 20 + 26;
+  return `
+  <g class="fsc-values" transform="translate(${WORLD_WIDTH - 12 - width} 12)">
+    <rect width="${width}" height="${height}" rx="4"/>
+    <text class="fsc-values-title" x="11" y="16">HQ INTEL</text>
+    ${lines.map((line, index) => `<text x="11" y="${36 + index * 20}">${attr(line)}</text>`).join('')}
   </g>`;
 }
 
@@ -237,8 +365,8 @@ export function visionCone(
 
 export function sceneMarkup(scene: IScene, id: string): string {
   const hazards = scene.hazards
-    .map(hazard =>
-      isCircle(hazard) ? searchlight(hazard, id) : laser(hazard)
+    .map((hazard, index) =>
+      isCircle(hazard) ? searchlight(hazard, index, id) : laser(hazard, index)
     )
     .join('');
   return `
@@ -253,12 +381,20 @@ export function sceneMarkup(scene: IScene, id: string): string {
     <rect x="${WORLD_WIDTH - 5}" width="5" height="${WORLD_HEIGHT}"/>
   </g>
   <circle class="fsc-start" cx="${scene.start.x}" cy="${scene.start.y}" r="24"/>
+  ${scene.exit ? exitPad(scene.exit) : ''}
   ${scene.guards.map(guardRoute).join('')}
   ${hazards}
+  ${scene.doors.map(door).join('')}
   ${scene.obstacles.map(obstacle => crate(obstacle, id)).join('')}
+  ${scene.fuses.map(fuseBox).join('')}
+  ${scene.terminals.map(terminal).join('')}
+  ${scene.keys.map(keycard).join('')}
+  ${scene.intel ? intelChip(scene.intel, id) : ''}
   ${scene.chips.map((c, index) => chip(c.x, c.y, !!c.trapped, index, id)).join('')}
   ${scene.guards.map((_, index) => guardMarkup(index)).join('')}
+  <g class="fsc-drone" hidden>${DRONE_MARKUP}</g>
   <g class="fsc-actor"></g>
+  ${scene.values ? valuesPanel(scene.values) : ''}
   <rect width="${WORLD_WIDTH}" height="${WORLD_HEIGHT}" fill="url(#${id}-vignette)" pointer-events="none"/>`;
 }
 
@@ -347,6 +483,15 @@ export const TOOL_ICONS = {
   send: toolIcon('<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>'),
   close: toolIcon('<path d="M6 6l12 12M18 6L6 18"/>')
 };
+
+export function starMarkup(earned: number): string {
+  return [0, 1, 2]
+    .map(
+      index =>
+        `<span class="${index < earned ? 'fsc-star-on' : 'fsc-star-off'}">★</span>`
+    )
+    .join('');
+}
 
 export const LOCK_BADGE =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';

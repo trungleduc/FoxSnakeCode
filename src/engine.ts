@@ -8,8 +8,8 @@ function toBase64(text: string): string {
   return btoa(binary);
 }
 
-export function buildRunCode(scene: IScene, code: string): string {
-  const payload = toBase64(JSON.stringify({ scene, code }));
+export function buildRunCode(scenes: IScene[], code: string): string {
+  const payload = toBase64(JSON.stringify({ scenes, code }));
   return (
     'from foxsnakecode.engine import run_mission\n' +
     `run_mission("${payload}")`
@@ -23,6 +23,7 @@ export function buildLoadCode(): string {
 export type GameEvent =
   | {
       t: 'move';
+      who?: 'drone';
       x: number;
       y: number;
       d: number;
@@ -30,14 +31,23 @@ export type GameEvent =
       walk: number;
       blocked: boolean;
       picked: { i: number; at: number }[];
+      keys?: { i: number; at: number }[];
+      intel?: number;
+      battery?: number;
     }
-  | { t: 'turn'; a: number; s: number }
-  | { t: 'wait'; s: number };
+  | { t: 'turn'; who?: 'drone'; a: number; s: number }
+  | { t: 'wait'; s: number }
+  | { t: 'launch'; x: number; y: number; a: number; battery: number; s: number }
+  | { t: 'zap'; i: number; hazards: number[]; s: number }
+  | { t: 'hack'; i: number; ok: boolean; s: number };
 
 export interface IRunResult {
   status: 'solved' | 'failed' | 'incomplete' | 'error' | 'stopped';
   reason?: string;
   events: GameEvent[];
+  room?: number;
+  commands?: number;
+  intel?: boolean;
   error?: {
     kind?: string;
     detail?: string;

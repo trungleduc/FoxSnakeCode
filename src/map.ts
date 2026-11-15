@@ -1,5 +1,17 @@
-import { BOSS_BADGE, FOX_MARKUP, LOCK_BADGE, sudoSnakeAvatar } from './art';
-import { IMission, isUnlocked } from './format';
+import {
+  BOSS_BADGE,
+  FOX_MARKUP,
+  LOCK_BADGE,
+  starMarkup,
+  sudoSnakeAvatar
+} from './art';
+import { IMission, isUnlocked, unlockedGadgets } from './format';
+
+const GADGETS: [string, string][] = [
+  ['drone', 'Drone'],
+  ['scanner', 'Scanner'],
+  ['hack', 'Hacking kit']
+];
 
 const COLUMNS = 5;
 const WIDTH = 1000;
@@ -61,7 +73,8 @@ export class MissionMap {
     this._path.className = 'fsc-map-path';
     const header = document.createElement('div');
     header.className = 'fsc-map-header';
-    header.append(this._title);
+    this._belt.className = 'fsc-map-belt';
+    header.append(this._title, this._belt);
     this.node.append(header, this._path);
     this.splash.className = 'fsc-splash';
     this.splash.innerHTML = splashMarkup();
@@ -100,7 +113,19 @@ export class MissionMap {
     const { levels, progress } = mission;
     const height = Math.ceil(levels.length / COLUMNS) * ROW_HEIGHT;
     const solvedCount = progress.solved.length;
-    this._title.textContent = `${mission.title}: ${solvedCount} / ${levels.length} missions solved`;
+    const starCount = Object.values(progress.stars).reduce((sum, count) => sum + count, 0);
+    this._title.textContent = `${mission.title}: ${solvedCount} / ${levels.length} missions solved · ★ ${starCount} / ${levels.length * 3}`;
+    const unlocked = unlockedGadgets(mission);
+    const offered = GADGETS.filter(([id]) => levels.some(level => level.gadget === id));
+    this._belt.textContent = '';
+    this._belt.hidden = !offered.length;
+    for (const [id, name] of offered) {
+      const gadget = document.createElement('span');
+      gadget.className = `fsc-map-gadget${unlocked.has(id) ? ' fsc-map-gadget-on' : ''}`;
+      gadget.textContent = name;
+      gadget.title = unlocked.has(id) ? `${name}: unlocked` : `${name}: beat its boss to unlock`;
+      this._belt.appendChild(gadget);
+    }
     this._path.style.height = `${height}px`;
 
     const lines = levels.slice(1).map((_, index) => {
@@ -145,6 +170,17 @@ export class MissionMap {
       label.className = 'fsc-map-label';
       label.textContent = level.title;
       stop.appendChild(label);
+      if (solved) {
+        const stars = progress.stars[level.id] ?? 1;
+        const hasIntel = [level.scene, ...level.variants].some(scene => scene.intel);
+        const badge = document.createElement('span');
+        badge.className = 'fsc-map-stars';
+        badge.innerHTML = starMarkup(stars);
+        if (hasIntel) {
+          badge.append(progress.intel.includes(level.id) ? ' ◆' : ' ◇');
+        }
+        stop.appendChild(badge);
+      }
       this._path.appendChild(stop);
     });
   }
@@ -163,5 +199,6 @@ export class MissionMap {
   private _onSelect: (index: number) => void;
   private _splashStart: HTMLButtonElement;
   private _title = document.createElement('h2');
+  private _belt = document.createElement('div');
   private _path = document.createElement('div');
 }

@@ -135,6 +135,15 @@ def _target(value, command):
     raise TypeError("%s() needs a chip, a guard or an (x, y) pair, but got %r" % (command, value))
 
 
+def _user_line():
+    frame = sys._getframe(1)
+    while frame is not None:
+        if frame.f_code.co_filename == SOURCE:
+            return frame.f_lineno
+        frame = frame.f_back
+    return None
+
+
 def _same(given, wanted):
     if isinstance(wanted, list):
         return isinstance(given, (list, tuple)) and len(given) == len(wanted) and all(
@@ -197,6 +206,7 @@ class _Mission:
         self.drone = None
         self.time = 0.0
         self.commands = 0
+        self.line = None
         self.events = []
         self.result = {"status": "incomplete", "events": self.events}
         self.hazards = scene["hazards"]
@@ -230,6 +240,7 @@ class _Mission:
         return self.fox
 
     def spend(self):
+        self.line = _user_line()
         self.commands += 1
         if self.commands > MAX_COMMANDS:
             raise _TooLong("commands")
@@ -237,7 +248,14 @@ class _Mission:
     def finish(self, status, reason):
         self.result["status"] = status
         self.result["reason"] = reason
+        if status == "failed" and self.line:
+            self.result["line"] = self.line
         raise _Finished()
+
+    def emit(self, event):
+        if self.line:
+            event["line"] = self.line
+        self.events.append(event)
 
     def walls(self):
         return self.scene["obstacles"] + [d._values for d in self.doors if not d._values["open"]]
@@ -387,7 +405,7 @@ class _Mission:
         })
         if who == "drone":
             event["battery"] = round(body["battery"], 2)
-        self.events.append(event)
+        self.emit(event)
         if hit:
             self.finish("failed", hit)
         if won:
@@ -398,7 +416,7 @@ class _Mission:
         event = {"t": "turn", "a": round(self.body(who)["angle"], 2), "s": round(elapsed, 4)}
         if who == "drone":
             event["who"] = "drone"
-        self.events.append(event)
+        self.emit(event)
         if hit:
             self.finish("failed", hit)
 
@@ -428,7 +446,7 @@ class _Mission:
             raise ValueError("wait() can't use a negative number, but got %r" % (seconds,))
         self.spend()
         elapsed, hit = self.pass_time(seconds)
-        self.events.append({"t": "wait", "s": round(elapsed, 4)})
+        self.emit({"t": "wait", "s": round(elapsed, 4)})
         if hit:
             self.finish("failed", hit)
 
@@ -465,7 +483,7 @@ class _Mission:
         source = self.scene["terminals"][index]
         correct = terminal["hacked"] or _same(answer, source["answer"])
         elapsed, hit = self.pass_time(HACK_TIME)
-        self.events.append({"t": "hack", "i": index, "ok": correct, "s": round(elapsed, 4)})
+        self.emit({"t": "hack", "i": index, "ok": correct, "s": round(elapsed, 4)})
         if not correct:
             self.finish("failed", "hack")
         terminal["hacked"] = True
@@ -482,7 +500,7 @@ class _Mission:
         self.spend()
         self.drone = {"x": self.fox["x"], "y": self.fox["y"], "angle": self.fox["angle"], "battery": float(config["battery"])}
         elapsed, hit = self.pass_time(LAUNCH_TIME)
-        self.events.append({
+        self.emit({
             "t": "launch",
             "x": round(self.drone["x"], 2),
             "y": round(self.drone["y"], 2),
@@ -503,7 +521,7 @@ class _Mission:
         hazards = self.scene["fuses"][index]["hazards"]
         self.zapped.update(hazards)
         elapsed, hit = self.pass_time(ZAP_TIME)
-        self.events.append({"t": "zap", "i": index, "hazards": hazards, "s": round(elapsed, 4)})
+        self.emit({"t": "zap", "i": index, "hazards": hazards, "s": round(elapsed, 4)})
         if hit:
             self.finish("failed", hit)
 

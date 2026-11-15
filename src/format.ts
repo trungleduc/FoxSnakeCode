@@ -112,6 +112,7 @@ export interface ILevel {
   variants: IScene[];
   par: IPar;
   gadget?: string;
+  hints: string[];
 }
 
 export interface IProgress {
@@ -124,6 +125,7 @@ export interface IProgress {
 
 export interface IMission {
   title: string;
+  chapters: string[];
   levels: ILevel[];
   progress: IProgress;
 }
@@ -420,7 +422,10 @@ function parseLevel(value: unknown, where: string): ILevel {
       parseScene(item, `${where}.variants[${index}]`)
     ),
     par: parsePar(source.par, `${where}.par`),
-    gadget: typeof source.gadget === 'string' ? source.gadget : undefined
+    gadget: typeof source.gadget === 'string' ? source.gadget : undefined,
+    hints: list(source.hints, `${where}.hints`).filter(
+      (hint): hint is string => typeof hint === 'string'
+    )
   };
 }
 
@@ -488,6 +493,9 @@ export function parseMission(missions: string, save: string): IMission {
   }
   return {
     title: typeof source.title === 'string' ? source.title : 'FoxSnakeCode',
+    chapters: list(source.chapters, 'The chapters').filter(
+      (name): name is string => typeof name === 'string'
+    ),
     levels,
     progress: parseProgress(parseSave(save).progress, levels)
   };

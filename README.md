@@ -134,10 +134,13 @@ Optional scene fields:
 - `values`: names and numbers, like `{ "size": 150 }`, given to the player's code as variables and shown on the map as HQ INTEL.
 - A laser with `"on"` and `"off"` seconds blinks.
 
+The top-level `chapters` list names the chapters on the map. Every 10 levels in order form one chapter, so the first name is for levels 1 to 10, the second for 11 to 20, and so on.
+
 Optional level fields:
 
 - `variants`: more scenes. The code must solve the main `scene` and every variant, so hard-coded numbers stop working when the rooms differ.
 - `par`: `{ "lines", "commands" }` targets for the 2nd and 3rd star. Lines count non-empty, non-comment lines; commands count the orders run (the most of any room).
+- `hints`: a list of written hints, shown one at a time when the player asks Sudo Snake. Each one should give a little more away than the last, without giving the full answer.
 - `gadget`: `"drone"`, `"scanner"` or `"hack"`. Solving this level unlocks the gadget, which adds its commands to the field manual.
 
 Each level needs a unique `id`. Saved games refer to levels by `id`, so never change one after release; new levels can go anywhere in the list without breaking saves. Add `"boss": true` to mark a boss level.

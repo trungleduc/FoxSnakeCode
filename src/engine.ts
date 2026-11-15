@@ -20,7 +20,7 @@ export function buildLoadCode(): string {
   return 'from foxsnakecode.engine import load_missions\nload_missions()';
 }
 
-export type GameEvent =
+export type GameEvent = (
   | {
       t: 'move';
       who?: 'drone';
@@ -39,13 +39,15 @@ export type GameEvent =
   | { t: 'wait'; s: number }
   | { t: 'launch'; x: number; y: number; a: number; battery: number; s: number }
   | { t: 'zap'; i: number; hazards: number[]; s: number }
-  | { t: 'hack'; i: number; ok: boolean; s: number };
+  | { t: 'hack'; i: number; ok: boolean; s: number }
+) & { line?: number };
 
 export interface IRunResult {
   status: 'solved' | 'failed' | 'incomplete' | 'error' | 'stopped';
   reason?: string;
   events: GameEvent[];
   room?: number;
+  line?: number;
   commands?: number;
   intel?: boolean;
   error?: {

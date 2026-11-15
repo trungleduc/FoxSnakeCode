@@ -1,10 +1,27 @@
 {
  "title": "FoxSnakeCode",
+ "chapters": [
+  "Orders",
+  "Loops",
+  "Variables",
+  "Loops in loops",
+  "Functions",
+  "Objects & lists",
+  "Decisions",
+  "While loops",
+  "Problem solving",
+  "Final operations"
+ ],
  "levels": [
   {
    "id": "c1-hello-fox",
    "title": "Hello, Fox",
    "instructions": "Chapter 1: Orders. Grep Fox, this is Sudo Snake. Each floor panel is 100 steps wide, and the chip is 2 panels ahead. Type `step(200)` and press Run.",
+   "hints": [
+    "Count the floor panels between Grep Fox and the chip. Each panel is 100 steps.",
+    "`step(n)` walks `n` steps forward, in the direction Grep Fox is facing.",
+    "Type `step(___)` with the number of steps to the chip, then press Run."
+   ],
    "par": {
     "lines": 1,
     "commands": 1
@@ -41,6 +58,11 @@
    "id": "c1-exit-pad",
    "title": "Way Out",
    "instructions": "A chip only counts once you get out with it. After the chip, keep walking until you stand on the green EXIT pad. One `step` can go as far as you like.",
+   "hints": [
+    "The mission isn't over until Grep Fox stands on the green EXIT pad.",
+    "Hover over the EXIT pad to see its `x`. Grep Fox starts at x = 100.",
+    "One order is enough: `step(___)`, the exit's x minus 100."
+   ],
    "starterCode": "step(200)\n",
    "par": {
     "lines": 1,
@@ -82,6 +104,11 @@
    "id": "c1-corner",
    "title": "Corner",
    "instructions": "The hall bends. `turn(-90)` turns Grep Fox to the left and `turn(90)` turns to the right. Walk to the corner, turn left, then head for the exit.",
+   "hints": [
+    "Two straight walks with one turn in between.",
+    "Facing right, `turn(-90)` makes Grep Fox face up the hall.",
+    "`step(300)`, `turn(-90)`, then `step(___)`: count the panels from the corner up to the exit."
+   ],
    "starterCode": "step(300)\n",
    "par": {
     "lines": 3,
@@ -123,6 +150,11 @@
    "id": "c1-two-chips",
    "title": "Two Chips",
    "instructions": "Orders run from top to bottom, one at a time. Plan the whole route before you run it: chip, corner, corner, chip, exit.",
+   "hints": [
+    "Trace the route with your finger first: right, up, right.",
+    "Turn left at the first chip and right at the top. Hover over the chips to measure each walk.",
+    "`step(200)`, `turn(-90)`, `step(___)`, `turn(90)`, `step(___)`."
+   ],
    "starterCode": "step(200)\nturn(-90)\n",
    "par": {
     "lines": 5,
@@ -168,6 +200,11 @@
    "id": "c1-about-face",
    "title": "About Face",
    "instructions": "The chip is at the end of a dead-end hall and the exit is behind you. `turn(180)` turns Grep Fox all the way around.",
+   "hints": [
+    "Get the chip first, then walk all the way back past where you started.",
+    "After `turn(180)` Grep Fox faces the other way. The chip is at x = 650 and the exit at x = 130.",
+    "`step(250)`, `turn(180)`, then `step(___)` from the chip back to the exit."
+   ],
    "starterCode": "step(250)\n",
    "par": {
     "lines": 3,
@@ -215,6 +252,11 @@
    "id": "c1-red-keycard",
    "title": "Red Keycard",
    "instructions": "A red door blocks the hall. A keycard opens every door of its color, so pick up the red keycard behind you first. The order of your orders matters.",
+   "hints": [
+    "Walking straight ahead runs into the red door. What's behind Grep Fox?",
+    "Turn round, walk to the keycard, and turn round again. The door opens as soon as you pick up the keycard.",
+    "`turn(180)`, `step(___)`, `turn(180)`, `step(___)`. The second walk goes from the keycard all the way to the exit."
+   ],
    "starterCode": "step(400)\n",
    "par": {
     "lines": 4,
@@ -272,6 +314,11 @@
    "id": "c1-bad-intel",
    "title": "Bad Intel",
    "instructions": "HQ wrote these orders from old blueprints, and one number is wrong. Run them, watch where Grep Fox goes wrong, and fix only that line. Hover over a chip to see its x and y.",
+   "hints": [
+    "Run it and watch: where does Grep Fox first go wrong?",
+    "The first walk stops before the corner. Hover over the first chip to see where the corner is.",
+    "Only line 1 changes: `step(___)` has to get from x = 100 to x = 400."
+   ],
    "starterCode": "step(200)\nturn(-90)\nstep(200)\nturn(90)\nstep(300)\n",
    "par": {
     "lines": 5,
@@ -317,6 +364,11 @@
    "id": "c1-locked-out",
    "title": "Locked Out",
    "instructions": "Every order here is right, but one is in the wrong place: Grep Fox walks into the blue door before picking up the blue keycard. Move one line so the keycard comes first.",
+   "hints": [
+    "Which line walks Grep Fox into the blue door?",
+    "`step(470)` is the long walk through the door. It has to wait until the blue keycard is collected.",
+    "Move `step(470)` further down, to a point where Grep Fox is back in the hall and facing right."
+   ],
    "starterCode": "step(150)\nstep(470)\nturn(-90)\nstep(150)\nturn(180)\nstep(150)\nturn(-90)\n",
    "par": {
     "lines": 7,
@@ -392,6 +444,11 @@
    "id": "c1-wrong-way",
    "title": "Wrong Way",
    "instructions": "Someone mixed up left and right, so some turns go the wrong way. `turn(90)` turns right and `turn(-90)` turns left, as Grep Fox sees it. Find the bad turns and fix them.",
+   "hints": [
+    "Run it and watch for the first turn that goes the wrong way.",
+    "Facing right, going down is a right turn and going right again from facing down is a left turn.",
+    "The four turns should be `turn(90)`, `turn(___)`, `turn(90)`, `turn(___)`."
+   ],
    "starterCode": "step(200)\nturn(90)\nstep(150)\nturn(90)\nstep(200)\nturn(90)\nstep(150)\nturn(90)\nstep(200)\n",
    "par": {
     "lines": 9,
@@ -450,6 +507,11 @@
    "title": "Boss: Gatehouse",
    "boss": true,
    "instructions": "Boss fight. Two doors, two keycards, two chips and an exit. Plan every turn before you run. The gold diamond is bonus intel: it's optional, but HQ would love it.",
+   "hints": [
+    "Plan the order: red keycard, red door, blue keycard, blue door, exit.",
+    "Walk up to the red keycard first, then right through the red door. The blue keycard is in a dead end, so `turn(180)` gets you back out.",
+    "`step(300)`, `turn(90)`, `step(450)`, `turn(90)`, `step(150)`, `turn(180)`, `step(150)`, `turn(90)`, `step(___)`, `turn(90)`, `step(___)`, `turn(90)`, `step(___)`."
+   ],
    "starterCode": "step(300)\n",
    "par": {
     "lines": 13,
@@ -541,6 +603,11 @@
    "id": "c2-patrol-loop",
    "title": "Patrol Loop",
    "instructions": "Chapter 2: Loops. A patrol around a square is the same two orders, four times. `for i in range(4):` repeats every line indented under it. Add a `turn(90)` inside the loop.",
+   "hints": [
+    "Run it: Grep Fox walks in a straight line. What's missing at each corner?",
+    "Every line indented under `for` repeats. The turn has to be inside the loop too.",
+    "Under `for i in range(4):` you need `step(200)` and then `___`, both indented by 4 spaces."
+   ],
    "starterCode": "for i in range(4):\n    step(200)\n",
    "par": {
     "lines": 3,
@@ -584,6 +651,11 @@
    "id": "c2-service-stairs",
    "title": "Service Stairs",
    "instructions": "A loop can repeat several lines. One stair is: step 80, turn left, step 60, turn right. Put the whole stair inside the loop.",
+   "hints": [
+    "One stair is four orders, and the loop only has two of them.",
+    "Add the rest of the stair inside the loop: up 60, then turn back to face right.",
+    "Inside the loop: `step(80)`, `turn(-90)`, `___`, `___`."
+   ],
    "starterCode": "for i in range(5):\n    step(80)\n    turn(-90)\n",
    "par": {
     "lines": 5,
@@ -655,6 +727,11 @@
    "id": "c2-wrap-it",
    "title": "Wrap It",
    "instructions": "One tooth of this comb is already written. Put `for i in range(...):` above it, indent the six lines by 4 spaces, and count how many teeth there are.",
+   "hints": [
+    "The six lines walk one tooth. Count the chips to know how many teeth there are.",
+    "Add a `for` line on top, then put 4 spaces in front of each of the six lines.",
+    "`for i in range(___):` with the six tooth lines indented under it."
+   ],
    "starterCode": "step(100)\nturn(-90)\nstep(230)\nturn(180)\nstep(230)\nturn(-90)\n",
    "par": {
     "lines": 7,
@@ -742,6 +819,11 @@
    "id": "c2-indent-error",
    "title": "Indent Error",
    "instructions": "Sudo Snake wrote this loop in a hurry. Only the lines indented under `for` repeat, and `turn(60)` slipped out. Fix the indentation. A hexagon has 6 corners of 60 degrees.",
+   "hints": [
+    "Which lines repeat? Only the ones indented under `for`.",
+    "`turn(60)` has no spaces in front, so it runs only once, after the loop.",
+    "Indent `turn(60)` so it lines up with `___`."
+   ],
    "starterCode": "for i in range(6):\n    step(150)\nturn(60)\n",
    "par": {
     "lines": 3,
@@ -788,6 +870,11 @@
    "id": "c2-before-after",
    "title": "Before and After",
    "instructions": "Code above a loop runs once before it, and code below it (not indented) runs once after. Walk 100 out of the room first, take the four stairs down, then walk 150 to the exit.",
+   "hints": [
+    "Three parts: something once at the start, the stairs, something once at the end.",
+    "Put `step(100)` above the `for` line, and a step to the exit below the loop with no indent.",
+    "`step(100)`, then the stairs loop, then `step(___)` back at the left edge."
+   ],
    "starterCode": "for i in range(4):\n    turn(90)\n    step(80)\n    turn(-90)\n    step(100)\n",
    "par": {
     "lines": 7,
@@ -877,6 +964,11 @@
    "id": "c2-up-and-over",
    "title": "Up and Over",
    "instructions": "A mountain of crates: three stairs up, then three stairs down to the exit. You can write two loops one after the other. The second loop starts back at the left edge, with no indent.",
+   "hints": [
+    "Going down is like going up, but the two turns swap.",
+    "Copy the loop below itself and swap `turn(-90)` and `turn(90)` in the copy. Then walk to the exit.",
+    "Second loop: `step(80)`, `turn(___)`, `step(80)`, `turn(___)`, then `step(140)` after it."
+   ],
    "starterCode": "for i in range(3):\n    step(80)\n    turn(-90)\n    step(80)\n    turn(90)\n",
    "par": {
     "lines": 11,
@@ -932,6 +1024,11 @@
    "id": "c2-star-route",
    "title": "Star Route",
    "instructions": "A five-point star. Every turn is the same, and over the whole star Grep Fox spins around twice, so each turn is `2 * 360 / 5`. Python can work that out for you: write it straight inside `turn(...)`.",
+   "hints": [
+    "With `turn(90)` you walk a square. A star needs much sharper turns.",
+    "Python can do the maths inside the brackets, so you can write the sum instead of the answer.",
+    "Inside the loop: `step(300)` and `turn(___)`."
+   ],
    "starterCode": "for i in range(5):\n    step(300)\n    turn(90)\n",
    "par": {
     "lines": 3,
@@ -974,6 +1071,11 @@
    "id": "c2-hurdles",
    "title": "Hurdles",
    "instructions": "Three crates in a row, all the same size, with a chip behind each one. Write how to get over one crate (up 110, right 140, down 110, right 60), then repeat it 3 times. Stay under the laser.",
+   "hints": [
+    "Write the hop over one crate first, run it, and check it lands behind the crate.",
+    "Up: `turn(-90)` and `step(110)`. Across: `turn(90)` and `step(140)`. Down: `turn(90)` and `step(110)`. Then face right again.",
+    "`for i in range(3):` with `turn(-90)`, `step(110)`, `turn(90)`, `step(140)`, `turn(90)`, `step(110)`, `turn(___)`, `step(___)`."
+   ],
    "par": {
     "lines": 9,
     "commands": 24
@@ -1032,6 +1134,11 @@
    "id": "c2-off-by-one",
    "title": "Off by One",
    "instructions": "This octagon patrol stops one side short of the exit. `range(1, 8)` counts 1, 2, 3, 4, 5, 6, 7: only 7 numbers. Fix the loop so it runs 8 times.",
+   "hints": [
+    "Count the corners of an octagon.",
+    "`range(8)` counts 0 to 7: that's 8 numbers. `range(1, 9)` would also work.",
+    "Change only the first line: `for i in range(___):`."
+   ],
    "starterCode": "for i in range(1, 8):\n    step(120)\n    turn(-45)\n",
    "par": {
     "lines": 3,
@@ -1091,6 +1198,11 @@
    "title": "Boss: Factory Floor",
    "boss": true,
    "instructions": "Boss fight. Hop the three crates with a loop, then head up to the blue keycard and out through the blue door to the exit. Code after the loop runs once.",
+   "hints": [
+    "Two parts: a loop for the three crates, then the walk to the keycard and the exit.",
+    "Each hop is up 110, along 130, down 110, along 50. After the loop, face up towards the blue keycard.",
+    "After the loop: `turn(-90)`, `step(___)`, `turn(-90)`, `step(___)`."
+   ],
    "par": {
     "lines": 13,
     "commands": 28
@@ -1179,6 +1291,11 @@
    "id": "c3-name-it",
    "title": "Name It",
    "instructions": "Chapter 3: Variables. A variable is a name for a value: `side = 150` stores 150 under the name `side`. The vault is 150 wide. Store it once, then use `side` instead of the number everywhere it's needed.",
+   "hints": [
+    "The vault is 150 wide, but the code has 100 in five places.",
+    "Set `side = 150`, then write `side` everywhere the code says 100.",
+    "Even shorter with a loop: `side = 150`, then `for i in range(4):` with `step(___)` and `turn(90)`."
+   ],
    "starterCode": "side = 100\nstep(100)\nturn(90)\nstep(100)\nturn(90)\nstep(100)\nturn(90)\nstep(100)\n",
    "par": {
     "lines": 4,
@@ -1222,6 +1339,11 @@
    "id": "c3-hq-feed",
    "title": "HQ Feed",
    "instructions": "The building changes every night, and this mission checks your code in 3 versions of the room. HQ sends the vault size as `size` (top right of the map). Use `size`, not a number, so one program works in every room.",
+   "hints": [
+    "The code has to work in all three rooms, so no fixed number can be right every time.",
+    "`size` already holds this room's vault size. Use it just like a number.",
+    "`for i in range(4):` with `step(___)` and `turn(90)`."
+   ],
    "starterCode": "for i in range(4):\n    step(120)\n    turn(90)\n",
    "par": {
     "lines": 3,
@@ -1342,6 +1464,11 @@
    "id": "c3-stair-feed",
    "title": "Stair Feed",
    "instructions": "Every night the stairs are rebuilt. HQ sends the size of one stair as `run` (along) and `rise` (up). There are always 4 stairs.",
+   "hints": [
+    "Which numbers in the code change from room to room?",
+    "Use `run` for the walk along and `rise` for the walk up.",
+    "Inside the loop: `step(___)`, `turn(-90)`, `step(___)`, `turn(90)`."
+   ],
    "starterCode": "for i in range(4):\n    step(80)\n    turn(-90)\n    step(60)\n    turn(90)\n",
    "par": {
     "lines": 5,
@@ -1519,6 +1646,11 @@
    "id": "c3-count-feed",
    "title": "Count Feed",
    "instructions": "The comb grows and shrinks each night. HQ counts the teeth for you in `teeth`. A loop can repeat a variable number of times: `range(teeth)`.",
+   "hints": [
+    "The number of teeth changes, so `range(4)` is only right on some nights.",
+    "`teeth` holds tonight's count. Put it inside `range(...)`.",
+    "Change only the first line: `for i in range(___):`."
+   ],
    "starterCode": "for i in range(4):\n    step(100)\n    turn(-90)\n    step(230)\n    turn(180)\n    step(230)\n    turn(-90)\n",
    "par": {
     "lines": 7,
@@ -1721,6 +1853,11 @@
    "id": "c3-growing-spiral",
    "title": "Growing Spiral",
    "instructions": "Each side is 40 steps longer than the one before. A variable can change: `side = side + 40` takes the old value, adds 40 and stores the result back under the same name. Put that inside the loop.",
+   "hints": [
+    "After each side the next one is 40 longer, so something has to change inside the loop.",
+    "Add `side = side + 40` as the last line inside the loop.",
+    "Inside the loop: `step(side)`, `turn(90)`, `___ = ___ + 40`."
+   ],
    "starterCode": "side = 40\nfor i in range(7):\n    step(side)\n    turn(90)\n",
    "par": {
     "lines": 5,
@@ -1775,6 +1912,11 @@
    "id": "c3-shrinking-spiral",
    "title": "Shrinking Spiral",
    "instructions": "The loop variable can be the distance itself. Run this code: `print(side)` shows each value under your code. Then make Grep Fox step that far and turn right each time round.",
+   "hints": [
+    "Run it first: the numbers under your code are the side lengths.",
+    "Inside the loop, `side` already is the distance. Walk it, then turn right.",
+    "Replace `print(side)` with `step(___)` and `turn(___)`."
+   ],
    "starterCode": "for side in range(300, 0, -60):\n    print(side)\n",
    "par": {
     "lines": 3,
@@ -1818,6 +1960,11 @@
    "id": "c3-lost-value",
    "title": "Lost Value",
    "instructions": "These stairs get bigger each time, but Grep Fox keeps taking the same small steps. One line works out the new gap and then throws the answer away. Fix that line so the result is stored.",
+   "hints": [
+    "Look at the last line inside the loop. Where does its answer go?",
+    "`gap + 20` works out a number but doesn't store it. Store the result back in `gap`.",
+    "Change the last line to `gap = ___`."
+   ],
    "starterCode": "gap = 60\nfor i in range(4):\n    step(gap)\n    turn(-90)\n    step(gap)\n    turn(90)\n    gap + 20\n",
    "par": {
     "lines": 7,
@@ -1879,6 +2026,11 @@
    "id": "c3-two-feeds",
    "title": "Two Feeds",
    "instructions": "Now the vault is a rectangle, and HQ sends both `width` and `height`. Going around a rectangle means: width, turn, height, turn, and then the same again.",
+   "hints": [
+    "A rectangle has a long side and a short side, then the same again.",
+    "One pass of a loop can walk one width and one height, so you need 2 passes.",
+    "`for i in range(2):` with `step(width)`, `turn(90)`, `step(___)`, `turn(___)`."
+   ],
    "par": {
     "lines": 5,
     "commands": 7
@@ -2001,6 +2153,11 @@
    "id": "c3-halfway",
    "title": "Halfway",
    "instructions": "A chip waits at the end of each arm of this cross, `size / 2` from the middle. Go out and back four times, then end in the middle on the exit. Store `size / 2` in a variable called `half` so you only work it out once.",
+   "hints": [
+    "Each arm is half the vault size long, and you come back the same way.",
+    "`half = size / 2`. Out with `step(half)`, back with `turn(180)` and `step(half)`, then face the next arm.",
+    "`for i in range(4):` with `step(half)`, `turn(180)`, `step(half)`, `turn(___)`."
+   ],
    "starterCode": "half = 100\n",
    "par": {
     "lines": 6,
@@ -2188,6 +2345,11 @@
    "title": "Boss: Night Shift",
    "boss": true,
    "instructions": "Boss fight. Climb `floors` stairs, each 80 along and `rise` up. Then go straight up to the top hall (it is at y = 80, so the climb is `360 - floors * rise`), pick up the red keycard, and go left through the red door to the exit.",
+   "hints": [
+    "Three parts: the stairs, the climb up to the top hall, the walk left to the exit.",
+    "Each stair is `step(80)`, `turn(-90)`, `step(rise)`, `turn(90)`, repeated `floors` times. After the loop, face up.",
+    "After the loop: `turn(-90)`, `step(360 - floors * rise)`, `turn(-90)`, `step(___)`. Every stair moved you 80 to the right."
+   ],
    "starterCode": "for i in range(floors):\n    step(80)\n",
    "par": {
     "lines": 9,
@@ -2383,6 +2545,11 @@
    "id": "c4-rooms-in-a-row",
    "title": "Rooms in a Row",
    "instructions": "Chapter 4: Loops in loops. Three rooms, each a square of 100. Walking around one room is a loop. Put that loop inside another loop that does it 3 times, with a `step(200)` to the next room after each lap.",
+   "hints": [
+    "The square loop works for one room. Now repeat the whole thing for each room.",
+    "Put `for room in range(3):` on top, indent the square loop under it, and walk to the next room after each lap.",
+    "Inside `for room in range(3):`, the square loop and then `___`, indented once."
+   ],
    "starterCode": "for side in range(4):\n    step(100)\n    turn(-90)\n",
    "par": {
     "lines": 5,
@@ -2446,6 +2613,11 @@
    "id": "c4-flower",
    "title": "Flower",
    "instructions": "One square petal is written. Put a loop around it that makes 6 petals, with `turn(60)` after each one. The inner loop runs all the way through every time the outer loop goes round once.",
+   "hints": [
+    "One petal is a square. Six petals, turning a little after each one.",
+    "Wrap the petal in `for petal in range(6):` and add a turn after the inner loop.",
+    "After the inner loop, but still inside the outer one: `turn(___)`."
+   ],
    "starterCode": "for side in range(4):\n    step(80)\n    turn(90)\n",
    "par": {
     "lines": 5,
@@ -2501,6 +2673,11 @@
    "id": "c4-nested-vaults",
    "title": "Nested Vaults",
    "instructions": "Five vaults share one corner, each 50 bigger than the last. The inner loop can use the outer loop's variable: walk the 4 sides of a vault with `step(size * 50)`.",
+   "hints": [
+    "Each vault is a square, and `size * 50` is the length of its side.",
+    "Replace the `print` with an inner loop that walks 4 sides of `size * 50`, turning left.",
+    "`for side in range(4):` with `step(___)` and `turn(-90)`."
+   ],
    "starterCode": "for size in range(1, 6):\n    print(size * 50)\n",
    "par": {
     "lines": 4,
@@ -2548,6 +2725,11 @@
    "id": "c4-which-loop",
    "title": "Which Loop?",
    "instructions": "Indentation decides which loop a line belongs to. `step(160)` should happen once per room, not once per side. Move it so it belongs to the outer loop.",
+   "hints": [
+    "Count the spaces in front of `step(160)`. Which loop does it belong to?",
+    "It's inside the inner loop, so it runs after every side. It should run once per room.",
+    "Indent `step(160)` so it lines up with `___`."
+   ],
    "starterCode": "for room in range(3):\n    for side in range(4):\n        step(80)\n        turn(-90)\n        step(160)\n",
    "par": {
     "lines": 5,
@@ -2611,6 +2793,11 @@
    "id": "c4-bar-chart",
    "title": "Bar Chart",
    "instructions": "Bar number `col` is `col` levels tall, with a chip on every level. Climb one level at a time with an inner `for level in range(col):`, come back down, then move 100 to the right.",
+   "hints": [
+    "Bar 1 has 1 chip, bar 2 has 2, and so on. Climb one level at a time.",
+    "Replace the comment with `for level in range(col):` and a step of 60 under it.",
+    "Between the two turns: `for level in range(col):` with `___(60)` indented under it."
+   ],
    "starterCode": "for col in range(1, 6):\n    turn(-90)\n    # climb col levels\n    turn(180)\n    step(col * 60)\n    turn(-90)\n    step(100)\n",
    "par": {
     "lines": 8,
@@ -2716,6 +2903,11 @@
    "id": "c4-grid-feed",
    "title": "Grid Feed",
    "instructions": "HQ sends `rows` and `cols`. Walk along a row collecting a chip every 80 steps, walk back, drop 80 down to the next row and turn to face right again. Rows outside, columns inside.",
+   "hints": [
+    "Get one row working first: collect `cols` chips going right.",
+    "After a row: turn round, walk back `80 * cols`, go down 80, then face right again.",
+    "After the inner loop: `turn(180)`, `step(80 * cols)`, `turn(-90)`, `step(80)`, `turn(___)`."
+   ],
    "starterCode": "for c in range(cols):\n    step(80)\n",
    "par": {
     "lines": 8,
@@ -2931,6 +3123,11 @@
    "id": "c4-garden-corners",
    "title": "Garden Corners",
    "instructions": "A spiral with a little 40-step room at each corner. Each lap of the spiral walks `i * 70`, sweeps the room with an inner loop (step 40, turn left, 4 times), then turns right.",
+   "hints": [
+    "The spiral already works. Add the small room at each corner.",
+    "Between `step(i * 70)` and `turn(90)`, add an inner loop that walks a 40 square.",
+    "`for side in range(4):` with `step(40)` and `turn(___)`."
+   ],
    "starterCode": "for i in range(1, 5):\n    step(i * 70)\n    turn(90)\n",
    "par": {
     "lines": 6,
@@ -2966,6 +3163,11 @@
    "id": "c4-mixed-up-names",
    "title": "Mixed-up Names",
    "instructions": "These vaults should grow, but every side is the wrong length, and the first one is 0. The inner loop uses the wrong loop variable. Which name holds the vault number?",
+   "hints": [
+    "Add `print(side * 50)` inside the loop to see what the sides really are.",
+    "`side` counts 0, 1, 2, 3 for the sides of one vault. The vault number is the outer loop's variable.",
+    "`step(___ * 50)`."
+   ],
    "starterCode": "for size in range(1, 6):\n    for side in range(4):\n        step(side * 50)\n        turn(90)\n",
    "par": {
     "lines": 4,
@@ -3013,6 +3215,11 @@
    "id": "c4-tents",
    "title": "Tents",
    "instructions": "Four triangle tents in a row. A triangle has 3 sides and you turn 120 degrees at each corner: use `turn(-120)` to go up and over. After each tent, `step(160)` to the next one.",
+   "hints": [
+    "One tent is a triangle: 3 sides of 100.",
+    "Inner loop: `step(100)` and `turn(-120)`, 3 times. Then move on to the next tent.",
+    "`for t in range(4):`, the triangle loop, then `___` to reach the next tent."
+   ],
    "par": {
     "lines": 5,
     "commands": 24
@@ -3082,6 +3289,11 @@
    "title": "Boss: Warehouse",
    "boss": true,
    "instructions": "Boss fight. Circle each rack (a square of `size`, going up with `turn(-90)`), with `step(size + 40)` to reach the next. After the last rack the red keycard is right in front of you. Then go down through the red door to the exit, 140 below.",
+   "hints": [
+    "Two parts: a loop over every rack, then the keycard and the exit.",
+    "`for r in range(racks):`, a square of `size` inside it, then `step(size + 40)`. After the loop, face down.",
+    "After the loop: `turn(90)` and `step(___)`."
+   ],
    "par": {
     "lines": 7,
     "commands": 47
@@ -3318,6 +3530,11 @@
    "id": "c5-hop",
    "title": "Hop",
    "instructions": "Chapter 5: Functions. A function gives a name to a group of orders: `def hop():` defines it and `hop()` runs it. The crates aren't evenly spaced, so a loop won't fit, but you can call `hop()` wherever you need it. Hop all three, then walk to the exit.",
+   "hints": [
+    "The function is ready. You just have to call it in the right places.",
+    "Walk 80, hop, walk 40, hop, walk 120, hop, then walk on to the exit.",
+    "`step(80)`, `hop()`, `step(40)`, `hop()`, `step(120)`, `hop()`, `step(___)`."
+   ],
    "starterCode": "def hop():\n    turn(-90)\n    step(80)\n    turn(90)\n    step(100)\n    turn(90)\n    step(80)\n    turn(-90)\n\nstep(80)\nhop()\n",
    "par": {
     "lines": 15,
@@ -3381,6 +3598,11 @@
    "id": "c5-detours",
    "title": "Detours",
    "instructions": "Three crates on three different walls. Write `def around():` once (turn left, 70, turn right, 120, turn right, 70, turn left). The turns are relative to the way Grep Fox faces, so the same detour works on every wall.",
+   "hints": [
+    "Finish the function first: left, 70, right, 120, right, 70, left.",
+    "Between detours you walk and turn: 100, around, 400, left, 100, around, 120, left, 100, around, 300.",
+    "`def around():` with `turn(-90)`, `step(70)`, `turn(90)`, `step(___)`, `turn(90)`, `step(70)`, `turn(___)`."
+   ],
    "starterCode": "def around():\n    turn(-90)\n    step(70)\n    # finish the detour\n\nstep(100)\naround()\n",
    "par": {
     "lines": 19,
@@ -3436,6 +3658,11 @@
    "id": "c5-square-sizes",
    "title": "Square Sizes",
    "instructions": "Functions can take inputs. In `def square(size):` the name `size` holds whatever number you pass in, so `square(80)` and `square(160)` walk different squares. Sizes here: 80, 160, 120 and 200, with steps of 120, 200 and 160 between them.",
+   "hints": [
+    "Write the square once, with `size` instead of a number.",
+    "Inside the function: `for side in range(4):` with `step(size)` and `turn(-90)`.",
+    "`square(80)`, `step(120)`, `square(160)`, `step(200)`, `square(___)`, `step(160)`, `square(___)`."
+   ],
    "starterCode": "def square(size):\n    # walk 4 sides of length size, turning left\n    pass\n\nsquare(80)\n",
    "par": {
     "lines": 11,
@@ -3497,6 +3724,11 @@
    "id": "c5-two-inputs",
    "title": "Two Inputs",
    "instructions": "A function can take more than one input: `def rect(w, h):`. Walk around three rectangles: `rect(200, 80)`, then `step(240)` and `rect(100, 240)`, then `step(140)` and `rect(150, 150)`.",
+   "hints": [
+    "A rectangle is width, turn, height, turn, done twice.",
+    "Inside `rect`: `for i in range(2):` with `step(w)`, `turn(-90)`, `step(h)`, `turn(-90)`.",
+    "`rect(200, 80)`, `step(240)`, `rect(100, 240)`, `step(___)`, `rect(150, 150)`."
+   ],
    "starterCode": "def rect(w, h):\n    pass\n",
    "par": {
     "lines": 11,
@@ -3548,6 +3780,11 @@
    "id": "c5-too-soon",
    "title": "Too Soon",
    "instructions": "Run this and read the error. Python reads your code from top to bottom, so a function has to be defined before the line that calls it. Move the `def` block to the top.",
+   "hints": [
+    "Read the error: when the loop runs, Python hasn't seen `zigzag` yet.",
+    "Move the whole `def zigzag():` block, with all its indented lines, above the loop.",
+    "Order: first `def zigzag():` and its lines, then `for i in range(3):` and `___`."
+   ],
    "starterCode": "for i in range(3):\n    zigzag()\n\ndef zigzag():\n    turn(-45)\n    step(141)\n    turn(90)\n    step(141)\n    turn(-45)\n",
    "par": {
     "lines": 8,
@@ -3597,6 +3834,11 @@
    "id": "c5-flights",
    "title": "Flights",
    "instructions": "A function can call another function. `stair()` climbs one stair. Write `flight(n)` to climb `n` stairs with a loop, then climb flights of 3, 2 and 4 with a `step(80)` landing between them.",
+   "hints": [
+    "`flight(n)` repeats `stair()` n times.",
+    "Inside `flight`: `for i in range(n):` with `stair()` under it.",
+    "`flight(3)`, `step(80)`, `flight(2)`, `step(80)`, `flight(___)`, `step(60)`."
+   ],
    "starterCode": "def stair():\n    step(50)\n    turn(-90)\n    step(40)\n    turn(90)\n\ndef flight(n):\n    pass\n",
    "par": {
     "lines": 14,
@@ -3632,6 +3874,11 @@
    "id": "c5-branches",
    "title": "Branches",
    "instructions": "Each branch off the hall has a chip at its end, and every branch is a different length. Write `branch(length)`: turn left, go in, turn around, come back, turn left. Branches are 150, 250 and 90 long and 150 apart, starting 100 ahead.",
+   "hints": [
+    "One branch: go in, turn round, come out, and face along the hall again.",
+    "`turn(-90)`, `step(length)`, `turn(180)`, `step(length)`, `turn(-90)`.",
+    "`step(100)`, `branch(150)`, `step(150)`, `branch(250)`, `step(150)`, `branch(___)`, `step(260)`."
+   ],
    "starterCode": "def branch(length):\n    pass\n\nstep(100)\nbranch(150)\n",
    "par": {
     "lines": 13,
@@ -3693,6 +3940,11 @@
    "id": "c5-mixed-signals",
    "title": "Mixed Signals",
    "instructions": "`rect(w, h)` takes the width first and the height second, but the call gives them the other way round, so Grep Fox runs into the laser. Inputs are matched by position. Fix the call.",
+   "hints": [
+    "Which side of the crate is long and which is short?",
+    "The first number goes into `w` (along), the second into `h` (up).",
+    "`rect(___, ___)`, with the long side first."
+   ],
    "starterCode": "def rect(w, h):\n    for i in range(2):\n        step(w)\n        turn(-90)\n        step(h)\n        turn(-90)\n\nrect(120, 320)\n",
    "par": {
     "lines": 7,
@@ -3740,6 +3992,11 @@
    "id": "c5-function-feed",
    "title": "Function Feed",
    "instructions": "Two vaults, a small one and a big one, and their sizes change every night. HQ sends `small` and `big`. Write `vault(size)` once and call it with each. There is a gap of 60 between the vaults.",
+   "hints": [
+    "The function is ready. Call it with the sizes HQ sends.",
+    "`vault(small)`, then walk to the next vault: the small vault's width plus the gap of 60.",
+    "`vault(small)`, `step(___ + 60)`, `vault(big)`."
+   ],
    "starterCode": "def vault(size):\n    for side in range(4):\n        step(size)\n        turn(-90)\n",
    "par": {
     "lines": 7,
@@ -3859,6 +4116,11 @@
    "boss": true,
    "gadget": "drone",
    "instructions": "Boss fight. Station `i` is a square of `i * 40`, and there are `stations` of them, 40 apart. Write `station(size)`, loop over the stations, then grab the blue keycard and go up through the blue door to the exit, 320 above. Beat this boss to unlock the drone.",
+   "hints": [
+    "Write `station(size)` as a square, then loop over the station numbers.",
+    "`for i in range(1, stations + 1):` gives 1, 2, 3 and so on. Call `station(i * 40)`, then `step(i * 40 + 40)`.",
+    "After the loop, the blue keycard is under you: `turn(-90)` and `step(___)` up to the exit."
+   ],
    "starterCode": "def station(size):\n    pass\n",
    "par": {
     "lines": 9,
@@ -4045,6 +4307,11 @@
    "id": "c6-drone-launch",
    "title": "Drone Launch",
    "instructions": "Chapter 6: Objects. The drone is an object: `d = launch_drone()` stores it in `d`, and `d.step(400)` gives the order to the drone instead of Grep Fox. It flies over lasers. Fly it to the fuse box, `d.zap()` it, then walk Grep Fox to the chip.",
+   "hints": [
+    "The drone flies over lasers, Grep Fox doesn't. Who should go first?",
+    "`d.step(400)` flies the drone to the fuse box, and `d.zap()` switches the laser off.",
+    "`d.step(400)`, `d.zap()`, then `step(___)` for Grep Fox."
+   ],
    "starterCode": "d = launch_drone()\n",
    "par": {
     "lines": 4,
@@ -4088,6 +4355,11 @@
    "id": "c6-battery-budget",
    "title": "Battery Budget",
    "instructions": "The drone only has 300 battery, and every step uses some. Flying right and then up costs too much. Objects have methods that answer questions: `d.turn_to(fuses[0])` and `d.distance_to(fuses[0])` take the straight line. Use `print(d.battery)` to check what's left.",
+   "hints": [
+    "Run it and `print(d.battery)`: the battery runs out before the fuse box.",
+    "A straight line is shorter than right-then-up. `d.turn_to(fuses[0])` aims the drone right at it.",
+    "`d.turn_to(fuses[0])`, `d.step(d.distance_to(___))`, `d.zap()`, then walk Grep Fox to the chip."
+   ],
    "starterCode": "d = launch_drone()\nd.step(180)\nd.turn(-90)\nd.step(200)\nd.zap()\n",
    "par": {
     "lines": 5,
@@ -4131,6 +4403,11 @@
    "id": "c6-chip-list",
    "title": "Chip List",
    "instructions": "Lists. `chips` is a list of every chip in the room, and `for c in chips:` takes them one at a time. `turn_to(c)` faces a chip and `distance_to(c)` says how far away it is. The chips move every night, so let the list do the counting.",
+   "hints": [
+    "Run `print(chips)` to see the list. The positions change every night.",
+    "`for c in chips:` takes the chips one at a time, and `c` is the chip for this pass.",
+    "`for c in chips:` with `turn_to(c)` and `step(distance_to(___))`."
+   ],
    "starterCode": "print(chips)\n",
    "par": {
     "lines": 3,
@@ -4239,6 +4516,11 @@
    "id": "c6-who-goes",
    "title": "Who Goes?",
    "instructions": "Grep Fox is an object too: `fox`. Write `go(who, target)` so it works for any agent: `who.turn_to(target)`, then `who.step(who.distance_to(target))`. Send the drone to the fuse box and zap it, then send `fox` to every chip in the laser box.",
+   "hints": [
+    "`who` can be the drone `d` or Grep Fox `fox`, and `who.step(...)` orders that one.",
+    "Finish `go` with `who.step(who.distance_to(target))`. Then drone to the fuse box, zap, Grep Fox to the chips.",
+    "`go(d, fuses[0])`, `d.zap()`, then `for c in chips:` with `go(___, c)`."
+   ],
    "starterCode": "def go(who, target):\n    who.turn_to(target)\n    # move who all the way to target\n\nd = launch_drone()\ngo(d, fuses[0])\n",
    "par": {
     "lines": 8,
@@ -4437,6 +4719,11 @@
    "id": "c6-backwards",
    "title": "Backwards",
    "instructions": "Tonight the list is in the worst order: `chips[0]` is behind the red door, and the red keycard sits on the last chip, `chips[-1]`. `reversed(chips)` goes through a list from the end to the start.",
+   "hints": [
+    "Run it: Grep Fox walks into the red door because `chips[0]` is behind it.",
+    "`reversed(chips)` gives the chips from last to first, so you pick up the keycard first.",
+    "Change only the first line: `for c in ___(chips):`."
+   ],
    "starterCode": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n",
    "par": {
     "lines": 3,
@@ -4560,6 +4847,11 @@
    "id": "c6-right-angles",
    "title": "Right Angles",
    "instructions": "A searchlight sits on every straight line between chips. Go along the floor lines instead: first across to the corner `(c.x, fox.y)`, then up or down to the chip. Every object has `x` and `y`, and `(c.x, fox.y)` makes a new point from them.",
+   "hints": [
+    "Straight lines between chips run through the searchlights. Walk along the floor lines instead.",
+    "Go across first, to the corner point `(c.x, fox.y)`, then up or down to the chip.",
+    "Inside the loop: `corner = (c.x, fox.y)`, `turn_to(corner)`, `step(distance_to(corner))`, then `turn_to(c)` and `step(___)`."
+   ],
    "starterCode": "for c in chips:\n    turn_to(c)\n    step(distance_to(c))\n",
    "par": {
     "lines": 6,
@@ -4686,6 +4978,11 @@
    "id": "c6-fuse-chain",
    "title": "Fuse Chain",
    "instructions": "Two laser fences, each wired to its own fuse box, and just enough battery to fly from one fuse box to the next. `fuses` is a list too: loop over it with the drone, zapping each one, then loop over `chips` with Grep Fox.",
+   "hints": [
+    "Zap the fuse boxes in list order: the battery only lasts if you fly from one to the next.",
+    "`for f in fuses:` with the drone turning to `f`, flying the distance to `f`, and zapping. Then a chip loop for Grep Fox.",
+    "Inside the fuse loop: `d.turn_to(f)`, `d.step(d.distance_to(___))`, `d.zap()`."
+   ],
    "starterCode": "d = launch_drone()\n",
    "par": {
     "lines": 8,
@@ -4856,6 +5153,11 @@
    "id": "c6-wrong-agent",
    "title": "Wrong Agent",
    "instructions": "One order went to the wrong agent: Grep Fox walks straight into the laser while the drone stays home. The name before the dot decides who obeys. Fix that one line.",
+   "hints": [
+    "Which line moves Grep Fox when it should move the drone?",
+    "`step(300)` has nothing before it, so Grep Fox obeys. The drone needs `d.` in front.",
+    "Line 2 should be `___.step(300)`."
+   ],
    "starterCode": "d = launch_drone()\nstep(300)\nd.zap()\nstep(500)\n",
    "par": {
     "lines": 4,
@@ -4913,6 +5215,11 @@
    "id": "c6-waypoints",
    "title": "Waypoints",
    "instructions": "You can make your own lists: `route = [(250, 100), (550, 100)]` is a list of points. Add the points that take Grep Fox over the crates and down to the last chip at `(700, 400)`, and the loop does the walking.",
+   "hints": [
+    "A straight line to the last chip goes through the crates. Go over them instead.",
+    "Add points to the list: up to the top, across, down past the crates, then to the chip.",
+    "`route = [(250, 100), (550, 100), (550, 400), (___, ___)]`."
+   ],
    "starterCode": "route = [(250, 100)]\nfor p in route:\n    turn_to(p)\n    step(distance_to(p))\n",
    "par": {
     "lines": 4,
@@ -4956,6 +5263,11 @@
    "boss": true,
    "gadget": "scanner",
    "instructions": "Boss fight. The laser box is wired to two fuse boxes, and the drone has just enough battery for both. Write `go(who, target)`, zap every fuse with the drone, send Grep Fox to every chip, then to the `exit_pad`. Beat this boss to unlock the scanner.",
+   "hints": [
+    "Order: drone zaps every fuse box, Grep Fox collects every chip, then the exit.",
+    "`d = launch_drone()`, then `for f in fuses:` with `go(d, f)` and `d.zap()`.",
+    "After the fuse loop: `for c in chips:` with `go(fox, c)`, then `go(fox, ___)`."
+   ],
    "starterCode": "def go(who, target):\n    who.turn_to(target)\n    who.step(who.distance_to(target))\n",
    "par": {
     "lines": 10,
@@ -5176,6 +5488,11 @@
    "id": "c7-decoys",
    "title": "Decoys",
    "instructions": "Chapter 7: Decisions. Some chips are decoys wired to the alarm, and they change every night. Every chip has `trapped`, which is `True` or `False`. `if not c.trapped:` runs the lines under it only for real chips.",
+   "hints": [
+    "Hover over the chips: decoys say `trapped = True`.",
+    "Only go to a chip when it isn't trapped: `if not c.trapped:`.",
+    "Inside the loop: `if not c.trapped:` with `___(c)` indented under it."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n\nfor c in chips:\n    go(c)\n",
    "par": {
     "lines": 6,
@@ -5277,6 +5594,11 @@
    "id": "c7-short-or-long",
    "title": "Short or Long",
    "instructions": "Some nights the red keycard is on the floor ahead of you, and some nights it isn't. `has_key('red')` is `True` or `False`. Use `if` for the short way through the red door and `else` for the long way over the top (up 170, along 450, down 170).",
+   "hints": [
+    "Some nights the door opens and some nights it doesn't. The `if` handles one case, you need the other.",
+    "`else:` runs when `has_key('red')` is False. That's the long way over the top.",
+    "`else:` with `turn(-90)`, `step(170)`, `turn(90)`, `step(450)`, `turn(90)`, `step(___)`."
+   ],
    "starterCode": "step(100)\nif has_key('red'):\n    step(450)\n",
    "par": {
     "lines": 10,
@@ -5428,6 +5750,11 @@
    "id": "c7-fork",
    "title": "Fork",
    "instructions": "You've unlocked the scanner: `ahead()` says how far Grep Fox can walk before hitting something. At the fork, one way is blocked tonight. Face left, and if `ahead()` is less than 60, turn around. Walk 300 to the end of the hall, then `turn_to(chips[0])` and step 100.",
+   "hints": [
+    "Run it: `print(ahead())` shows a small number when the way is blocked.",
+    "If `ahead()` is less than 60, the left way is blocked, so turn round to face the other way.",
+    "`if ahead() < 60:` with `turn(___)` under it, then `step(300)`, `turn_to(chips[0])`, `step(100)`."
+   ],
    "starterCode": "step(200)\nturn(-90)\nprint(ahead())\n",
    "par": {
     "lines": 7,
@@ -5635,6 +5962,11 @@
    "id": "c7-color-code",
    "title": "Color Code",
    "instructions": "Tonight's keycard could be red, blue or green, and each opens one hall: red at the top, blue in the middle, green at the bottom. `elif` checks another condition only if the ones above it were False, and `else` catches the rest.",
+   "hints": [
+    "Three colors, three halls. The middle hall (blue) is straight ahead.",
+    "`elif has_key('green'):` handles green, and blue needs no turns at all.",
+    "`elif has_key('green'):` with `turn(90)`, `step(150)`, `turn(___)`, then `step(450)` and walk to the exit."
+   ],
    "starterCode": "step(100)\nif has_key('red'):\n    turn(-90)\n    step(150)\n    turn(90)\n",
    "par": {
     "lines": 14,
@@ -5830,6 +6162,11 @@
    "id": "c7-equals",
    "title": "Equals",
    "instructions": "Run this and read the error. In Python `=` stores a value and `==` compares two values. For `True` or `False` you can skip the comparison: `if c.trapped:` is enough.",
+   "hints": [
+    "Read the error: Python doesn't expect `=` inside an `if`.",
+    "`=` stores a value and `==` compares. Or write `if not c.trapped:`.",
+    "`if c.trapped ___ False:`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n\nfor c in chips:\n    if c.trapped = False:\n        go(c)\n",
    "par": {
     "lines": 6,
@@ -5900,6 +6237,11 @@
    "id": "c7-turn-at-walls",
    "title": "Turn at Walls",
    "instructions": "A different maze every night, but each one only ever turns right. Repeat one simple rule: if `ahead()` is under 60, `turn(90)`, otherwise `step(100)`. A loop of 30 is plenty, because the mission ends as soon as the chip is yours.",
+   "hints": [
+    "Grep Fox needs to decide at every step: wall ahead or not?",
+    "`if ahead() < 60:` then turn right, `else:` step 100.",
+    "Inside the loop: `if ahead() < 60:` with `turn(90)`, `else:` with `___`."
+   ],
    "starterCode": "for i in range(30):\n    step(100)\n",
    "par": {
     "lines": 5,
@@ -6047,6 +6389,11 @@
    "id": "c7-stray-line",
    "title": "Stray Line",
    "instructions": "Grep Fox stops turning towards decoys, but still walks off for each one. Indentation decides what belongs to the `if`. Find the line that slipped out of the `if` block.",
+   "hints": [
+    "Which line still runs for decoys? Look at the spaces in front of each line.",
+    "`step(distance_to(c))` isn't inside the `if`, so it runs for every chip.",
+    "Indent the `step` line so it lines up with `___`."
+   ],
    "starterCode": "for c in chips:\n    if not c.trapped:\n        turn_to(c)\n    step(distance_to(c))\n",
    "par": {
     "lines": 4,
@@ -6148,6 +6495,11 @@
    "id": "c7-gatekeeper",
    "title": "Gatekeeper",
    "instructions": "A laser fence splits the room, and the only gap is at the top, around `(400, 75)`. Before each chip, check: if the chip is on the right (`c.x > 400`) `and` Grep Fox is on the left (`fox.x < 400`), go through the gap first. Then the same check the other way.",
+   "hints": [
+    "Crossing the laser fence is only safe through the gap at the top.",
+    "Before each chip, check whether the chip and Grep Fox are on different sides. If they are, go through the gap first.",
+    "`if c.x > 400 and fox.x < 400:` with `go((370, 75))` and `go((430, 75))`. Then `elif` for the other way: `go((___, 75))`, `go((___, 75))`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n\nfor c in chips:\n    go(c)\n",
    "par": {
     "lines": 11,
@@ -6279,6 +6631,11 @@
    "id": "c7-maze-runner",
    "title": "Maze Runner",
    "instructions": "These mazes turn both ways. When the way ahead is blocked, try turning right, and if that's blocked too, turn all the way round to face left. An `if` inside an `if` lets you make the second check only when you need it.",
+   "hints": [
+    "When turning right still faces a wall, the open way is behind you.",
+    "After `turn(90)`, check `ahead()` again, and if it's still blocked, `turn(180)`.",
+    "Under `turn(90)`: `if ahead() < 60:` with `turn(___)`."
+   ],
    "starterCode": "for i in range(40):\n    if ahead() < 60:\n        turn(90)\n    else:\n        step(100)\n",
    "par": {
     "lines": 7,
@@ -6463,6 +6820,11 @@
    "title": "Boss: Checkpoint",
    "boss": true,
    "instructions": "Boss fight. Skip the decoys, use the gap at the top of the laser fence to change sides, then go to `(560, 250)`. If the red keycard was there, go down to `(560, 420)` and through the red door to the exit. If not, go round through `(770, 300)` and `(770, 430)`.",
+   "hints": [
+    "Three parts: real chips (using the gap), then `(560, 250)`, then the way to the exit.",
+    "The chip loop is Gatekeeper with an extra `if not c.trapped:` around it. Make sure you're on the right side before `(560, 250)`.",
+    "At `(560, 250)`: `if has_key('red'):` with `go((560, 420))` and `go(exit_pad)`, `else:` with `go((770, 300))`, `go((770, 430))`, `go(___)`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n",
    "par": {
     "lines": 23,
@@ -6681,6 +7043,11 @@
    "id": "c8-until-the-exit",
    "title": "Until the Exit",
    "instructions": "Chapter 8: While loops. `for` repeats a set number of times, but `while` repeats as long as something is true. The exit is a different distance away every night. Keep stepping 100 `while fox.x < exit_pad.x:`.",
+   "hints": [
+    "Run it: the loop never ends, because nothing moves Grep Fox.",
+    "Inside the `while`, step forward so `fox.x` grows.",
+    "Replace `print(fox.x)` with `step(___)`."
+   ],
    "starterCode": "while fox.x < exit_pad.x:\n    print(fox.x)\n",
    "par": {
     "lines": 2,
@@ -6798,6 +7165,11 @@
    "id": "c8-unknown-hurdles",
    "title": "Unknown Hurdles",
    "instructions": "Tonight there could be 1, 2 or 3 crates. `hop()` clears one crate and lands 200 further on. Hop `while` Grep Fox is still short of the exit, then take the last 60 steps.",
+   "hints": [
+    "You don't know how many crates there are, but you know where the exit is.",
+    "`while fox.x < exit_pad.x - 60:` keeps hopping until Grep Fox is 60 short of the exit.",
+    "`while fox.x < exit_pad.x - 60:` with `hop()`, then `step(___)`."
+   ],
    "starterCode": "def hop():\n    turn(-90)\n    step(80)\n    turn(90)\n    step(100)\n    turn(90)\n    step(80)\n    turn(-90)\n    step(100)\n\nhop()\n",
    "par": {
     "lines": 12,
@@ -6939,6 +7311,11 @@
    "id": "c8-maze-and-out",
    "title": "Maze and Out",
    "instructions": "Use your maze rule, but this time don't stop when the chip is collected: then you still need to leave by the exit. Loop `while not chips[0].collected:`, then `turn_to(exit_pad)` and step 100.",
+   "hints": [
+    "Use the maze rule from Maze Runner, but keep going only until the chip is collected.",
+    "`while not chips[0].collected:` with the maze rule inside. After the loop, face the exit.",
+    "After the loop: `turn_to(exit_pad)` and `step(___)`."
+   ],
    "starterCode": "while not chips[0].collected:\n    step(100)\n",
    "par": {
     "lines": 9,
@@ -7134,6 +7511,11 @@
    "id": "c8-blink",
    "title": "Blink",
    "instructions": "This laser switches on and off, and the timing changes every night. Walk up to it (260 steps), wait `while lasers[0].on:` in small `wait(0.1)` steps, and cross as soon as it goes off.",
+   "hints": [
+    "A fixed `wait` only works on some nights, because the timing changes.",
+    "`while lasers[0].on:` with `wait(0.1)` waits exactly as long as needed.",
+    "`step(260)`, `while lasers[0].on:` with `wait(0.1)`, then `step(___)`."
+   ],
    "starterCode": "step(260)\nwait(1)\nstep(290)\n",
    "par": {
     "lines": 4
@@ -7214,6 +7596,11 @@
    "id": "c8-gauntlet",
    "title": "Gauntlet",
    "instructions": "Three blinking lasers, each with its own rhythm. A laser that's off right now might switch on while you're crossing, so wait for a fresh gap: wait `while laser.on`, and before that, wait `while not laser.on` so you catch the moment it switches off. Walk to 40 short of each laser (`laser.x - 40 - fox.x`), then cross with `step(80)`.",
+   "hints": [
+    "A laser that is off right now might switch on while you cross. Wait for it to switch off fresh.",
+    "Two `while` loops: wait while it's off, then wait while it's on. Then cross.",
+    "`while not laser.on:` with `wait(0.1)`, `while laser.on:` with `wait(0.1)`, then `step(80)`. After the loop, `step(700 - ___)`."
+   ],
    "starterCode": "for laser in lasers:\n    step(laser.x - 40 - fox.x)\n",
    "par": {
     "lines": 8
@@ -7378,6 +7765,11 @@
    "id": "c8-watch-the-bug",
    "title": "Watch the Bug",
    "instructions": "A Sentry Bug patrols up and down across your path, at a different speed every night. Your code can watch it: wait `while guards[0].y > 100:`, so you set off the moment it reaches the top. Then cross.",
+   "hints": [
+    "The bug's speed changes every night, so a fixed `wait` can't work every time.",
+    "Watch the bug's `y`: when it's above 100, it's at the top and looking away.",
+    "`step(150)`, `while guards[0].y > 100:` with `wait(0.1)`, then `step(___)`."
+   ],
    "starterCode": "step(150)\nwait(2)\nstep(400)\n",
    "par": {
     "lines": 4
@@ -7551,6 +7943,11 @@
    "id": "c8-counter",
    "title": "Counter",
    "instructions": "Walk down the hall 100 at a time `while ahead() > 60:`, grab the chip at the end, then come all the way back to the exit where you started. A variable that goes up by 1 each time round, `count = count + 1`, remembers how far you went.",
+   "hints": [
+    "To walk back, you need to remember how many steps of 100 you took.",
+    "Inside the loop, `count = count + 1` after each step. After the loop, turn round.",
+    "After the loop: `turn(180)` and `step(100 * ___)`."
+   ],
    "starterCode": "count = 0\nwhile ahead() > 60:\n    step(100)\n",
    "par": {
     "lines": 6,
@@ -7674,6 +8071,11 @@
    "id": "c8-endless",
    "title": "Endless",
    "instructions": "This loop never ends: nothing inside it changes `fox.x`, so the condition stays True forever and HQ stops the mission. Make Grep Fox move inside the loop.",
+   "hints": [
+    "`wait` lets time pass, but Grep Fox stays where it is, so `fox.x` never changes.",
+    "Replace the `wait` with a step so `fox.x` grows each time round.",
+    "`while fox.x < 600:` with `step(___)`."
+   ],
    "starterCode": "while fox.x < 600:\n    wait(0.1)\n",
    "par": {
     "lines": 2,
@@ -7715,6 +8117,11 @@
    "id": "c8-two-bugs",
    "title": "Two Bugs",
    "instructions": "Two Sentry Bugs at different speeds. Wait `while guards[0].y > 100:` so you cross the first one's path as it reaches the top, wait at the chip between the crates, then do the same for `guards[1]`.",
+   "hints": [
+    "Treat each bug on its own: wait for it, then cross its path.",
+    "After the first wait, `step(300)` to the chip between the crates, then wait for `guards[1]`.",
+    "`while guards[1].y > 100:` with `wait(0.1)`, then `step(___)`."
+   ],
    "starterCode": "while guards[0].y > 100:\n    wait(0.1)\n",
    "par": {
     "lines": 6
@@ -7905,6 +8312,11 @@
    "boss": true,
    "gadget": "hack",
    "instructions": "Boss fight. Along the bottom hall: grab the first chip, wait out the blinking laser, hop over the decoy (up 60, along 80, down 60), grab the next chip. Then wait for the Sentry Bug to reach the top of its patrol, and run for the exit. Beat this boss to unlock the hacking kit.",
+   "hints": [
+    "Work along the hall one danger at a time: laser, decoy, bug.",
+    "After the first chip: step 30, wait while the laser is on, cross, hop the decoy, collect the next chip. Then wait for the bug.",
+    "At the end: `while guards[0].y > 100:` with `wait(0.1)`, then `go(___)`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n",
    "par": {
     "lines": 19
@@ -8108,6 +8520,11 @@
    "id": "c9-first-hack",
    "title": "First Hack",
    "instructions": "Chapter 9: Problem solving. You have the hacking kit. Next to a terminal, `hack(answer)` sends an answer, and a wrong one sets off the alarm. Tonight's question: what is the total of `terminals[0].data`? Add it up with a loop: `total = total + n`.",
+   "hints": [
+    "Run `print(terminals[0].data)` to see the numbers.",
+    "`total = 0`, then add each number: `for n in terminals[0].data:` with `total = total + n`.",
+    "After the loop: `hack(___)`, then `step(550)` through the open door."
+   ],
    "starterCode": "print(terminals[0].data)\ntotal = 0\n",
    "par": {
     "lines": 5,
@@ -8270,6 +8687,11 @@
    "id": "c9-biggest",
    "title": "Biggest",
    "instructions": "The terminal wants the biggest number in its data. Start with `biggest = data[0]`, then go through the list: `if n > biggest:`, keep `n` instead.",
+   "hints": [
+    "Keep the biggest number you've seen so far, and check every number against it.",
+    "`for n in data:` with `if n > biggest:` and `biggest = n` under it.",
+    "After the loop: `hack(___)` and `step(550)`."
+   ],
    "starterCode": "data = terminals[0].data\nbiggest = data[0]\n",
    "par": {
     "lines": 7,
@@ -8432,6 +8854,11 @@
    "id": "c9-count-them",
    "title": "Count Them",
    "instructions": "Question: how many numbers in the data are more than 50? Start a counter at 0 and add 1 each time `n > 50`.",
+   "hints": [
+    "Go through every number and count only the ones over 50.",
+    "`for n in terminals[0].data:` with `if n > 50:` and `count = count + 1`.",
+    "After the loop: `hack(___)` and `step(550)`."
+   ],
    "starterCode": "count = 0\n",
    "par": {
     "lines": 6,
@@ -8598,6 +9025,11 @@
    "id": "c9-return",
    "title": "Return",
    "instructions": "Two terminals ask the same question: the total of their data. Write `total(numbers)` once. `return result` hands the answer back to whoever called it, so `hack(total(terminals[0].data))` works. The second terminal is 230 further on.",
+   "hints": [
+    "Finish `total` first: add each number to `result`.",
+    "Inside `total`: `for n in numbers:` with `result = result + n`, then `return result` after the loop.",
+    "`hack(total(terminals[0].data))`, `step(230)`, `hack(total(terminals[___].data))`, `step(370)`."
+   ],
    "starterCode": "def total(numbers):\n    result = 0\n    # add up the numbers\n    return result\n",
    "par": {
     "lines": 9,
@@ -8810,6 +9242,11 @@
    "id": "c9-build-a-list",
    "title": "Build a List",
    "instructions": "Make a new list of only the real chips: start with `real = []` and `real.append(c)` for every chip that isn't trapped. The terminal asks how many there are: `len(real)`. Then go and collect them.",
+   "hints": [
+    "Make a new list of only the chips that aren't trapped.",
+    "`for c in chips:` with `if not c.trapped:` and `real.append(c)`.",
+    "`hack(len(real))`, then `for c in real:` and go to `___`."
+   ],
    "starterCode": "real = []\n",
    "par": {
     "lines": 10,
@@ -8959,6 +9396,11 @@
    "id": "c9-average",
    "title": "Average",
    "instructions": "The terminal wants the average of its data: the total divided by how many numbers there are. `len(data)` counts them, and `/` divides.",
+   "hints": [
+    "An average is the total divided by how many numbers there are.",
+    "Add the numbers up with a loop, then divide by `len(data)`.",
+    "`hack(total / ___)` and `step(550)`."
+   ],
    "starterCode": "data = terminals[0].data\n",
    "par": {
     "lines": 6,
@@ -9120,6 +9562,11 @@
    "id": "c9-print-or-return",
    "title": "Print or Return",
    "instructions": "`biggest` shows the right number under your code, but the terminal still says ACCESS DENIED. `print` only shows a value; it doesn't hand it back. A function with no `return` gives back `None`.",
+   "hints": [
+    "The number is right, but `hack` doesn't get it. What does the function hand back?",
+    "`print` only shows a value. `return` hands it back to the line that called the function.",
+    "Change the last line of the function to `___ best`."
+   ],
    "starterCode": "def biggest(numbers):\n    best = numbers[0]\n    for n in numbers:\n        if n > best:\n            best = n\n    print(best)\n\nhack(biggest(terminals[0].data))\nstep(550)\n",
    "par": {
     "lines": 8,
@@ -9229,6 +9676,11 @@
    "id": "c9-nearest-first",
    "title": "Nearest First",
    "instructions": "The chips sit in a ring around a searchlight, and the list jumps across the ring, so going in list order walks straight into the light. Write `nearest()` to return the closest chip not yet collected, and always go to that one next.",
+   "hints": [
+    "Going in list order walks across the ring and into the light. Always go to the closest chip instead.",
+    "In `nearest()`, keep the best chip so far: skip collected ones, and keep `c` if there's no best yet or `c` is closer.",
+    "Then: `for i in range(len(chips)):` with `go(___())`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n\nfor c in chips:\n    go(c)\n",
    "par": {
     "lines": 12,
@@ -9385,6 +9837,11 @@
    "id": "c9-sorted",
    "title": "Sorted",
    "instructions": "This terminal wants its data back in order, from smallest to largest. Python has a built-in function for that: `sorted(data)` returns a new, sorted list.",
+   "hints": [
+    "The terminal wants the same numbers, in order from smallest to largest.",
+    "`sorted(data)` gives you a new list in order.",
+    "`hack(___(data))`, then `step(550)`."
+   ],
    "starterCode": "data = terminals[0].data\nprint(data)\n",
    "par": {
     "lines": 3,
@@ -9565,6 +10022,11 @@
    "title": "Boss: Data Heist",
    "boss": true,
    "instructions": "Boss fight. The terminal asks how many decoys are in the room. Then collect every real chip, always the nearest one next, so you go round the ring and not across the searchlight in the middle. Finish on the exit pad.",
+   "hints": [
+    "Two jobs: count the decoys for the terminal, then collect real chips nearest first.",
+    "Count with `if c.trapped:`. In `nearest()`, skip chips that are collected or trapped.",
+    "After hacking: go to `nearest()` once for each real chip, then `go(___)`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n",
    "par": {
     "lines": 22,
@@ -9795,6 +10257,11 @@
    "id": "c10-recon",
    "title": "Recon",
    "instructions": "Chapter 10: Final operations. Everything you know, in one mission. Zap every fuse with the drone, collect only the real chips inside the laser box, and leave by the exit pad.",
+   "hints": [
+    "Same plan as Blackout, with decoys in the box.",
+    "Drone: zap every fuse box. Grep Fox: only chips that aren't trapped. Then the exit.",
+    "`for c in chips:` with `if not c.trapped:` and `go(fox, c)`, then `go(fox, ___)`."
+   ],
    "starterCode": "def go(who, target):\n    who.turn_to(target)\n    who.step(who.distance_to(target))\n",
    "par": {
     "lines": 11,
@@ -10026,6 +10493,11 @@
    "id": "c10-locksmith",
    "title": "Locksmith",
    "instructions": "Each chip is locked in a cell behind a colored door, and the keycards are scattered around the room. Loop over `keys` to collect every keycard, then for each chip go to `(520, c.y)` in front of its door, walk in, and come back out the same way.",
+   "hints": [
+    "Collect every keycard first, then visit the cells.",
+    "`for k in keys:` with `go(k)`. For each chip, walk to the front of its cell before going in.",
+    "`for c in chips:` with `go((520, c.y))`, `go(c)`, `go((520, ___))`."
+   ],
    "starterCode": "def go(target):\n    turn_to(target)\n    step(distance_to(target))\n",
    "par": {
     "lines": 9,
@@ -10389,6 +10861,11 @@
    "id": "c10-guard-rotation",
    "title": "Guard Rotation",
    "instructions": "Two Sentry Bugs and a blinking laser. Write `wait_top(g)` that waits until a guard reaches the top, and `wait_gap(laser)` that waits for a fresh gap. Then: wait for bug 0, step 290 to the chip, wait for bug 1, step 290, wait for the gap, step 100.",
+   "hints": [
+    "Write the two waiting functions first, then use them in order.",
+    "`wait_top(g)`: `while g.y > 100:` with `wait(0.1)`. `wait_gap(laser)`: wait while it's off, then while it's on.",
+    "`wait_top(guards[0])`, `step(290)`, `wait_top(guards[1])`, `step(290)`, `wait_gap(___)`, `step(100)`."
+   ],
    "starterCode": "def wait_top(g):\n    pass\n\ndef wait_gap(laser):\n    pass\n",
    "par": {
     "lines": 14
@@ -10607,6 +11084,11 @@
    "id": "c10-code-breaker",
    "title": "Code Breaker",
    "instructions": "Two terminals, two questions. The first wants the biggest number in its data. The second, 230 further on, wants how many of its numbers are over 50. Write a function for each, with `return`.",
+   "hints": [
+    "Write each function with `return`, then hack each terminal.",
+    "`biggest`: keep the biggest so far. `count_over`: add 1 when `n > limit`.",
+    "`hack(biggest(terminals[0].data))`, `step(230)`, `hack(count_over(terminals[1].data, ___))`, `step(370)`."
+   ],
    "starterCode": "def biggest(numbers):\n    pass\n\ndef count_over(numbers, limit):\n    pass\n",
    "par": {
     "lines": 16,
@@ -10820,6 +11302,11 @@
    "id": "c10-spiral-vault",
    "title": "Spiral Vault",
    "instructions": "A spiral of corner rooms that changes every night. HQ sends `first` (the first side), `grow` (how much longer each side gets) and `turns`. At each corner, sweep a 40 room with `turn(-90)`, then turn right and carry on.",
+   "hints": [
+    "This is Garden Corners with the numbers coming from HQ.",
+    "Loop `turns` times: walk `side`, sweep a 40 square with `turn(-90)`, `turn(90)`, then make `side` longer.",
+    "Last line inside the loop: `side = side + ___`."
+   ],
    "starterCode": "side = first\n",
    "par": {
     "lines": 8,
@@ -10926,6 +11413,11 @@
    "id": "c10-scanner-sweep",
    "title": "Scanner Sweep",
    "instructions": "A maze with chips along the way and the exit at the far end. Follow your maze rule `while distance_to(exit_pad) > 30:`.",
+   "hints": [
+    "`pass` does nothing, so this loop never ends. Put your maze rule inside it.",
+    "The maze rule: if blocked, turn right, and if still blocked, turn all the way round. Otherwise step 100.",
+    "Inside the `while`: `if ahead() < 60:` with `turn(90)` and another `if ahead() < 60:` with `turn(180)`, `else:` with `___`."
+   ],
    "starterCode": "while distance_to(exit_pad) > 30:\n    pass\n",
    "par": {
     "lines": 7,
@@ -11137,6 +11629,11 @@
    "id": "c10-bug-hunt",
    "title": "Bug Hunt",
    "instructions": "HQ's own code has three bugs in it. Run it, read what goes wrong, fix one bug, and run it again. Check the function's answer, who flies to the fuse box, and which chips get collected.",
+   "hints": [
+    "Run it and fix the first problem you see. Then run it again.",
+    "One bug is in the function (look at its last line), one is about who flies, and one is in the `if` about chips.",
+    "The three fixes: `___ count`, `go(d, fuses[0])` and `if not c.trapped:`."
+   ],
    "starterCode": "def go(who, target):\n    who.turn_to(target)\n    who.step(who.distance_to(target))\n\ndef count_decoys():\n    count = 0\n    for c in chips:\n        if c.trapped:\n            count = count + 1\n    print(count)\n\nhack(count_decoys())\nd = launch_drone()\ngo(fox, fuses[0])\nd.zap()\nfor c in chips:\n    if c.trapped:\n        go(fox, c)\n",
    "par": {
     "lines": 16,
@@ -11334,6 +11831,11 @@
    "id": "c10-drone-escort",
    "title": "Drone Escort",
    "instructions": "Three laser fences, three fuse boxes and three chips, and both lists are in the same order. Go through them by number: for each `i`, the drone zaps `fuses[i]`, then Grep Fox collects `chips[i]`. The drone only has enough battery to hop from one fuse box to the next.",
+   "hints": [
+    "Use the same number `i` for both lists: `fuses[i]` and `chips[i]`.",
+    "Each pass: the drone goes to `fuses[i]` and zaps, then Grep Fox goes to `chips[i]`.",
+    "Inside the loop: `go(d, fuses[i])`, `d.zap()`, `go(fox, chips[___])`."
+   ],
    "starterCode": "def go(who, target):\n    who.turn_to(target)\n    who.step(who.distance_to(target))\n\nd = launch_drone()\nfor i in range(len(fuses)):\n    pass\n",
    "par": {
     "lines": 8,
@@ -11547,6 +12049,11 @@
    "id": "c10-inventory",
    "title": "Inventory",
    "instructions": "The terminal wants the `x` of every real chip, as a list sorted from smallest to largest. Build the list with `append`, `hack(sorted(...))` it, then collect the real chips.",
+   "hints": [
+    "Build a list of the real chips' `x` values, sort it, and send it.",
+    "`for c in chips:` with `if not c.trapped:` and `xs.append(c.x)`.",
+    "`hack(___(xs))`, then go to every chip that isn't trapped."
+   ],
    "starterCode": "xs = []\n",
    "par": {
     "lines": 11,
@@ -11699,6 +12206,11 @@
    "title": "Boss: Grand Heist",
    "boss": true,
    "instructions": "Final boss. Hack the terminal with the number of decoys. Send the drone to zap the laser fence. Wait at `(340, 250)` for the Sentry Bug to arrive at the top: if it's already up there it may be about to leave, so let it go first. Then cross to `(620, 250)`. Collect every real chip and get out. Good luck, Grep Fox.",
+   "hints": [
+    "Five parts: hack, drone, wait for the bug, real chips, exit.",
+    "Count the decoys in a function with `return`. At `(340, 250)`, first wait while `guards[0].y < 100`, then while it's above 100.",
+    "After waiting: `go(fox, (620, 250))`, the loop over real chips, then `go(fox, ___)`."
+   ],
    "starterCode": "def go(who, target):\n    who.turn_to(target)\n    who.step(who.distance_to(target))\n",
    "par": {
     "lines": 23

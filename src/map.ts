@@ -14,6 +14,7 @@ const GADGETS: [string, string][] = [
 ];
 
 const COLUMNS = 5;
+const CHAPTER_SIZE = 10;
 const WIDTH = 1000;
 const ROW_HEIGHT = 170;
 const MARGIN = 100;
@@ -74,7 +75,8 @@ export class MissionMap {
     const header = document.createElement('div');
     header.className = 'fsc-map-header';
     this._belt.className = 'fsc-map-belt';
-    header.append(this._title, this._belt);
+    this._chapters.className = 'fsc-map-chapters';
+    header.append(this._title, this._belt, this._chapters);
     this.node.append(header, this._path);
     this.splash.className = 'fsc-splash';
     this.splash.innerHTML = splashMarkup();
@@ -110,8 +112,19 @@ export class MissionMap {
   }
 
   render(mission: IMission, current: number): void {
+    this._mission = mission;
+    this._current = current;
+    this._chapter = Math.max(0, Math.floor(current / CHAPTER_SIZE));
+    this._render();
+  }
+
+  private _render(): void {
+    const mission = this._mission;
+    if (!mission) {
+      return;
+    }
+    const current = this._current;
     const { levels, progress } = mission;
-    const height = Math.ceil(levels.length / COLUMNS) * ROW_HEIGHT;
     const solvedCount = progress.solved.length;
     const starCount = Object.values(progress.stars).reduce((sum, count) => sum + count, 0);
     this._title.textContent = `${mission.title}: ${solvedCount} / ${levels.length} missions solved · ★ ${starCount} / ${levels.length * 3}`;
@@ -126,21 +139,66 @@ export class MissionMap {
       gadget.title = unlocked.has(id) ? `${name}: unlocked` : `${name}: beat its boss to unlock`;
       this._belt.appendChild(gadget);
     }
+
+    this._chapters.textContent = '';
+    for (let chapter = 0; chapter * CHAPTER_SIZE < levels.length; chapter++) {
+      const first = chapter * CHAPTER_SIZE;
+      const members = levels.slice(first, first + CHAPTER_SIZE);
+      const open = isUnlocked(mission, first);
+      const done = members.filter(level => progress.solved.includes(level.id)).length;
+      const stars = members.reduce((sum, level) => sum + (progress.stars[level.id] ?? 0), 0);
+      const name = mission.chapters[chapter] ?? `Chapter ${chapter + 1}`;
+      const tab = document.createElement('button');
+      tab.className = 'fsc-map-chapter';
+      tab.classList.toggle('fsc-map-chapter-current', chapter === this._chapter);
+      tab.classList.toggle('fsc-map-chapter-done', done === members.length);
+      tab.disabled = !open;
+      tab.setAttribute(
+        'aria-label',
+        `Chapter ${chapter + 1}: ${name}, ${done} of ${members.length} solved${open ? '' : ', locked'}`
+      );
+      tab.setAttribute('aria-pressed', String(chapter === this._chapter));
+      const number = document.createElement('strong');
+      number.textContent = String(chapter + 1);
+      const label = document.createElement('span');
+      label.className = 'fsc-map-chapter-name';
+      label.textContent = name;
+      const count = document.createElement('span');
+      count.className = 'fsc-map-chapter-count';
+      count.textContent = open ? `${done}/${members.length} · ★ ${stars}` : '';
+      tab.append(number, label, count);
+      if (!open) {
+        const lock = document.createElement('span');
+        lock.className = 'fsc-map-lock';
+        lock.innerHTML = LOCK_BADGE;
+        tab.appendChild(lock);
+      }
+      tab.addEventListener('click', () => {
+        this._chapter = chapter;
+        this._render();
+      });
+      this._chapters.appendChild(tab);
+    }
+
+    const first = this._chapter * CHAPTER_SIZE;
+    const shown = levels.slice(first, first + CHAPTER_SIZE);
+    const height = Math.ceil(shown.length / COLUMNS) * ROW_HEIGHT;
     this._path.style.height = `${height}px`;
 
-    const lines = levels.slice(1).map((_, index) => {
-      const from = position(index);
-      const to = position(index + 1);
-      const done = progress.solved.includes(levels[index].id);
+    const lines = shown.slice(1).map((_, place) => {
+      const from = position(place);
+      const to = position(place + 1);
+      const done = progress.solved.includes(shown[place].id);
       return `<line class="fsc-map-line${done ? ' fsc-map-line-done' : ''}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`;
     });
     this._path.innerHTML = `<svg viewBox="0 0 ${WIDTH} ${height}" preserveAspectRatio="none" aria-hidden="true">${lines.join('')}</svg>`;
 
-    levels.forEach((level, index) => {
+    shown.forEach((level, place) => {
+      const index = first + place;
       const solved = progress.solved.includes(level.id);
       const unlocked = isUnlocked(mission, index);
       const state = solved ? 'solved' : unlocked ? 'open' : 'locked';
-      const point = position(index);
+      const point = position(place);
 
       const stop = document.createElement('button');
       stop.className = `fsc-map-stop fsc-map-${state}`;
@@ -198,6 +256,10 @@ export class MissionMap {
 
   private _onSelect: (index: number) => void;
   private _splashStart: HTMLButtonElement;
+  private _mission: IMission | null = null;
+  private _current = 0;
+  private _chapter = 0;
+  private _chapters = document.createElement('div');
   private _title = document.createElement('h2');
   private _belt = document.createElement('div');
   private _path = document.createElement('div');

@@ -26,9 +26,9 @@ const MAX_HINT_QUESTIONS = 10;
 const HINT_CARD_GAP = 8;
 const HINT_CARD_MAX_HEIGHT = 400;
 const HINT_CONNECT_NOTICE =
-  'Connect an AI provider and I can give you hints on this mission.';
+  'Connect an AI provider and you can also ask me your own questions.';
 const HINT_INSTALL_NOTICE =
-  'Hints need the jupyter-ai-lite extension. Install it with `pip install jupyter-ai-lite`, then restart JupyterLab. On a hosted site, ask whoever runs it to add it.';
+  'Asking your own questions needs the jupyter-ai-lite extension. Install it with `pip install jupyter-ai-lite`, then restart JupyterLab. On a hosted site, ask whoever runs it to add it.';
 const HINT_STARTERS = [
   'Where do I start?',
   'Why did my run fail?',
@@ -406,7 +406,19 @@ export class FscPanel extends SplitPanel {
     this._hintSetup.addEventListener('click', () => {
       this._hints?.openSettings();
     });
+    this._tipButton.type = 'button';
+    this._tipButton.addEventListener('click', () => {
+      this._tipCount++;
+      this._renderTips();
+      this._scrollHintChat();
+    });
+    this._tips.append(
+      element('strong', 'fsc-tips-title', 'Hints from HQ'),
+      this._tipList,
+      this._tipButton
+    );
     this._hintBody.append(
+      this._tips,
       this._hintLog,
       this._hintNotice,
       this._hintStarters,
@@ -492,7 +504,29 @@ export class FscPanel extends SplitPanel {
     return bubble;
   }
 
+  private _renderTips(): void {
+    const mission = this._mission;
+    const index = this._currentIndex();
+    const hints = mission && index >= 0 ? mission.levels[index].hints : [];
+    this._tips.hidden = !hints.length;
+    this._tipList.textContent = '';
+    hints.slice(0, this._tipCount).forEach((hint, number) => {
+      const item = element('p', 'fsc-tip');
+      item.appendChild(element('strong', '', `Hint ${number + 1}: `));
+      const text = element('span', '');
+      setInlineCode(text, hint);
+      item.appendChild(text);
+      this._tipList.appendChild(item);
+    });
+    this._tipButton.hidden = this._tipCount >= hints.length;
+    this._tipButton.textContent = this._tipCount
+      ? `Next hint (${this._tipCount + 1} of ${hints.length})`
+      : `Show hint 1 of ${hints.length}`;
+  }
+
   private _resetHintChat(): void {
+    this._tipCount = 0;
+    this._renderTips();
     this._hintRequest++;
     this._hintHistory = [];
     this._hintOutcome = '';
@@ -776,6 +810,7 @@ export class FscPanel extends SplitPanel {
     const code = this._editorModel.sharedModel.getSource();
     const runId = ++this._runId;
     this._flushSave();
+    this._clearMark();
     this._stage.reset();
     this._banner.hidden = true;
     this._showOutput('');
@@ -814,7 +849,29 @@ export class FscPanel extends SplitPanel {
     ]
       .filter(Boolean)
       .join(' ');
-    this._showResult(result, levelIndex, countLines(code));
+    this._showResult(result, levelIndex, code);
+  }
+
+  private _lineNote(code: string, line: number | null | undefined): string {
+    if (!line) {
+      return '';
+    }
+    const text = (code.split('\n')[line - 1] ?? '').trim();
+    this._editor.editor.setSelection({
+      start: { line: line - 1, column: 0 },
+      end: { line: line - 1, column: code.split('\n')[line - 1]?.length ?? 0 }
+    });
+    this._marked = true;
+    return text ? `Line ${line} (${text}): ` : `Line ${line}: `;
+  }
+
+  private _clearMark(): void {
+    if (this._marked) {
+      this._marked = false;
+      this._editor.editor.setCursorPosition(
+        this._editor.editor.getSelection().end
+      );
+    }
   }
 
   private async _halt(): Promise<void> {
@@ -855,12 +912,13 @@ export class FscPanel extends SplitPanel {
   private _showResult(
     result: IRunResult,
     levelIndex: number,
-    lines: number
+    code: string
   ): void {
     const mission = this._mission;
     if (!mission) {
       return;
     }
+    const lines = countLines(code);
     const level = mission.levels[levelIndex];
     const rooms = level.variants.length + 1;
     const room = result.room ?? 0;
@@ -949,7 +1007,11 @@ export class FscPanel extends SplitPanel {
           'ALARM TRIPPED',
           `${MASCOT} was detected. Plot a new route.`
         ];
-        this._showBanner('fail', title, where + detail);
+        this._showBanner(
+          'fail',
+          title,
+          where + this._lineNote(code, result.line) + detail
+        );
         return;
       }
       case 'incomplete': {
@@ -961,6 +1023,14 @@ export class FscPanel extends SplitPanel {
           }
         }
         const remaining = left - taken.size;
+        const bump = [...result.events]
+          .reverse()
+          .find(event => event.t === 'move' && event.blocked);
+        const blocked = bump?.line
+          ? ` ${this._lineNote(code, bump.line)}${
+              bump.t === 'move' && bump.who === 'drone' ? 'the drone' : MASCOT
+            } walked into a wall or a closed door.`
+          : '';
         this._showBanner(
           'info',
           'OBJECTIVE INCOMPLETE',
@@ -969,7 +1039,8 @@ export class FscPanel extends SplitPanel {
               ? `Your orders ran out with ${remaining} ${
                   remaining === 1 ? 'chip' : 'chips'
                 } still in the building.`
-              : `Every chip is collected, but ${MASCOT} still needs to reach the exit pad.`)
+              : `Every chip is collected, but ${MASCOT} still needs to reach the exit pad.`) +
+            blocked
         );
         return;
       }
@@ -984,7 +1055,7 @@ export class FscPanel extends SplitPanel {
           );
           return;
         }
-        const line = `${where}${error.line ? `Line ${error.line}: ` : ''}`;
+        const line = `${where}${this._lineNote(code, error.line)}`;
         const message = error.message ? `: ${error.message}` : '';
         this._showBanner(
           'fail',
@@ -1134,6 +1205,11 @@ export class FscPanel extends SplitPanel {
   private _saveTimer = 0;
 
   private _levelTitle = element('span', 'fsc-level-title');
+  private _tips = element('div', 'fsc-tips');
+  private _tipList = element('div', 'fsc-tip-list');
+  private _tipButton = element('button', 'fsc-tip-button');
+  private _tipCount = 0;
+  private _marked = false;
   private _commands = element('dl', '');
   private _instructions = element('p', 'fsc-instructions');
   private _targets = element('p', 'fsc-targets');
